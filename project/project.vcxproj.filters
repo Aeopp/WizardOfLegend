@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="header">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="project.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="barrel.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="bullet.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_component.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_manager.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="layer_type.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="math.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="monster.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="moveable_object.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="render_type.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="rotation_bullet.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="shield.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="singleton_interface.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="stalker.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="static_object.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_mgr.h">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="project.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="barrel.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="bullet.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="monster.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="moveable_object.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="rotation_bullet.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="shield.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="singleton_interface.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="stalker.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="static_object.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_mgr.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="project.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="project.ico">
+      <Filter>resource</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

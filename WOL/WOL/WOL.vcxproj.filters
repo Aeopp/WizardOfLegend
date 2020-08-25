@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="source\collision">
+      <UniqueIdentifier>{b1c7942f-3278-406a-8274-561431f2c66a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\sound">
+      <UniqueIdentifier>{a344d640-6427-4d93-b3c8-beb873f038f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\manager">
+      <UniqueIdentifier>{16dd4639-e9a7-454c-aee9-449083c30cc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\object">
+      <UniqueIdentifier>{1ee3f4db-0b84-4bdf-9440-d083ce0fb7fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\ETC">
+      <UniqueIdentifier>{50fa3403-f0dc-45f5-ad61-68b41bee08b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\sound\fmod">
+      <UniqueIdentifier>{78e178f5-1348-41a9-bed5-a9fd0e41675e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fmod.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod.hpp">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod_codec.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod_common.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod_dsp.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod_dsp_effects.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod_errors.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="fmod_output.h">
+      <Filter>source\sound\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="WOL.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_mgr.h">
+      <Filter>source\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_tag.h">
+      <Filter>source\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_component.h">
+      <Filter>source\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_mgr.h">
+      <Filter>source\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>source\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="object_mgr.h">
+      <Filter>source\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>source\object</Filter>
+    </ClInclude>
+    <ClInclude Include="singleton_interface.h">
+      <Filter>source\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="layer_type.h">
+      <Filter>source\ETC</Filter>
+    </ClInclude>
+    <ClInclude Include="math.h">
+      <Filter>source\ETC</Filter>
+    </ClInclude>
+    <ClInclude Include="transform.h">
+      <Filter>source\ETC</Filter>
+    </ClInclude>
+    <ClInclude Include="Input_mgr.h">
+      <Filter>source\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WOL.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_component.cpp">
+      <Filter>source\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_mgr.cpp">
+      <Filter>source\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_mgr.cpp">
+      <Filter>source\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>source\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="object_mgr.cpp">
+      <Filter>source\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>source\object</Filter>
+    </ClCompile>
+    <ClCompile Include="singleton_interface.cpp">
+      <Filter>source\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="layer_type.cpp">
+      <Filter>source\ETC</Filter>
+    </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>source\ETC</Filter>
+    </ClCompile>
+    <ClCompile Include="transform.cpp">
+      <Filter>source\ETC</Filter>
+    </ClCompile>
+    <ClCompile Include="Input_mgr.cpp">
+      <Filter>source\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WOL.rc">
+      <Filter>resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="WOL.ico">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fmod_errors.cs">
+      <Filter>source\sound\fmod</Filter>
+    </None>
+    <None Include="fmod.cs">
+      <Filter>source\sound\fmod</Filter>
+    </None>
+    <None Include="fmod_dsp.cs">
+      <Filter>source\sound\fmod</Filter>
+    </None>
+    <None Include="fmod.dll">
+      <Filter>source\sound\fmod</Filter>
+    </None>
+    <None Include="fmodL.dll">
+      <Filter>source\sound\fmod</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="fmod_vc.lib">
+      <Filter>source\sound\fmod</Filter>
+    </Library>
+    <Library Include="fmodL_vc.lib">
+      <Filter>source\sound\fmod</Filter>
+    </Library>
+  </ItemGroup>
+</Project>
