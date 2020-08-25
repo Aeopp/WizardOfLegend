@@ -1,5 +1,24 @@
 #include "pch.h"
 #include "sound_mgr.h"
+#include <fstream>
+#include <filesystem>
+#include <iostream>
+
+void sound_mgr::initialize()
+{
+	Init();
+
+	namespace fs =   std::filesystem;
+
+	for (const fs::directory_entry& entry :
+		fs::directory_iterator(fs::current_path() /".."/".."/"Resources"/"Sound")) {
+		bool bLoad =Load(entry.path().string());
+
+		
+	}
+
+	Play(default_path + "MAIN_MENU_BGM.mp3",true,1.f);
+}
 
 bool sound_mgr::Play(const std::string& SoundKey,
 	bool IsBgm, const float Volume) {

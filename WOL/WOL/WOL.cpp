@@ -14,6 +14,8 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 HWND hWnd{};
+bool bDebug{ true };
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -57,9 +59,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        else
+
+        Timer& _Timer = Timer::instance();
+        game& _game = game::instance();
+        
         {
-			Timer& _Timer = Timer::instance();
+			
 			DWORD current_tick = GetTickCount();
            
 				// TODO :: 여기에 게임 로직을 호출 합니다.
@@ -67,7 +72,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			_Timer.tick = current_tick;
 
-			game::instance().update();
+            _game.update();
+            _game.late_update();
+            _game.render(GetDC(_game.hWnd));
 
 			InvalidateRect(hWnd, nullptr, false);
 			UpdateWindow(hWnd);
@@ -184,34 +191,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
         {
         /** 더블버퍼링 시작처리입니다. **/
-        static HDC hdc, MemDC, tmpDC;
-        static HBITMAP BackBit, oldBackBit;
-        static RECT bufferRT;
-        PAINTSTRUCT ps;
+        //static HDC hdc, MemDC, tmpDC;
+        //static HBITMAP BackBit, oldBackBit;
+        //static RECT bufferRT;
+        //PAINTSTRUCT ps;
 
-        hdc = BeginPaint(hWnd, &ps);
-        GetClientRect(hWnd, &bufferRT);
-        MemDC = CreateCompatibleDC(hdc);
-        BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
-        oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
-        PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
-        tmpDC = hdc;
-        hdc = MemDC;
-        MemDC = tmpDC;
-        // TODO: 여기에 그리기 코드를 추가합니다.
+        //hdc = BeginPaint(hWnd, &ps);
+        //GetClientRect(hWnd, &bufferRT);
+        //MemDC = CreateCompatibleDC(hdc);
+        //BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
+        //oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
+        //PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
+        //tmpDC = hdc;
+        //hdc = MemDC;
+        //MemDC = tmpDC;
+        //// TODO: 여기에 그리기 코드를 추가합니다.
 
-        game::instance().render(hdc);
+        //game::instance().render(hdc);
 
-        /** 더블버퍼링 끝처리 입니다. **/
-        tmpDC = hdc;
-        hdc = MemDC;
-        MemDC = tmpDC;
-        GetClientRect(hWnd, &bufferRT);
-        BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
-        SelectObject(MemDC, oldBackBit);
-        DeleteObject(BackBit);
-        DeleteDC(MemDC);
-        EndPaint(hWnd, &ps);
+        ///** 더블버퍼링 끝처리 입니다. **/
+        //tmpDC = hdc;
+        //hdc = MemDC;
+        //MemDC = tmpDC;
+        //GetClientRect(hWnd, &bufferRT);
+        //BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
+        //SelectObject(MemDC, oldBackBit);
+        //DeleteObject(BackBit);
+        //DeleteDC(MemDC);
+        //EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:

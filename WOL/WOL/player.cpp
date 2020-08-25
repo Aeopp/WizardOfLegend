@@ -3,7 +3,7 @@
 #include "collision_mgr.h"
 #include "Input_mgr.h"
 #include "timer.h"
-
+#include "game.h"
 
 void Player::initialize()
 {
@@ -19,29 +19,52 @@ void Player::update(float dt)
 {
 	object::update(dt);
 
-	if (Input_mgr::instance().Key_Pressing(VK_RIGHT))
+	player_move(dt);
+
+	if (Input_mgr::instance().Key_Pressing(VK_SPACE))
 	{
-		if(Input_mgr::instance().Key_Pressing(VK_UP))
+		MessageBox(game::instance().hWnd, L"GOOD", L"GOOD", MB_OK);
+
+
+	}
+	    
+	//Input_mgr::instance().Event_Regist(VK_SPACE, key_event::EDown, []() {std::terminate(); });
+}
+
+void Player::render(HDC hdc, vec camera_pos)
+{
+	object::render(hdc, camera_pos);
+};
+
+
+
+void Player::player_move(float dt)
+{
+	Input_mgr& _Input = Input_mgr::instance();
+
+	if (_Input.Key_Pressing(VK_RIGHT))
+	{
+		if (_Input.Key_Pressing(VK_UP))
 		{
-			_transform->_location += vec{ +1,0 }*_speed*sqrtf(2.f) * dt;
+			_transform->_location += vec{ +1,0 }*_speed * sqrtf(2.f) * dt;
 			_transform->_location += vec{ 0,-1 }*_speed * sqrtf(2.f) * dt;
 		}
-		if (Input_mgr::instance().Key_Pressing(VK_DOWN))
+		if (_Input.Key_Pressing(VK_DOWN))
 		{
 			_transform->_location += vec{ +1,0 }*_speed * sqrtf(2.f) * dt;
 			_transform->_location += vec{ 0,+1 }*_speed * sqrtf(2.f) * dt;
 		}
-		else 
+		else
 			_transform->_location += vec{ +1,0 }*_speed * dt;
 	}
-	if (Input_mgr::instance().Key_Pressing(VK_LEFT))
+	if (_Input.Key_Pressing(VK_LEFT))
 	{
-		if (Input_mgr::instance().Key_Pressing(VK_UP))
+		if (_Input.Key_Pressing(VK_UP))
 		{
 			_transform->_location += vec{ -1,0 }*_speed * sqrtf(2.f) * dt;
 			_transform->_location += vec{ 0,-1 }*_speed * sqrtf(2.f) * dt;
 		}
-		if (Input_mgr::instance().Key_Pressing(VK_DOWN))
+		if (_Input.Key_Pressing(VK_DOWN))
 		{
 			_transform->_location += vec{ -1,0 }*_speed * sqrtf(2.f) * dt;
 			_transform->_location += vec{ 0,+1 }*_speed * sqrtf(2.f) * dt;
@@ -50,18 +73,12 @@ void Player::update(float dt)
 			_transform->_location += vec{ -1,0 }*_speed * dt;
 	}
 
-	 if (Input_mgr::instance().Key_Pressing(VK_UP))
+	if (_Input.Key_Pressing(VK_UP))
 	{
 		_transform->_location += vec{ 0,-1 }*_speed * dt;;
 	}
-	 if (Input_mgr::instance().Key_Pressing(VK_DOWN))
+	if (_Input.Key_Pressing(VK_DOWN))
 	{
 		_transform->_location += vec{ 0,+1 }*_speed * dt; ;
 	}
-}
-
-void Player::render(HDC hdc,vec camera_pos)
-{
-	object::render(hdc, camera_pos);
-
 }

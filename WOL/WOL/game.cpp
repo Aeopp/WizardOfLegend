@@ -4,6 +4,7 @@
 #include "collision_mgr.h"
 #include "Input_mgr.h"
 #include "timer.h"
+#include "sound_mgr.h"
 
 void game::render(HDC hdc)
 {
@@ -16,18 +17,22 @@ void game::render(HDC hdc)
 
 void game::update()
 {
+	Input_mgr::instance().update();
+
 	Timer::instance().update();
+
+	sound_mgr::instance().update();
 
 	object_mgr::instance().update();
 
 	collision_mgr::instance().update();
-
-	Input_mgr::instance().update();
 }
 
 void game::initialize()
 {
 	Timer::instance().initialize();
+
+	sound_mgr::instance().initialize();
 
 	Input_mgr::instance().initialize();
 
@@ -40,9 +45,15 @@ void game::release()
 {
 	Timer::instance().release();
 
+	sound_mgr::instance().release();
+
 	collision_mgr::instance().release();
 
 	object_mgr::instance().release();
 
 	Input_mgr::instance().release();
+}
+
+void game::late_update()
+{
 }

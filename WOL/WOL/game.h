@@ -11,6 +11,7 @@ public:
 	void update()override;
 	void initialize()override;
 	void release()override;
+	void late_update();
 
 	RECT client_rect;
 public:

@@ -11,6 +11,7 @@
 #include <tchar.h>
 
 //   ==================================================
+extern bool bDebug;
 
 #include <memory>
 #include <mutex>

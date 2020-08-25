@@ -11,5 +11,8 @@ public:
     void initialize()override;
     void update(float dt)override;
     void render(HDC hdc,vec camera_pos)override;
+
+private:
+    void player_move(float dt);
 };
 

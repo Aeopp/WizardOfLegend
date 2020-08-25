@@ -11,6 +11,8 @@ public:
 	static inline constexpr float DefaultVolume = 1.f;
 	FMOD::System* FMOD_System = nullptr;
 public:
+	void initialize()override;
+
 	bool Play(const std::string& SoundKey, bool IsBgm = false, const float Volume = DefaultVolume);
 	bool Load(std::string FullPath);
 	bool Init();

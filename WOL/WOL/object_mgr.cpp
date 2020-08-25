@@ -7,17 +7,28 @@
 #include "timer.h"
 #include "Camera.h"
 
-
 void object_mgr::render(HDC hdc)
 {
-	for (auto& [f,obj_list] : object_map)
+	int count = 0;
+
+	for (auto& [f, obj_list] : object_map)
 	{
 		for (auto& obj : obj_list)
 		{
-			obj->render(hdc,camera_pos);
+			count++; 
+			obj->render(hdc, camera_pos);
 		}
 	}
-}
+
+	if (bDebug)
+	{
+		std::wstringstream wss;
+		wss << L"오브젝트 개수 : " << count << std::endl; 
+		RECT _rt{ 600,100,  900 , 200 }; 
+
+		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
+	}
+};
 
 void object_mgr::update()
 {
@@ -39,7 +50,7 @@ void object_mgr::initialize()
 	auto _camera = insert_object<Camera>();
 	_camera->_owner = _ptr;
 
-	for (int i = 1; i < 1000; ++i)
+	for (int i = 1; i < 2000; ++i)
 	{
 		auto _ptr2 = insert_object<Monster>();
 		_ptr2->_transform->_location = vec{ i *100,i*100};
