@@ -6,8 +6,8 @@
 class object abstract
 {
 public:
-	virtual void update();
-	virtual void render(HDC hdc);
+	virtual void update(float dt);
+	virtual void render(HDC hdc,vec camera_pos);
 	virtual void initialize();
 	virtual void release();
 	void late_initialize() {};

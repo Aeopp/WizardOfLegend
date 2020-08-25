@@ -13,8 +13,8 @@ enum key_event
 class Input_mgr : public singleton_interface<Input_mgr>
 {
 public:
-	void update() override ;
-	void initialize()override  ;
+	void update() override;
+	void initialize()override;
 
 	bool Key_Pressing(int _key);
 	bool Key_Down(int _key);

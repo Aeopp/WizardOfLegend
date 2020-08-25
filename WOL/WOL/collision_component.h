@@ -9,6 +9,8 @@ private:
 	std::weak_ptr<class object> _owner{};
 public:
 	bool bCollision{ true };
+	bool bRender{ true };
+
 	void set_owner(std::weak_ptr<object> _owner)&;
 	std::weak_ptr<object> get_owner()const { return _owner; }
 	bool bPush{ true };

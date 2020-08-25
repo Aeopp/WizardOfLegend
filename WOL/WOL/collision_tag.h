@@ -10,4 +10,5 @@ enum collision_tag
 {
 	player,
 	monster,
+	mouse,
 };

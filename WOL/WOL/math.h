@@ -6,16 +6,16 @@ struct vec
 {
 	float x{}; float y{};
 	// ========================================
-	vec() = default;
+	 vec() = default;
 	~vec()noexcept = default;
-	vec(const vec&) = default;
-	vec(vec&&)noexcept = default;
-	vec& operator=(vec&&)noexcept = default;
-	vec& operator=(const vec&) = default;
+	 vec(const vec&) = default;
+	 vec(vec&&)noexcept = default;
+	 vec& operator=(vec&&)noexcept = default;
+	 vec& operator=(const vec&) = default;
 	template<typename _Ty>
-	vec(_Ty _x, _Ty _y) : x{ (float)_x }, y{ (float)_y }{};
-	vec(float _x, float _y);
-	vec(const float degree);
+	 vec(_Ty _x, _Ty _y) : x{ (float)_x }, y{ (float)_y }{};
+	 vec(float _x, float _y);
+	static vec make_vec_from_dir(const float degree);
 	// ========================================
 	vec& operator-=(const vec& _rhs);
 	vec& operator+=(const vec& _rhs);
@@ -26,6 +26,7 @@ struct vec
 	vec& operator*=(const float _rhs);
 	vec& operator/=(const float _rhs);
 
+	vec operator*(const float _scala)const;
 	vec operator+(const vec& _rhs)const;
 	vec operator-(const vec& _rhs)const;
 	float operator*(const vec& _rhs)const;

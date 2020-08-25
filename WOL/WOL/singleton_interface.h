@@ -16,7 +16,6 @@ public:
 	 static SubType& instance();
 };
 
-
 template<typename SubType>
 inline SubType& singleton_interface<SubType>::instance()
 {

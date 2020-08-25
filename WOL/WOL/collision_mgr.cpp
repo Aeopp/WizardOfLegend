@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "collision_mgr.h"
 #include "object.h"
+#include "object_mgr.h"
+#include "game.h"
 
 std::shared_ptr<collision_component> 
 collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
@@ -17,27 +19,58 @@ collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 
 void collision_mgr::render(HDC hdc)
 {
+	if (!bRender)return;
+
+	RECT c_rect = game::instance().client_rect;
+
+	vec cpos  = object_mgr::instance().camera_pos;
+
+	int render_object_count = 0;
+
 	for (auto& [tag, collisions] : _collision_map)
 	{
 		for (auto& collision : collisions)
 		{
 			if (!collision)continue;
+			if (!collision->bRender) continue;;
 			auto _owner = collision->get_owner().lock();
 			if (!_owner)continue;
 
 			vec _loc = _owner->_transform->_location;
 			vec _size = collision->_size;
 
+			RECT _rt;
+
+			RECT _rhs{ _loc.x - _size.x
+					- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
+					- cpos.y };
+
+			if (!IntersectRect(&_rt, &c_rect, &_rhs))continue;
+
 			if (collision->_figure_type == ERect)
 			{
-				Rectangle(hdc, _loc.x - _size.x, _loc.y - _size.y, _loc.x + _size.x, _loc.y + _size.y); 
+				Rectangle(hdc, _loc.x - _size.x
+					- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
+					- cpos.y);
+
+				++render_object_count;
 			}
 			else if (collision->_figure_type == ECircle)
 			{
-				Ellipse(hdc, _loc.x - _size.x, _loc.y - _size.y, _loc.x + _size.x, _loc.y + _size.y);
+					Ellipse(hdc, _loc.x - _size.x
+						- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
+						- cpos.y);
+
+					++render_object_count;
 			}
 		}
 	}
+
+	std::wstringstream wss;
+	wss << L"렌더링 되는 충돌체 : " << render_object_count << std::endl;
+	RECT _rt{ 300,300,500,500 };
+
+	DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
 }
 void collision_mgr::update()
 {
@@ -65,6 +98,7 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 
 			if (lhs_figure == ERect && rhs_figure == ERect)
 			{
+
 				bCollision= math::rectVSrect(lhs_obj->make_rect(), rhs_obj->make_rect());
 			}
 			else if ( lhs_figure == ECircle && rhs_figure == ECircle)

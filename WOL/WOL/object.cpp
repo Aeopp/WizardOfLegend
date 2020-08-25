@@ -2,12 +2,12 @@
 #include "object.h"
 
 
-void object::update()
+void object::update(float dt)
 {
 
 }
 
-void object::render(HDC hdc)
+void object::render(HDC hdc,vec camera_pos)
 {
 
 }
@@ -15,6 +15,8 @@ void object::render(HDC hdc)
 void object::initialize()
 {
 	_transform = std::make_shared<Transform>();
+	_transform->_location = vec{ 0,0 };
+
 }
 
 void object::release()

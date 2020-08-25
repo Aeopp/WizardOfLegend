@@ -149,6 +149,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="actor.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="collision_component.h" />
     <ClInclude Include="collision_mgr.h" />
     <ClInclude Include="collision_tag.h" />
@@ -166,6 +168,7 @@
     <ClInclude Include="layer_type.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="Monster.h" />
+    <ClInclude Include="Mouse.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object_mgr.h" />
     <ClInclude Include="pch.h" />
@@ -174,10 +177,14 @@
     <ClInclude Include="singleton_interface.h" />
     <ClInclude Include="sound_mgr.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="timer.h" />
     <ClInclude Include="transform.h" />
+    <ClInclude Include="UI.h" />
     <ClInclude Include="WOL.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="actor.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="collision_component.cpp" />
     <ClCompile Include="collision_mgr.cpp" />
     <ClCompile Include="game.cpp" />
@@ -185,6 +192,7 @@
     <ClCompile Include="layer_type.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="Monster.cpp" />
+    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object_mgr.cpp" />
     <ClCompile Include="pch.cpp">
@@ -196,7 +204,9 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="singleton_interface.cpp" />
     <ClCompile Include="sound_mgr.cpp" />
+    <ClCompile Include="timer.cpp" />
     <ClCompile Include="transform.cpp" />
+    <ClCompile Include="UI.cpp" />
     <ClCompile Include="WOL.cpp" />
   </ItemGroup>
   <ItemGroup>

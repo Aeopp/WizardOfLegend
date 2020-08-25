@@ -9,6 +9,8 @@ public:
 	void update()override;
 	void initialize() override;
 	void release()override;
+
+	vec camera_pos{};
 private:
 	std::map<uint32_t,std::list<std::shared_ptr<class object>>> object_map;
 public:

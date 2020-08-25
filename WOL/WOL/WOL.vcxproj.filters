@@ -107,7 +107,14 @@
     <ClInclude Include="player.h">
       <Filter>source\object</Filter>
     </ClInclude>
-    <ClInclude Include="Monster.h" />
+    <ClInclude Include="Monster.h">
+      <Filter>source\object</Filter>
+    </ClInclude>
+    <ClInclude Include="actor.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -153,6 +160,21 @@
       <Filter>source\object</Filter>
     </ClCompile>
     <ClCompile Include="Monster.cpp">
+      <Filter>source\object</Filter>
+    </ClCompile>
+    <ClCompile Include="actor.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

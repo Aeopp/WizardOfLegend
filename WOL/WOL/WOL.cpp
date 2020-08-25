@@ -5,6 +5,7 @@
 #include "framework.h"
 #include "WOL.h"
 #include "game.h"
+#include "timer.h"
 
 #define MAX_LOADSTRING 100
 
@@ -58,13 +59,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            // TODO :: 여기에 게임 로직을 호출 합니다.
-            game::instance().update();
+			Timer& _Timer = Timer::instance();
+			DWORD current_tick = GetTickCount();
+           
+				// TODO :: 여기에 게임 로직을 호출 합니다.
+			_Timer.dt = current_tick - _Timer.tick;
 
-            InvalidateRect(hWnd, nullptr, false);
-            UpdateWindow(hWnd);
+			_Timer.tick = current_tick;
+
+			game::instance().update();
+
+			InvalidateRect(hWnd, nullptr, false);
+			UpdateWindow(hWnd);
         }
-    }
+    };
+
     game::instance().release();
 
     return (int) msg.wParam;
@@ -112,16 +121,25 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-    hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+   constexpr int width = 1280;
+   constexpr int height = 720;
+
+   game::instance().client_rect= RECT{ 0,0,width ,height };
+
+   RECT _rt = { 0,0,width,height };
+   AdjustWindowRect(&_rt, WS_OVERLAPPEDWINDOW, FALSE);
+
+   hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+       CW_USEDEFAULT, 0, _rt.right - _rt.left, 
+       _rt.bottom - _rt.top, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
       return FALSE;
    }
 
-   
-   
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -151,6 +169,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
+          
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
@@ -198,6 +217,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

@@ -11,6 +11,8 @@ public:
 	void update()override;
 	void initialize()override;
 	void release()override;
+
+	RECT client_rect;
 public:
 	HWND hWnd{};
 };

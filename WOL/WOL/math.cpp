@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "math.h"
+#include "game.h"
 
 
 // 전체 각으로부터 방향 리턴
@@ -28,80 +29,33 @@ vec math::rotation_dir_to_add_angle(const vec dir,
 
 std::optional<vec>   math::rectVScircle(RECT _rect, circle _circle)
 {
-	// left,top , right,top , left,bottom , right,bottom 네 꼭짓점
-
-	float _radius_pow2 = pow(_circle._radius, 2);
-
-	
-	vec v0 = { _rect.left,_rect.top };
-	vec point_to_circle = _circle._pos - v0;
-	float length = point_to_circle.length_2();
-	vec _rect_center = { (_rect.right + _rect.left) / 2 ,(_rect.bottom + _rect.top) / 2 };
-
-
-	if (length < _radius_pow2)
-	{
-		return { _circle._pos - _rect_center };
-	}
-
-	v0 = { _rect.right,_rect.top };
-	point_to_circle = _circle._pos - v0;
-	length = point_to_circle.length_2();
-
-	if (length < _radius_pow2)
-	{
-		return { _circle._pos - _rect_center };
-	}
-
-	v0 = { _rect.left,_rect.bottom };
-	point_to_circle = _circle._pos - v0;
-	length = point_to_circle.length_2();
-
-	if (length < _radius_pow2)
-	{
-		return { _circle._pos - _rect_center };
-	}
-
-	v0 = { _rect.right,_rect.bottom };
-	point_to_circle = _circle._pos - v0;
-	length = point_to_circle.length_2();
-	if (length < _radius_pow2)
-	{
-		return { _circle._pos - _rect_center };
-	}
-
 	float r = _circle._radius;
-	RECT c = { _rect.left - r,_rect.top - r,_rect.right + r ,_rect.bottom + r };
-	vec p = _circle._pos;
+	vec t1 = _circle._pos;
 
-	if (p.x >= c.left && p.x <= c.right && p.y <= c.bottom && p.y >= c.top)
+	float left = (_rect.left - r);
+	float top = (_rect.top - r);
+	float bottom= (_rect.bottom + r);
+	float right = (_rect.right + r);
+
+	if ((t1.x >= left && t1.x <= right) &&
+		(t1.y >= top && t1.y <= bottom))
 	{
-		RECT _rt;
-		RECT lhs = _rect;
-		RECT rhs = {p.x - r,p.y - r , p.x +r,p.y +r};
+		vec _c = {  (_rect.right + _rect.left) / 2 , (_rect.bottom + _rect.top )/ 2 };
+		vec dis = _circle._pos - _c;
 
-		if (IntersectRect(&_rt, &lhs, &rhs))
+		if (abs(dis.y) < abs(dis.x) )
 		{
-			float h = _rt.bottom - _rt.top;
-			float w = _rt.right - _rt.left;
+			float l = (_rect.right - _rect.left) / 2 + _circle._radius;
 
-			if (h < w)
-			{
-				float dir = rhs.bottom - lhs.bottom;
-				dir = dir / abs(dir);
+			return vec{ dis.x/abs(dis.x) *(l-abs(dis.x)), 0 };
+		}
+		else 
+		{
+			float l = (_rect.bottom - _rect.top) / 2 + _circle._radius;
 
-				return vec{ 0,h * dir };
-			}
-			if (w < h)
-			{
-				float dir = rhs.right - lhs.right;
-				dir = dir / abs(dir);
-
-				return vec{ w * dir,0 };
-			}
+			return vec{ 0,dis.y / abs(dis.y) * (l - abs(dis.y)) };
 		}
 	}
-
 	return std::nullopt;
 };
 
@@ -124,7 +78,7 @@ std::optional<vec> math::circleVScircle(circle lhs, circle rhs)
 
 	if (v.length() < radius)
 	{
-		return { v };
+		return v.get_normalize() * (radius - v.length());
 	}
 
 	return std::nullopt;
@@ -162,10 +116,11 @@ vec::vec(float _x, float _y) : x{ _x }, y{ _y }
 {
 }
 
-vec::vec(const float degree) : x{ std::cosf(math::degree_to_radian(degree)) },
-y{ std::sinf(math::degree_to_radian(degree)) }
-{
 
+
+vec vec::make_vec_from_dir(const float degree)
+{
+	return vec(std::cosf(math::degree_to_radian(degree)), std::sinf(math::degree_to_radian(degree)));
 }
 
 vec& vec::operator-=(const vec& _rhs)
@@ -227,6 +182,11 @@ vec& vec::operator/=(const float _scala)
 	x /= _scala;
 	y /= _scala;
 	return *this;
+}
+
+vec vec::operator*(const float _scala) const
+{
+	return vec(x*_scala,y*_scala);
 }
 
 vec vec::operator+(const vec& _rhs) const
