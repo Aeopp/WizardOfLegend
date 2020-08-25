@@ -9,7 +9,9 @@ public:
 	std::shared_ptr<collision_component> _collision_component;
 
 	void initialize()override;
-	void update(float dt)override;
+	Event update(float dt)override;
 	void render(HDC hdc,vec camera_pos)override;
+
+	
 };
 

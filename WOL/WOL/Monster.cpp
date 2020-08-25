@@ -6,7 +6,7 @@ void Monster::initialize()
 {
 	object::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::monster, ERect);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
 	if (!_collision_component)return;
 
 	_collision_component->_size = { 50.0f,50.0f };
@@ -14,9 +14,10 @@ void Monster::initialize()
 	_transform->_location = { 300.f,300.f };
 };
 
-void Monster::update(float dt)
+Event Monster::update(float dt)
 {
-	object::update(dt);
+	Event _E = object::update(dt);
+	return _E;
 }
 
 void Monster::render(HDC hdc,vec camera_pos)

@@ -2,11 +2,12 @@
 #include "pch.h"
 #include "layer_type.h"
 #include "transform.h"
+#include "event.h"
 
 class object abstract
 {
 public:
-	virtual void update(float dt);
+	virtual Event update(float dt);
 	virtual void render(HDC hdc,vec camera_pos);
 	virtual void initialize();
 	virtual void release();

@@ -10,11 +10,11 @@ public:
 
     float delta();
     template<typename ..._params>
-    void event_regist(float time,std::function<void()> event, _params&&... params);
+    void event_regist(float time, _params&&... params);
 
     std::list < std::pair<float, std::function<void()>>  > _events;
 
-    int max_fps{ 65 };
+    int max_fps{1000};
     int fps{ 0};
 
     float time_scale{ 1.f };
@@ -22,8 +22,9 @@ public:
     float tick{ 0.f };
 };
 
-template<typename ..._params>
- void Timer::event_regist(float time,std::function<void()> event, _params&& ...params)
-{
-     _events.emplace_back(time,std::bind(event, std::forward<_params>(params)...) );
-}
+ template<typename ..._params>
+ void Timer::event_regist(float time,_params&& ...params)
+ {
+     _events.emplace_back(time, std::bind(std::forward<_params>(params)...)                     );
+ }
+

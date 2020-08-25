@@ -17,8 +17,6 @@ void game::render(HDC hdc)
 
 void game::update()
 {
-	Input_mgr::instance().update();
-
 	Timer::instance().update();
 
 	sound_mgr::instance().update();
@@ -56,4 +54,5 @@ void game::release()
 
 void game::late_update()
 {
+	Input_mgr::instance().update();
 }

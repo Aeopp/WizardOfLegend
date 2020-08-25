@@ -23,9 +23,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -38,7 +38,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
@@ -46,6 +46,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WOL));
 
     MSG msg;
+    msg.message = WM_NULL;
+
+    game& _game = game::instance();
+    _game.initialize();
 
     ZeroMemory(&msg, sizeof(msg));
 
@@ -55,38 +59,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
-            GetMessage(&msg, NULL, 0, 0);
+            GetMessage(&msg, NULL, 0, 0); 
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
         Timer& _Timer = Timer::instance();
-        game& _game = game::instance();
-        
-        {
-			
-			DWORD current_tick = GetTickCount();
-           
-				// TODO :: 여기에 게임 로직을 호출 합니다.
-			_Timer.dt = current_tick - _Timer.tick;
 
-			_Timer.tick = current_tick;
+        if (_Timer.tick  + (10) < GetTickCount () )
+        {
+            _Timer.dt = GetTickCount() - _Timer.tick;
 
             _game.update();
             _game.late_update();
-            _game.render(GetDC(_game.hWnd));
+         //   _game.render(GetDC(_game.hWnd));
+           
+            InvalidateRect(hWnd, nullptr, false);
+             UpdateWindow(hWnd);
 
-			InvalidateRect(hWnd, nullptr, false);
-			UpdateWindow(hWnd);
+            _Timer.tick = GetTickCount();
         }
     };
 
     game::instance().release();
 
-    return (int) msg.wParam;
-}
-
-
+    return (int)msg.wParam;
+};
 
 //
 //  함수: MyRegisterClass()
@@ -151,7 +148,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    UpdateWindow(hWnd);
 
    game::instance().hWnd = hWnd;
-   game::instance().initialize();
+  
 
    return TRUE;
 }
@@ -191,34 +188,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
         {
         /** 더블버퍼링 시작처리입니다. **/
-        //static HDC hdc, MemDC, tmpDC;
-        //static HBITMAP BackBit, oldBackBit;
-        //static RECT bufferRT;
-        //PAINTSTRUCT ps;
+        static HDC hdc, MemDC, tmpDC;
+        static HBITMAP BackBit, oldBackBit;
+        static RECT bufferRT;
+        PAINTSTRUCT ps;
 
-        //hdc = BeginPaint(hWnd, &ps);
-        //GetClientRect(hWnd, &bufferRT);
-        //MemDC = CreateCompatibleDC(hdc);
-        //BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
-        //oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
-        //PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
-        //tmpDC = hdc;
-        //hdc = MemDC;
-        //MemDC = tmpDC;
-        //// TODO: 여기에 그리기 코드를 추가합니다.
+        hdc = BeginPaint(hWnd, &ps);
+        GetClientRect(hWnd, &bufferRT);
+        MemDC = CreateCompatibleDC(hdc);
+        BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
+        oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
+        PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
+        tmpDC = hdc;
+        hdc = MemDC;
+        MemDC = tmpDC;
+        // TODO: 여기에 그리기 코드를 추가합니다.
 
-        //game::instance().render(hdc);
+        game::instance().render(hdc);
 
-        ///** 더블버퍼링 끝처리 입니다. **/
-        //tmpDC = hdc;
-        //hdc = MemDC;
-        //MemDC = tmpDC;
-        //GetClientRect(hWnd, &bufferRT);
-        //BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
-        //SelectObject(MemDC, oldBackBit);
-        //DeleteObject(BackBit);
-        //DeleteDC(MemDC);
-        //EndPaint(hWnd, &ps);
+        /** 더블버퍼링 끝처리 입니다. **/
+        tmpDC = hdc;
+        hdc = MemDC;
+        MemDC = tmpDC;
+        GetClientRect(hWnd, &bufferRT);
+        BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
+        SelectObject(MemDC, oldBackBit);
+        DeleteObject(BackBit);
+        DeleteDC(MemDC);
+        EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:

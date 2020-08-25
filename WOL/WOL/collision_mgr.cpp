@@ -74,7 +74,7 @@ void collision_mgr::render(HDC hdc)
 }
 void collision_mgr::update()
 {
-	collision(monster,player);
+	collision(EMonster,EPlayer);
 };
 
 void collision_mgr::collision(collision_tag lhs, collision_tag rhs)

@@ -3,13 +3,13 @@
 #include "object_mgr.h"
 #include "game.h"
 
-void Camera::update(float dt)
+Event Camera::update(float dt)
 {
-	object::update(dt);
+	Event _E = object::update(dt);
 
 	auto _target_ptr = _owner.lock();
-	if (!_target_ptr)return;
-	if (!_object_mgr)return;
+	if (!_target_ptr)return Event::None;
+	if (!_object_mgr)return Event::None;
 
 	RECT _rt = game::instance().client_rect;
 
@@ -20,6 +20,8 @@ void Camera::update(float dt)
 
 	_object_mgr->camera_pos.x -= width;
 	_object_mgr->camera_pos.y -= height;
+
+	return _E;
 }
 
 void Camera::initialize()

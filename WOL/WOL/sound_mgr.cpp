@@ -13,8 +13,6 @@ void sound_mgr::initialize()
 	for (const fs::directory_entry& entry :
 		fs::directory_iterator(fs::current_path() /".."/".."/"Resources"/"Sound")) {
 		bool bLoad =Load(entry.path().string());
-
-		
 	}
 
 	Play(default_path + "MAIN_MENU_BGM.mp3",true,1.f);

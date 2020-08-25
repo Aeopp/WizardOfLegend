@@ -8,7 +8,9 @@ enum figure_type
 
 enum collision_tag
 {
-	player,
-	monster,
-	mouse,
+	EPlayer,
+	EMonster,
+	EMouse,
+	EShield,
+	EPlayerAttack,
 };

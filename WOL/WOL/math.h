@@ -64,6 +64,8 @@ struct circle
 class math
 {
 public:
+	static inline float PI = std::numbers::pi;
+
 	static inline constexpr float degree_to_radian(const float degree)
 	{
 		constexpr float  factor = (float)std::numbers::pi / (float)180.0f;

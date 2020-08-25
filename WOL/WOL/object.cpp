@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "object.h"
 
-
-void object::update(float dt)
+Event object::update(float dt)
 {
-
+	return Event::None;
 }
 
 void object::render(HDC hdc,vec camera_pos)
@@ -16,7 +15,6 @@ void object::initialize()
 {
 	_transform = std::make_shared<Transform>();
 	_transform->_location = vec{ 0,0 };
-
 }
 
 void object::release()

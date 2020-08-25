@@ -4,31 +4,32 @@
 #include "Input_mgr.h"
 #include "timer.h"
 #include "game.h"
+#include "shield.h"
+#include "object_mgr.h"
+#include "Mouse.h"
+#include "ICE_Crystal.h"
+
 
 void Player::initialize()
 {
 	object::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::player, ECircle);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ECircle);
 	if (!_collision_component)return;
 
 	_collision_component->_size = { 50.f,50.0f };
+
 };
 
-void Player::update(float dt)
+Event Player::update(float dt)
 {
-	object::update(dt);
+	Event _E = object::update(dt);
 
-	player_move(dt);
+	player_check(dt);
 
-	if (Input_mgr::instance().Key_Pressing(VK_SPACE))
-	{
-		MessageBox(game::instance().hWnd, L"GOOD", L"GOOD", MB_OK);
+	MakeShield();
 
-
-	}
-	    
-	//Input_mgr::instance().Event_Regist(VK_SPACE, key_event::EDown, []() {std::terminate(); });
+	return _E;
 }
 
 void Player::render(HDC hdc, vec camera_pos)
@@ -36,9 +37,59 @@ void Player::render(HDC hdc, vec camera_pos)
 	object::render(hdc, camera_pos);
 };
 
+void Player::temp(float temp)
+{
+	MessageBox(game::instance().hWnd, __FUNCTIONW__, __FUNCTIONW__, MB_OK);
+}
+
+void Player::MakeShield()
+{
+	Input_mgr& _Input = Input_mgr::instance();
+
+	if (!_Input.Key_Down('Q'))return;
+
+	static float shield_distance = 150.0f;
+	static float shield_speed = 360.f;
+
+	object_mgr& _obj_mgr = object_mgr::instance();
+
+	float degree=360.0f / 8.f;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		auto _shield = _obj_mgr.insert_object<shield>();
+
+	   _shield->_transform->_dir = math::dir_from_angle(degree * i);
+
+		if (!_shield) return;
+		_shield->_owner = _ptr;
+
+		_shield->_transform->_location = _transform->_location + _shield->_transform->_dir * shield_distance;
+
+		_shield->_shield_distance = shield_distance;
+		_shield->_speed = shield_speed;
+	}
+}
+void Player::ICE_CRYSTAL()
+{
+	Input_mgr& _Input = Input_mgr::instance();
+
+	auto V= _Input.GetWorldMousePos();
+
+	if (!V)return;
+
+	auto _ICE = object_mgr::instance().insert_object<ICE_Crystal>();
+
+	if (!_ICE) return;
 
 
-void Player::player_move(float dt)
+	_ICE->_owner = _ptr;
+	_ICE->_target = *V;
+	_ICE->_transform->_location = _transform->_location;
+
+};
+
+void Player::player_check(float dt)
 {
 	Input_mgr& _Input = Input_mgr::instance();
 
@@ -46,13 +97,17 @@ void Player::player_move(float dt)
 	{
 		if (_Input.Key_Pressing(VK_UP))
 		{
-			_transform->_location += vec{ +1,0 }*_speed * sqrtf(2.f) * dt;
-			_transform->_location += vec{ 0,-1 }*_speed * sqrtf(2.f) * dt;
+			float f = 1/ sqrtf(2.f);
+
+			_transform->_location += vec{ +1,0 }*_speed * f * dt;
+			_transform->_location += vec{ 0,-1 }*_speed * f * dt;
 		}
 		if (_Input.Key_Pressing(VK_DOWN))
 		{
-			_transform->_location += vec{ +1,0 }*_speed * sqrtf(2.f) * dt;
-			_transform->_location += vec{ 0,+1 }*_speed * sqrtf(2.f) * dt;
+			float f = 1 / sqrtf(2.f);
+
+			_transform->_location += vec{ +1,0 }*_speed * f * dt;
+			_transform->_location += vec{ 0,+1 }*_speed * f* dt;
 		}
 		else
 			_transform->_location += vec{ +1,0 }*_speed * dt;
@@ -61,13 +116,17 @@ void Player::player_move(float dt)
 	{
 		if (_Input.Key_Pressing(VK_UP))
 		{
-			_transform->_location += vec{ -1,0 }*_speed * sqrtf(2.f) * dt;
-			_transform->_location += vec{ 0,-1 }*_speed * sqrtf(2.f) * dt;
+			float f = 1 / sqrtf(2.f);
+
+			_transform->_location += vec{ -1,0 }*_speed * f* dt;
+			_transform->_location += vec{ 0,-1 }*_speed * f* dt;
 		}
 		if (_Input.Key_Pressing(VK_DOWN))
 		{
-			_transform->_location += vec{ -1,0 }*_speed * sqrtf(2.f) * dt;
-			_transform->_location += vec{ 0,+1 }*_speed * sqrtf(2.f) * dt;
+			float f = 1 / sqrtf(2.f);
+
+			_transform->_location += vec{ -1,0 }*_speed * f* dt;
+			_transform->_location += vec{ 0,+1 }*_speed *f* dt;
 		}
 		else
 			_transform->_location += vec{ -1,0 }*_speed * dt;
@@ -80,5 +139,10 @@ void Player::player_move(float dt)
 	if (_Input.Key_Pressing(VK_DOWN))
 	{
 		_transform->_location += vec{ 0,+1 }*_speed * dt; ;
+	}
+
+	if (_Input.Key_Down('W'))
+	{
+		ICE_CRYSTAL();
 	}
 }

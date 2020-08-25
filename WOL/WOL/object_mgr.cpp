@@ -32,16 +32,31 @@ void object_mgr::render(HDC hdc)
 
 void object_mgr::update()
 {
+	using namespace std;
+
 	float dt = Timer::instance().delta();
 
 	for (auto& [f, obj_list] : object_map)
 	{
-		for (auto& obj : obj_list)
+		for (auto obj = begin(obj_list); obj != end(obj_list);)
 		{
-			obj->update(dt);
+			Event _event = (*obj)->update(dt);
+
+			switch (_event)
+			{
+			case None:
+				++obj;
+				break;
+			case Die:
+				obj = obj_list.erase(obj);
+				break;
+			default:
+				break;
+			}
 		}
 	}
-}
+};
+
 
 void object_mgr::initialize()
 {
@@ -50,13 +65,13 @@ void object_mgr::initialize()
 	auto _camera = insert_object<Camera>();
 	_camera->_owner = _ptr;
 
-	for (int i = 1; i < 2000; ++i)
+	for (int i = 1; i < 100; ++i)
 	{
 		auto _ptr2 = insert_object<Monster>();
 		_ptr2->_transform->_location = vec{ i *100,i*100};
 	}
 	
-	auto mouse = insert_object<Mouse>();
+	auto EMouse = insert_object<Mouse>();
 }
 
 void object_mgr::release()

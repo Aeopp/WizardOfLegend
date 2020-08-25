@@ -27,6 +27,9 @@
     <Filter Include="source\sound\fmod">
       <UniqueIdentifier>{78e178f5-1348-41a9-bed5-a9fd0e41675e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{1c85b878-bf86-42f4-8ef6-582536a794f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fmod.h">
@@ -101,9 +104,6 @@
     <ClInclude Include="transform.h">
       <Filter>source\ETC</Filter>
     </ClInclude>
-    <ClInclude Include="Input_mgr.h">
-      <Filter>source\manager</Filter>
-    </ClInclude>
     <ClInclude Include="player.h">
       <Filter>source\object</Filter>
     </ClInclude>
@@ -115,6 +115,12 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="UI.h" />
+    <ClInclude Include="shield.h" />
+    <ClInclude Include="Input_mgr.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ICE_Crystal.h" />
+    <ClInclude Include="event.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -153,9 +159,6 @@
     <ClCompile Include="transform.cpp">
       <Filter>source\ETC</Filter>
     </ClCompile>
-    <ClCompile Include="Input_mgr.cpp">
-      <Filter>source\manager</Filter>
-    </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>source\object</Filter>
     </ClCompile>
@@ -165,9 +168,6 @@
     <ClCompile Include="actor.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="timer.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="Mouse.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -175,6 +175,18 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="UI.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="shield.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Input_mgr.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ICE_Crystal.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
