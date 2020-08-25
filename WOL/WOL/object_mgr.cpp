@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "object_mgr.h"
 #include "object.h"
+#include "player.h"
+#include "Monster.h"
 
 void object_mgr::render(HDC hdc)
 {
@@ -26,6 +28,8 @@ void object_mgr::update()
 
 void object_mgr::initialize()
 {
+	auto _ptr = insert_object<Player>();
+	auto _ptr2 = insert_object<Monster>();
 
 }
 

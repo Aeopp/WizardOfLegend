@@ -45,7 +45,6 @@ struct vec
 };
 struct circle
 {
-
 	vec _pos;
 	float _radius{ 0.0f };
 

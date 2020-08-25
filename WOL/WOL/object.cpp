@@ -14,7 +14,7 @@ void object::render(HDC hdc)
 
 void object::initialize()
 {
-
+	_transform = std::make_shared<Transform>();
 }
 
 void object::release()

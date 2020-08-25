@@ -2,10 +2,12 @@
 #include "collision_mgr.h"
 #include "object.h"
 
-std::shared_ptr<collision_component> collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
+std::shared_ptr<collision_component> 
+collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 	figure_type _type)
 {
-	std::shared_ptr<collision_component> _collision;
+	std::shared_ptr<collision_component> _collision = std::make_shared< collision_component>();
+
 	_collision->_figure_type = _type;
 	_collision->set_owner(_owner);
 	_collision_map[_tag].push_back(_collision);
@@ -24,7 +26,7 @@ void collision_mgr::render(HDC hdc)
 			if (!_owner)continue;
 
 			vec _loc = _owner->_transform->_location;
-			vec _size = _loc - collision->_size;
+			vec _size = collision->_size;
 
 			if (collision->_figure_type == ERect)
 			{
@@ -36,7 +38,10 @@ void collision_mgr::render(HDC hdc)
 			}
 		}
 	}
-	
+}
+void collision_mgr::update()
+{
+	collision(monster,player);
 };
 
 void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
@@ -65,12 +70,10 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 			else if ( lhs_figure == ECircle && rhs_figure == ECircle)
 			{
 				bCollision = math::circleVScircle(lhs_obj->make_circle(), rhs_obj->make_circle());
-
 			}
 			else if (lhs_figure == ERect && rhs_figure == ECircle)
 			{
 				bCollision = math::rectVScircle(lhs_obj->make_rect(), rhs_obj->make_circle());
-
 			}
 			else if (lhs_figure == ECircle&& rhs_figure == ERect)
 			{

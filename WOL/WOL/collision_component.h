@@ -15,7 +15,6 @@ public:
 	void Hit(std::weak_ptr<class object> _target);
 	figure_type _figure_type{ figure_type::ERect };
 
-	float radius{};
 	vec _size;
 
 	RECT make_rect();

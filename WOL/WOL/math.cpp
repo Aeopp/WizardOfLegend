@@ -32,13 +32,16 @@ std::optional<vec>   math::rectVScircle(RECT _rect, circle _circle)
 
 	float _radius_pow2 = pow(_circle._radius, 2);
 
+	
 	vec v0 = { _rect.left,_rect.top };
 	vec point_to_circle = _circle._pos - v0;
 	float length = point_to_circle.length_2();
+	vec _rect_center = { (_rect.right + _rect.left) / 2 ,(_rect.bottom + _rect.top) / 2 };
+
 
 	if (length < _radius_pow2)
 	{
-		return { point_to_circle };
+		return { _circle._pos - _rect_center };
 	}
 
 	v0 = { _rect.right,_rect.top };
@@ -47,7 +50,7 @@ std::optional<vec>   math::rectVScircle(RECT _rect, circle _circle)
 
 	if (length < _radius_pow2)
 	{
-		return { point_to_circle };
+		return { _circle._pos - _rect_center };
 	}
 
 	v0 = { _rect.left,_rect.bottom };
@@ -56,7 +59,7 @@ std::optional<vec>   math::rectVScircle(RECT _rect, circle _circle)
 
 	if (length < _radius_pow2)
 	{
-		return { point_to_circle };
+		return { _circle._pos - _rect_center };
 	}
 
 	v0 = { _rect.right,_rect.bottom };
@@ -64,7 +67,39 @@ std::optional<vec>   math::rectVScircle(RECT _rect, circle _circle)
 	length = point_to_circle.length_2();
 	if (length < _radius_pow2)
 	{
-		return { point_to_circle };
+		return { _circle._pos - _rect_center };
+	}
+
+	float r = _circle._radius;
+	RECT c = { _rect.left - r,_rect.top - r,_rect.right + r ,_rect.bottom + r };
+	vec p = _circle._pos;
+
+	if (p.x >= c.left && p.x <= c.right && p.y <= c.bottom && p.y >= c.top)
+	{
+		RECT _rt;
+		RECT lhs = _rect;
+		RECT rhs = {p.x - r,p.y - r , p.x +r,p.y +r};
+
+		if (IntersectRect(&_rt, &lhs, &rhs))
+		{
+			float h = _rt.bottom - _rt.top;
+			float w = _rt.right - _rt.left;
+
+			if (h < w)
+			{
+				float dir = rhs.bottom - lhs.bottom;
+				dir = dir / abs(dir);
+
+				return vec{ 0,h * dir };
+			}
+			if (w < h)
+			{
+				float dir = rhs.right - lhs.right;
+				dir = dir / abs(dir);
+
+				return vec{ w * dir,0 };
+			}
+		}
 	}
 
 	return std::nullopt;
@@ -98,18 +133,24 @@ std::optional<vec> math::rectVSrect(RECT lhs, RECT rhs)
 {
 	RECT _rt;
 
-	if (IntersectRect(&lhs, &rhs, &_rt))
+	if (IntersectRect(&_rt ,&lhs, &rhs ))
 	{
 		float h = _rt.bottom - _rt.top;
 		float w = _rt.right - _rt.left;
 
 		if (h < w)
 		{
-			return vec{ 0,h };
+			float dir = rhs.bottom - lhs.bottom;
+			dir = dir / abs(dir);
+
+			return vec{ 0,h*dir };
 		}
 		if (w < h)
 		{
-			return vec{ w,0 };
+			float dir = rhs.right-lhs.right;
+			dir = dir / abs(dir);
+
+			return vec{ w*dir,0 };
 		}
 	}
 

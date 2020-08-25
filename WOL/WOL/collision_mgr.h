@@ -12,5 +12,6 @@ public:
 
 	void collision(collision_tag lhs, collision_tag rhs);
 	void render(HDC hdc) override;
+	void update() override;
 };
 

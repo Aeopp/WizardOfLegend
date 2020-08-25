@@ -104,7 +104,10 @@
     <ClInclude Include="Input_mgr.h">
       <Filter>source\manager</Filter>
     </ClInclude>
-    <ClInclude Include="player.h" />
+    <ClInclude Include="player.h">
+      <Filter>source\object</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -147,6 +150,9 @@
       <Filter>source\manager</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
+      <Filter>source\object</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

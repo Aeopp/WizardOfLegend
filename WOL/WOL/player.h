@@ -2,12 +2,14 @@
 #include "object.h"
 #include "collision_component.h"
 
-class player :
+class Player :
     public object
 {
 public:
-    collision_component _collision_component;
+    std::shared_ptr<collision_component> _collision_component;
 
     void initialize()override;
+    void update()override;
+    void render(HDC hdc)override;
 };
 

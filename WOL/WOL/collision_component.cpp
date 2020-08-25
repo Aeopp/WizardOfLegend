@@ -36,7 +36,7 @@ circle collision_component::make_circle()
 	auto _ptr = _owner.lock();
 	if (!_ptr)return circle{};
 
-	return { _ptr->_transform->_location ,radius };
+	return { _ptr->_transform->_location ,_size.x };
 }
 
 

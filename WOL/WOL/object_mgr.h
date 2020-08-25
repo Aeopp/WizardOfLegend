@@ -24,8 +24,8 @@ template<typename object_type, typename ...param_Ty>
 	_ptr->set_ptr(_ptr);
 
 	_ptr->initialize();
-
-	if  constexpr (std::enable_if<decltype(std::declval<object_type>().late_initialize())>)
+	
+	if  constexpr (std::is_member_function_pointer<decltype(&object_type::late_initialize)>::value)
 	{
 		_ptr->late_initialize(std::forward<param_Ty>(_params)...);
 	};

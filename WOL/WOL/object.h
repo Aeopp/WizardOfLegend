@@ -10,6 +10,7 @@ public:
 	virtual void render(HDC hdc);
 	virtual void initialize();
 	virtual void release();
+	void late_initialize() {};
 public:
 	virtual uint32_t get_layer_id()const&;
 	void set_ptr(std::weak_ptr<object> _ptr)&;
