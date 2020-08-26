@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include <iostream>
 
 struct vec
 {
@@ -42,8 +43,14 @@ struct vec
 	bool operator<(const vec& _rhs)const;
 	bool operator<=(const vec& _rhs)const;
 	bool operator>(const vec& _rhs)const;
-	bool operator>=(const vec& _rhs)const;
+	bool operator>=(const vec& _rhs)const;	
+
+
+	
 };
+std::wostream& operator<<(std::wostream& os, vec _lhs);
+
+
 struct circle
 {
 	vec _pos;
@@ -98,6 +105,8 @@ public:
 	static std::optional<vec> rectVSrect(RECT lhs, RECT rhs);
 
 public:
+	static float my_lerp(float start, float goal, float goal_time,float dt);
+
 	static inline std::random_device rd;
 
 	template<typename Ty>

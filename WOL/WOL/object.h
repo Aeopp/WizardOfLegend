@@ -8,7 +8,7 @@ class object abstract
 {
 public:
 	virtual Event update(float dt);
-	virtual void render(HDC hdc,vec camera_pos);
+	virtual void render(HDC hdc, vec camera_pos, vec size_factor);
 	virtual void initialize();
 	virtual void release();
 	void late_initialize() {};

@@ -9,5 +9,10 @@ enum layer_type : uint32_t
 	EObject = number(2),
 	EEffect = number(3),
 	EUI = number(4),
-	ENone = number(2ll << 32),
+	EUIButton = number(5),
+	EUIInfo = number(6),
+
+
+	ENone,
+	// ENone = number(2ll << 32),
 };

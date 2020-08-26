@@ -30,8 +30,17 @@
     <Filter Include="source\Util">
       <UniqueIdentifier>{1c85b878-bf86-42f4-8ef6-582536a794f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\Bitmap">
+    <Filter Include="source\Render">
+      <UniqueIdentifier>{f1b4416a-3f32-4b5a-9a03-217268a6b200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Render\Bitmap">
       <UniqueIdentifier>{7d7c9630-ec71-4e61-b5f1-c43bc0f9a6ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\object\Actor">
+      <UniqueIdentifier>{af3b52b2-4e67-4e73-ae5d-a7aae8239e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\object\UI">
+      <UniqueIdentifier>{2719909b-850f-47f5-bf55-70009ee07776}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -107,17 +116,9 @@
     <ClInclude Include="transform.h">
       <Filter>source\ETC</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
-      <Filter>source\object</Filter>
-    </ClInclude>
-    <ClInclude Include="Monster.h">
-      <Filter>source\object</Filter>
-    </ClInclude>
-    <ClInclude Include="actor.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="UI.h" />
     <ClInclude Include="shield.h" />
     <ClInclude Include="Input_mgr.h">
       <Filter>source\Util</Filter>
@@ -128,6 +129,43 @@
     <ClInclude Include="Bmp.h" />
     <ClInclude Include="render_component.h" />
     <ClInclude Include="MY_RECT.h" />
+    <ClInclude Include="Debuger.h" />
+    <ClInclude Include="UI.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="actor.h">
+      <Filter>source\object\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>source\object\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>source\object\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="UISkillBar.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="UIGold.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_PlayerBar.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="player_info.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="UIBar.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIHPBar.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIMpBar.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIInfo.h" />
+    <ClInclude Include="UISkillIBarIcon.h" />
+    <ClInclude Include="ESkillBarIcon.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -166,46 +204,79 @@
     <ClCompile Include="transform.cpp">
       <Filter>source\ETC</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
-      <Filter>source\object</Filter>
-    </ClCompile>
-    <ClCompile Include="Monster.cpp">
-      <Filter>source\object</Filter>
-    </ClCompile>
-    <ClCompile Include="actor.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="UI.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="shield.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="timer.cpp">
       <Filter>source\Util</Filter>
     </ClCompile>
     <ClCompile Include="Input_mgr.cpp">
       <Filter>source\Util</Filter>
     </ClCompile>
-    <ClCompile Include="ICE_Crystal.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="Bmp_mgr.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="Bmp.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="render_component.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="UI.cpp">
+      <Filter>source\object\UI</Filter>
     </ClCompile>
     <ClCompile Include="MY_RECT.cpp">
+      <Filter>source\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Bmp_mgr.cpp">
+      <Filter>source\Render\Bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="Bmp.cpp">
+      <Filter>source\Render\Bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>source\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Debuger.cpp">
+      <Filter>source\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="render_component.cpp">
+      <Filter>source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="actor.cpp">
+      <Filter>source\object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>source\object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>source\object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="shield.cpp">
+      <Filter>source\object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="ICE_Crystal.cpp">
+      <Filter>source\object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_PlayerBar.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UISkillBar.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMpBar.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIHPBar.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIGold.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIBar.cpp">
+      <Filter>source\object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIInfo.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UISkillIBarIcon.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

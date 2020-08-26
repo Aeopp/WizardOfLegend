@@ -7,7 +7,7 @@
 #include "timer.h"
 #include "Camera.h"
 
-void object_mgr::render(HDC hdc)
+void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 {
 	int count = 0;
 
@@ -16,15 +16,17 @@ void object_mgr::render(HDC hdc)
 		for (auto& obj : obj_list)
 		{
 			count++; 
-			obj->render(hdc, camera_pos);
+			obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
 		}
 	}
 
 	if (bDebug)
 	{
+		auto [sx, sy] = size_factor;
+
 		std::wstringstream wss;
 		wss << L"오브젝트 개수 : " << count << std::endl; 
-		RECT _rt{ 600,100,  900 , 200 }; 
+		RECT _rt{ 1200 *sx,100*sy,  1400 *sx, 200*sy }; 
 
 		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
 	}

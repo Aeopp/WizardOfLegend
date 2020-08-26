@@ -4,23 +4,42 @@
 #include "game.h"
 #include "Input_mgr.h"
 #include "render_component.h"
+#include "Debuger.h"
 
-void Mouse::render(HDC hdc, vec camera_pos)
+void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	UI::render(hdc, camera_pos);
+	object::render(hdc, camera_pos, size_factor);
+
+	vec loc = _transform->_location;
+	vec s = _transform->_size;
+	vec ps = _render_component->Dest_Paint_Size;
+
+	s.x *= size_factor.x;
+	s.y *= size_factor.y;
+
+	Debuger(hdc, [&] {Rectangle(hdc, loc.x - s.x, loc.y - s.y, loc.x + s.x, loc.y + s.y); });
 
 	if (!_render_component)return;
 
-	vec _loc = _transform->_location;
-	RECT src_rt = _render_component->_Img_src;
-	vec _size = vec{ src_rt.right - src_rt.left, src_rt.bottom - src_rt.top };
+	ps.x *= size_factor.x;
+	ps.y *= size_factor.y;
 
-	_render_component->_Img_Dest = 
-		make_rect(_loc.x - _size.x, _loc.y - _size.y,
-		_size.x + _size.x, _size.y + _size.y);
+	//loc.y *= size_factor.y;
+	//	loc.x *= size_factor.x;
 
+	loc -= _render_component->Dest_Paint_Size * 0.5f;
+
+	_render_component->Dest_Loc = loc;
 	_render_component->Render(hdc);
-};
+
+	if (bDebug)
+	{
+		std::wstringstream wss;
+		wss << loc;
+		RECT _rt{ loc.x,loc.y,loc.x + 200,loc.y + 100 };
+		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
+	}
+}
 
 void Mouse::initialize()
 {
@@ -29,11 +48,13 @@ void Mouse::initialize()
 	_transform->_size = { 10,10 };
 
 	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMouse, ECircle);
-	if (!_collision_component)return;
+	auto sp_collision = _collision_component.lock();
 
-	_collision_component->_size = { 10.f,10.0f };
-	_collision_component->bPush = false;
-	_collision_component->bRender = false;
+	if (!sp_collision)return;
+
+	sp_collision->_size = { 10.f,10.0f };
+	sp_collision->bPush = false;
+	sp_collision->bRender = false;
 
 	ShowCursor(false);
 
@@ -42,6 +63,7 @@ void Mouse::initialize()
 	_render_component = render_component::MakeRenderComponent_SP(L"UI_MOUSE.bmp", L"UI_MOUSE");
 	_render_component->_ColorKey = RGB(255, 0, 255);
 	_render_component->_Img_src = RECT{0,0,60,60};
+	_render_component->Default_Dest_Paint_Size = vec{ 30,30 };
 	_render_component->_RenderDesc = ERender::Transparent;
 }
 

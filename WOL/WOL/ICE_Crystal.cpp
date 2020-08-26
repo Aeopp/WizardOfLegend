@@ -8,12 +8,14 @@ void ICE_Crystal::initialize()
 
 	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ERect);
 
-	if (!_collision_component)return;
+	auto sp_collision = _collision_component.lock();
 
-	_collision_component->_size = { 50.f,50.0f };
-	_collision_component->bRender = true;
-	_collision_component->bPush = false;
-	_collision_component->bCollision = true;
+	if (!sp_collision)return;
+
+	sp_collision ->_size = { 50.f,50.0f };
+	sp_collision ->bRender = true;
+	sp_collision ->bPush = false;
+	sp_collision ->bCollision = true;
 
 	Minimum_distance = 10.f;
 	bSuccess = false;

@@ -11,9 +11,9 @@ class Timer :
     public singleton_interface<Timer>
 {
 public:
-    void update()override;
-    void render(HDC hdc)override;
-    void initialize()override;
+    void update();
+    void render(HDC hdc);
+    void initialize();
 
     float delta();
     template<typename ..._params>

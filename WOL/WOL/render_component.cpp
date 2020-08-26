@@ -5,8 +5,8 @@
 
 void render_component::release() noexcept
 {
-	
-}
+
+};
 
 std::shared_ptr<render_component> render_component::MakeRenderComponent_SP(const std::wstring& _filename, const std::wstring& ImageKey)
 {
@@ -29,18 +29,19 @@ void render_component::Render(HDC hDC)
 	HDC _BDC = sp_Image->Get_MemDC();
 
 	const RECT& s = _Img_src;
-	const RECT& d = _Img_Dest;
+	const vec& dl = Dest_Loc;
+	const vec& ps = Dest_Paint_Size;
 
 	switch (_RenderDesc)
 	{
 	case Transparent:
 		GdiTransparentBlt(hDC
-			, d.left, d.top
-			, d.right, d.bottom
+			, dl.x,dl.y
+			, ps.x, ps.y
 			, _BDC
 			, s.left, s.top
 			, s.right, s.bottom
-			, RGB(255, 255, 255));
+			, _ColorKey);
 		break;
 	default:
 		break;

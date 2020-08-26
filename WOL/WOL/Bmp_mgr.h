@@ -4,8 +4,8 @@
 class Bmp_mgr : public singleton_interface<Bmp_mgr>
 {
 public :
-	void initialize()override;
-	void release() override;
+	void initialize();
+	void release() ;
 
 	virtual ~Bmp_mgr()noexcept; 
 public:

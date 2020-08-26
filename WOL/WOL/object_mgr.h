@@ -5,10 +5,10 @@ class object_mgr : public singleton_interface<object_mgr>
 {
 
 public:
-	void render(HDC hdc)override;
-	void update()override;
-	void initialize() override;
-	void release()override;
+	void render(HDC hdc,std::pair<float,float> size_factor);
+	void update();
+	void initialize() ;
+	void release();
 
 	vec camera_pos{};
 

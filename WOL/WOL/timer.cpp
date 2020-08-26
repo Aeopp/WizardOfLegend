@@ -78,12 +78,15 @@ void Timer::update()
 
 void Timer::render(HDC hdc)
 {
-	std::wstringstream wss;
-	wss << "FPS : " << fps << "DeltaTime : " << dt << std::endl;
+	if (bDebug)
+	{
+		std::wstringstream wss;
+		wss << "FPS : " << fps << "DeltaTime : " << dt << std::endl;
 
-	RECT _rt{ 50,50,200,200 };
+		RECT _rt{ 1200,200,1600,300 };
 
-	DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+	}
 }
 
 void Timer::initialize()

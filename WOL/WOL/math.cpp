@@ -109,6 +109,11 @@ std::optional<vec> math::rectVSrect(RECT lhs, RECT rhs)
 	}
 
 	return std::nullopt;
+}
+float math::my_lerp(float start, float goal, float goal_time,float dt)
+{
+	float f = goal - start;
+	return start + ((f * dt) / goal_time);
 };
 
 
@@ -263,3 +268,9 @@ bool vec::operator>=(const vec& _rhs) const
 	return l > m && EQUAL(l, m);
 }
 
+
+std::wostream& operator<<(std::wostream& os, vec _lhs)
+{
+	os << L" X : " << _lhs.x << L" Y : " << _lhs.y << std::endl;
+	return os;
+}

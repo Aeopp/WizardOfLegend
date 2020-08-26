@@ -127,12 +127,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	constexpr int width = 1280;
-	constexpr int height = 720;
-
-	game::instance().client_rect = RECT{ 0,0,width ,height };
-
-	RECT _rt = { 0,0,width,height };
+	game& _game = game::instance();
+	RECT _rt = { 0,0,_game.width,_game.height };
 
 	AdjustWindowRect(&_rt, WS_OVERLAPPEDWINDOW, FALSE);
 
@@ -150,8 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
-	game::instance().hWnd = hWnd;
-
+	_game.game::instance().hWnd = hWnd;
 
 	return TRUE;
 }

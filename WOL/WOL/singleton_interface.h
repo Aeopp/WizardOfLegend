@@ -8,10 +8,6 @@ protected:
 	virtual ~singleton_interface()noexcept = default;
 public:
 	friend class std::shared_ptr<singleton_interface>;
-	virtual void render(HDC hdc) {};
-	virtual void update() {};
-	virtual void initialize() {};
-	virtual void release() {};
 public:
 	 static SubType& instance();
 };

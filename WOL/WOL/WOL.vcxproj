@@ -156,6 +156,9 @@
     <ClInclude Include="collision_component.h" />
     <ClInclude Include="collision_mgr.h" />
     <ClInclude Include="collision_tag.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Debuger.h" />
+    <ClInclude Include="ESkillBarIcon.h" />
     <ClInclude Include="event.h" />
     <ClInclude Include="fmod.h" />
     <ClInclude Include="fmod.hpp" />
@@ -165,6 +168,7 @@
     <ClInclude Include="fmod_dsp_effects.h" />
     <ClInclude Include="fmod_errors.h" />
     <ClInclude Include="fmod_output.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="ICE_Crystal.h" />
@@ -178,6 +182,7 @@
     <ClInclude Include="object_mgr.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="player_info.h" />
     <ClInclude Include="render_component.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="shield.h" />
@@ -187,6 +192,14 @@
     <ClInclude Include="timer.h" />
     <ClInclude Include="transform.h" />
     <ClInclude Include="UI.h" />
+    <ClInclude Include="UIBar.h" />
+    <ClInclude Include="UIGold.h" />
+    <ClInclude Include="UIHPBar.h" />
+    <ClInclude Include="UISkillIBarIcon.h" />
+    <ClInclude Include="UIInfo.h" />
+    <ClInclude Include="UIMpBar.h" />
+    <ClInclude Include="UISkillBar.h" />
+    <ClInclude Include="UI_PlayerBar.h" />
     <ClInclude Include="WOL.h" />
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +209,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="collision_component.cpp" />
     <ClCompile Include="collision_mgr.cpp" />
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Debuger.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="ICE_Crystal.cpp" />
     <ClCompile Include="Input_mgr.cpp" />
@@ -220,6 +236,14 @@
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="UI.cpp" />
+    <ClCompile Include="UIBar.cpp" />
+    <ClCompile Include="UIGold.cpp" />
+    <ClCompile Include="UIHPBar.cpp" />
+    <ClCompile Include="UISkillIBarIcon.cpp" />
+    <ClCompile Include="UIInfo.cpp" />
+    <ClCompile Include="UIMpBar.cpp" />
+    <ClCompile Include="UISkillBar.cpp" />
+    <ClCompile Include="UI_PlayerBar.cpp" />
     <ClCompile Include="WOL.cpp" />
   </ItemGroup>
   <ItemGroup>

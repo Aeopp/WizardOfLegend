@@ -3,8 +3,9 @@
 #include "object.h"
 #include "object_mgr.h"
 #include "game.h"
+#include "Debuger.h"
 
-std::shared_ptr<collision_component> 
+std::weak_ptr< collision_component>
 collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 	figure_type _type)
 {
@@ -17,7 +18,7 @@ collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 	return _collision;
 };
 
-void collision_mgr::render(HDC hdc)
+void collision_mgr::render(HDC hdc, std::pair<float,float> size_factor)
 {
 	if (!bRender)return;
 
@@ -38,7 +39,7 @@ void collision_mgr::render(HDC hdc)
 
 			vec _loc = _owner->_transform->_location;
 			vec _size = collision->_size;
-
+			
 			RECT _rt;
 
 			RECT _rhs{ _loc.x - _size.x
@@ -47,31 +48,33 @@ void collision_mgr::render(HDC hdc)
 
 			if (!IntersectRect(&_rt, &c_rect, &_rhs))continue;
 
-			if (collision->_figure_type == ERect)
-			{
-				Rectangle(hdc, _loc.x - _size.x
-					- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
-					- cpos.y);
+			Debuger(hdc, [&]() {
+				if (collision->_figure_type == ERect)
+				{
+					Rectangle(hdc, _loc.x - _size.x
+						- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
+						- cpos.y);
 
-				++render_object_count;
-			}
-			else if (collision->_figure_type == ECircle)
-			{
+					++render_object_count;
+				}
+				else if (collision->_figure_type == ECircle)
+				{
 					Ellipse(hdc, _loc.x - _size.x
 						- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
 						- cpos.y);
 
 					++render_object_count;
+				}
+				});
 			}
 		}
-	}
-
-	std::wstringstream wss;
-	wss << L"렌더링 되는 충돌체 : " << render_object_count << std::endl;
-	RECT _rt{ 300,300,500,500 };
-
-	DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+			Debuger(hdc, [&]() {std::wstringstream wss;
+			wss << L"렌더링 되는 충돌체 : " << render_object_count << std::endl;
+			RECT _rt{ 1200,300,1600,400 };
+			DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+	});
 }
+
 void collision_mgr::update()
 {
 	collision(EMonster,EPlayer);

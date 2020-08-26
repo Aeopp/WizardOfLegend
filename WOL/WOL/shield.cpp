@@ -8,9 +8,11 @@ void shield::initialize()
 
 	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
 
-	if (!_collision_component)return;
+	auto sp_collision = _collision_component.lock();
 
-	_collision_component->_size = { 50.f,50.0f };
+	if (!sp_collision)return;
+
+	sp_collision->_size = { 50.f,50.0f };
 
 	duration = 5.f;
 }
