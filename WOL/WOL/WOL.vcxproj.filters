@@ -27,7 +27,7 @@
     <Filter Include="source\sound\fmod">
       <UniqueIdentifier>{78e178f5-1348-41a9-bed5-a9fd0e41675e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Util">
+    <Filter Include="source\Util">
       <UniqueIdentifier>{1c85b878-bf86-42f4-8ef6-582536a794f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -117,7 +117,7 @@
     <ClInclude Include="UI.h" />
     <ClInclude Include="shield.h" />
     <ClInclude Include="Input_mgr.h">
-      <Filter>Util</Filter>
+      <Filter>source\Util</Filter>
     </ClInclude>
     <ClInclude Include="ICE_Crystal.h" />
     <ClInclude Include="event.h" />
@@ -181,10 +181,10 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="timer.cpp">
-      <Filter>Util</Filter>
+      <Filter>source\Util</Filter>
     </ClCompile>
     <ClCompile Include="Input_mgr.cpp">
-      <Filter>Util</Filter>
+      <Filter>source\Util</Filter>
     </ClCompile>
     <ClCompile Include="ICE_Crystal.cpp">
       <Filter>source</Filter>

@@ -23,66 +23,66 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: 여기에 코드를 입력합니다.
+	// TODO: 여기에 코드를 입력합니다.
 
-    // 전역 문자열을 초기화합니다.
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_WOL, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+	// 전역 문자열을 초기화합니다.
+	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	LoadStringW(hInstance, IDC_WOL, szWindowClass, MAX_LOADSTRING);
+	MyRegisterClass(hInstance);
 
-    // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance(hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
+	// 애플리케이션 초기화를 수행합니다:
+	if (!InitInstance(hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WOL));
+	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WOL));
 
-    MSG msg;
-    msg.message = WM_NULL;
+	MSG msg;
+	msg.message = WM_NULL;
 
-    game& _game = game::instance();
-    _game.initialize();
+	ZeroMemory(&msg, sizeof(msg));
 
-    ZeroMemory(&msg, sizeof(msg));
+	// 기본 메시지 루프입니다:
 
-    // 기본 메시지 루프입니다:
+	game& _game = game::instance();
+	_game.initialize();
+	Timer& _Timer = Timer::instance();
 
-    while (WM_QUIT != msg.message)
-    {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
-        {
-            GetMessage(&msg, NULL, 0, 0); 
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        Timer& _Timer = Timer::instance();
+	while (WM_QUIT != msg.message)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		{
+			GetMessage(&msg, NULL, 0, 0);
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 
-        if (_Timer.tick  + (10) < GetTickCount () )
-        {
-            _Timer.dt = GetTickCount() - _Timer.tick;
+		if (_Timer.tick + (10) < GetTickCount())
+		{
+			_Timer.dt = GetTickCount() - _Timer.tick;
 
-            _game.update();
-            _game.late_update();
-         //   _game.render(GetDC(_game.hWnd));
-           
-            InvalidateRect(hWnd, nullptr, false);
-             UpdateWindow(hWnd);
+			_game.update();
+			_game.late_update();
+			//   _game.render(GetDC(_game.hWnd));
 
-            _Timer.tick = GetTickCount();
-        }
-    };
+			InvalidateRect(hWnd, nullptr, false);
+			UpdateWindow(hWnd);
 
-    game::instance().release();
+			_Timer.tick = GetTickCount();
+		}
+	};
 
-    return (int)msg.wParam;
+	game::instance().release();
+
+	return (int)msg.wParam;
 };
 
 //
@@ -92,23 +92,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-    WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex;
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WOL));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WOL);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WOL));
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_WOL);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-    return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcex);
 }
 
 //
@@ -123,34 +123,37 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+	hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-   constexpr int width = 1280;
-   constexpr int height = 720;
+	constexpr int width = 1280;
+	constexpr int height = 720;
 
-   game::instance().client_rect= RECT{ 0,0,width ,height };
+	game::instance().client_rect = RECT{ 0,0,width ,height };
 
-   RECT _rt = { 0,0,width,height };
-   AdjustWindowRect(&_rt, WS_OVERLAPPEDWINDOW, FALSE);
+	RECT _rt = { 0,0,width,height };
 
-   hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-       CW_USEDEFAULT, 0, _rt.right - _rt.left, 
-       _rt.bottom - _rt.top, nullptr, nullptr, hInstance, nullptr);
+	AdjustWindowRect(&_rt, WS_OVERLAPPEDWINDOW, FALSE);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, _rt.right - _rt.left,
+		_rt.bottom - _rt.top, nullptr, nullptr, hInstance, nullptr);
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+	GetClientRect(hWnd, &game::instance().client_rect);
 
-   game::instance().hWnd = hWnd;
-  
+	if (!hWnd)
+	{
+		return FALSE;
+	}
 
-   return TRUE;
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	game::instance().hWnd = hWnd;
+
+
+	return TRUE;
 }
 
 //
@@ -165,85 +168,89 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-          
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        {
-        /** 더블버퍼링 시작처리입니다. **/
-        static HDC hdc, MemDC, tmpDC;
-        static HBITMAP BackBit, oldBackBit;
-        static RECT bufferRT;
-        PAINTSTRUCT ps;
+	switch (message)
+	{
+	case WM_COMMAND:
+	{
+		int wmId = LOWORD(wParam);
+		// 메뉴 선택을 구문 분석합니다:
+		switch (wmId)
+		{
 
-        hdc = BeginPaint(hWnd, &ps);
-        GetClientRect(hWnd, &bufferRT);
-        MemDC = CreateCompatibleDC(hdc);
-        BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
-        oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
-        PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
-        tmpDC = hdc;
-        hdc = MemDC;
-        MemDC = tmpDC;
-        // TODO: 여기에 그리기 코드를 추가합니다.
+		case IDM_ABOUT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
+		case IDM_EXIT:
+			DestroyWindow(hWnd);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+	}
+	break;
+	case WM_SIZE:
+		GetClientRect(hWnd, &game::instance().client_rect);
+		InvalidateRect(hWnd, NULL, TRUE);
+		return 0;
+	case WM_PAINT:
+	{
+		/** 더블버퍼링 시작처리입니다. **/
+		static HDC hdc, MemDC, tmpDC;
+		static HBITMAP BackBit, oldBackBit;
+		static RECT bufferRT;
+		PAINTSTRUCT ps;
 
-        game::instance().render(hdc);
+		hdc = BeginPaint(hWnd, &ps);
+		GetClientRect(hWnd, &bufferRT);
+		MemDC = CreateCompatibleDC(hdc);
+		BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
+		oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
+		PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
+		tmpDC = hdc;
+		hdc = MemDC;
+		MemDC = tmpDC;
+		// TODO: 여기에 그리기 코드를 추가합니다.
 
-        /** 더블버퍼링 끝처리 입니다. **/
-        tmpDC = hdc;
-        hdc = MemDC;
-        MemDC = tmpDC;
-        GetClientRect(hWnd, &bufferRT);
-        BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
-        SelectObject(MemDC, oldBackBit);
-        DeleteObject(BackBit);
-        DeleteDC(MemDC);
-        EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
+		game::instance().render(hdc);
 
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
+		/** 더블버퍼링 끝처리 입니다. **/
+		tmpDC = hdc;
+		hdc = MemDC;
+		MemDC = tmpDC;
+		GetClientRect(hWnd, &bufferRT);
+		BitBlt(hdc, 0, 0, bufferRT.right, bufferRT.bottom, MemDC, 0, 0, SRCCOPY);
+		SelectObject(MemDC, oldBackBit);
+		DeleteObject(BackBit);
+		DeleteDC(MemDC);
+		EndPaint(hWnd, &ps);
+	}
+	break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
 }
 
 // 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
