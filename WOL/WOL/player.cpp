@@ -10,7 +10,7 @@
 #include "Mouse.h"
 #include "ICE_Crystal.h"
 #include "timer.h"
-
+#include "Bmp_mgr.h"
 
 void Player::initialize()
 {
@@ -22,6 +22,8 @@ void Player::initialize()
 	_collision_component->_size = { 50.f,50.0f };
 
 	_Camera = object_mgr::instance()._Camera;
+
+	
 };
 
 Event Player::update(float dt)

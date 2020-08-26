@@ -13,7 +13,7 @@ public:
 	void release()override;
 	void late_update();
 
-	RECT client_rect;
+	RECT client_rect{};
 public:
 	HWND hWnd{};
 };

@@ -10,6 +10,7 @@ public:
 
 	uint32_t get_layer_id()const& override;
 
+	std::shared_ptr<class render_component> _render_component{};
 	std::shared_ptr<class collision_component> _collision_component{};
 };
 

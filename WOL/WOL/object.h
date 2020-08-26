@@ -17,9 +17,10 @@ public:
 	void set_ptr(std::weak_ptr<object> _ptr)&;
 	std::weak_ptr<object> get_ptr()const{return _ptr;}
 public:
-	std::shared_ptr<Transform> _transform;
+	std::shared_ptr<Transform> _transform{};
 	std::weak_ptr<object> _ptr{};
 	std::weak_ptr<object> _owner{};
+
 	void Hit(std::weak_ptr<object> _target);
 };
 

@@ -12,8 +12,6 @@ public:
     void initialize()override;
     Event update(float dt)override;
     void render(HDC hdc,vec camera_pos)override;
-
-    
 private:
     void temp(float temp);
     void MakeShield();

@@ -30,6 +30,9 @@
     <Filter Include="source\Util">
       <UniqueIdentifier>{1c85b878-bf86-42f4-8ef6-582536a794f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\Bitmap">
+      <UniqueIdentifier>{7d7c9630-ec71-4e61-b5f1-c43bc0f9a6ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fmod.h">
@@ -121,6 +124,10 @@
     </ClInclude>
     <ClInclude Include="ICE_Crystal.h" />
     <ClInclude Include="event.h" />
+    <ClInclude Include="Bmp_mgr.h" />
+    <ClInclude Include="Bmp.h" />
+    <ClInclude Include="render_component.h" />
+    <ClInclude Include="MY_RECT.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -187,6 +194,18 @@
       <Filter>source\Util</Filter>
     </ClCompile>
     <ClCompile Include="ICE_Crystal.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Bmp_mgr.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Bmp.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="render_component.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="MY_RECT.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
