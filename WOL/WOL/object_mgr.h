@@ -11,6 +11,8 @@ public:
 	void release()override;
 
 	vec camera_pos{};
+
+	std::weak_ptr<class Camera> _Camera;
 private:
 	std::map<uint32_t,std::list<std::shared_ptr<class object>>> object_map;
 public:

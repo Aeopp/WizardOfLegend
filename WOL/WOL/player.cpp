@@ -3,11 +3,13 @@
 #include "collision_mgr.h"
 #include "Input_mgr.h"
 #include "timer.h"
+#include "Camera.h"
 #include "game.h"
 #include "shield.h"
 #include "object_mgr.h"
 #include "Mouse.h"
 #include "ICE_Crystal.h"
+#include "timer.h"
 
 
 void Player::initialize()
@@ -19,6 +21,7 @@ void Player::initialize()
 
 	_collision_component->_size = { 50.f,50.0f };
 
+	_Camera = object_mgr::instance()._Camera;
 };
 
 Event Player::update(float dt)
@@ -70,6 +73,7 @@ void Player::MakeShield()
 		_shield->_speed = shield_speed;
 	}
 }
+
 void Player::ICE_CRYSTAL()
 {
 	Input_mgr& _Input = Input_mgr::instance();
@@ -87,6 +91,18 @@ void Player::ICE_CRYSTAL()
 	_ICE->_target = *V;
 	_ICE->_transform->_location = _transform->_location;
 
+}
+void Player::Camera_Shake(float force,vec dir,float duration)
+{
+	auto Cam = _Camera.lock();
+
+	if (!Cam)
+	{
+		this->_Camera = object_mgr::instance()._Camera;
+		return;
+	};
+
+	Cam->camera_shake(force, dir ,duration);
 };
 
 void Player::player_check(float dt)
@@ -144,5 +160,10 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('W'))
 	{
 		ICE_CRYSTAL();
+	}
+
+	if (_Input.Key_Down(VK_LBUTTON))
+	{
+		Camera_Shake(5, vec{ 1,1 }, 0.1f);
 	}
 }

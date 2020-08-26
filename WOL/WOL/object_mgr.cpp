@@ -57,13 +57,14 @@ void object_mgr::update()
 	}
 };
 
-
 void object_mgr::initialize()
 {
 	auto _ptr = insert_object<Player>();
 
 	auto _camera = insert_object<Camera>();
 	_camera->_owner = _ptr;
+
+	this->_Camera = _camera;
 
 	for (int i = 1; i < 100; ++i)
 	{

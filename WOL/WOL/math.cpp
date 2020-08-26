@@ -112,6 +112,7 @@ std::optional<vec> math::rectVSrect(RECT lhs, RECT rhs)
 };
 
 
+
 vec::vec(float _x, float _y) : x{ _x }, y{ _y }
 {
 }

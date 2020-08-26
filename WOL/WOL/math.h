@@ -96,6 +96,15 @@ public:
 	// 벡터 길이는 교차한 만큼( 노멀라이즈 하지 않음)
 	// 렉트는 충돌면적이 작은쪽으로 밀어주는게 자연스럽기 때문에.
 	static std::optional<vec> rectVSrect(RECT lhs, RECT rhs);
+
+public:
+	static inline std::random_device rd;
+
+	template<typename Ty>
+	static Ty Rand_N(std::pair<Ty, Ty> range);
+
+	template<typename Ty>
+	static Ty Rand(std::pair<Ty, Ty> range);
 };
 
 static  bool EQUAL(const float lhs, const float rhs)
@@ -106,6 +115,39 @@ static  bool EQUAL(const float lhs, const float rhs)
 	}
 	// else 
 	return false;
+};
+
+template<typename Ty>
+Ty math::Rand_N(std::pair<Ty, Ty> range)
+{
+	static std::mt19937 gen(rd());
+
+	if constexpr (std::is_floating_point_v<Ty>)
+	{
+		std::uniform_real_distribution<Ty> dis(range.first, range.second);
+		return dis(gen);
+	}
+	else  {
+		std::uniform_int_distribution<Ty> dis(range.first, range.second);
+		return dis(gen);
+	}
+
+	
 }
 
+template<typename Ty>
+Ty math::Rand(std::pair<Ty, Ty> range)
+{
+	static std::mt19937 gen(rd());
 
+	if constexpr (std::is_floating_point_v<Ty>)
+	{
+		std::uniform_real<Ty> dis(range.first, range.second);
+		return dis(gen);
+	}
+	else {
+		std::uniform_int<Ty> dis(range.first, range.second);
+		return dis(gen);
+	}
+}
+	

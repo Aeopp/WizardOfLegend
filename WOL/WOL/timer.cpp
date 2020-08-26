@@ -15,7 +15,7 @@ void Timer::update()
 		fpscount = 0;
 	};
 
-	for (auto event_iter = std::begin(_events); event_iter != std::end(_events);)
+	for (auto event_iter = std::begin(once_events); event_iter != std::end(once_events);)
 	{
 		auto& [remain_time, function] = *event_iter;
 
@@ -24,13 +24,56 @@ void Timer::update()
 		if (remain_time < 0)
 		{
 			function();
-			event_iter=_events.erase(event_iter);
+			event_iter= once_events.erase(event_iter);
 		}
 		else
 		{
 			++event_iter;
 		}
 	}
+
+	for (auto event_iter = std::begin(loop_events); event_iter != std::end(loop_events);)
+	{
+		auto& [remain_time,default_time, function] = *event_iter;
+
+		remain_time -= delta();
+
+		if (remain_time < 0)
+		{
+			remain_time = default_time;
+			bool bEnd = function();
+
+			if (bEnd) {
+				event_iter = loop_events.erase(event_iter);
+			}
+			else {
+				++event_iter;
+			}
+		}
+		else
+		{
+			++event_iter;
+		}
+	}
+
+
+	for (auto event_iter = std::begin(rewhile_events); event_iter != std::end(rewhile_events);)
+	{
+		auto& [remain_time, function] = *event_iter;
+
+		remain_time -= delta();
+
+		if (remain_time < 0)
+		{
+			event_iter = rewhile_events.erase(event_iter);
+		}
+		else
+		{
+			function();
+			++event_iter;
+		}
+	}
+
 }
 
 void Timer::render(HDC hdc)
