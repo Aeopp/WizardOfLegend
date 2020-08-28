@@ -30,6 +30,16 @@ struct vec
 	vec operator*(const float _scala)const;
 	vec operator+(const vec& _rhs)const;
 	vec operator-(const vec& _rhs)const;
+
+	template<typename T>
+	std::pair<T, T> Pair()
+	{
+		return std::pair<T, T>{x, y};
+	}
+
+	template<typename T>
+	vec(std::pair<T, T> Pair) : x{ (float)Pair.first }, y{ (float)Pair.second }{};
+
 	float operator*(const vec& _rhs)const;
 
 	float dot(const vec& _rhs)const;

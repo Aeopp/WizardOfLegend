@@ -45,6 +45,9 @@
     <Filter Include="source\Scene">
       <UniqueIdentifier>{f43921a7-02d1-4798-93d0-518ae4daf4ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\Tile">
+      <UniqueIdentifier>{99dc1fbd-8ef8-4bd7-80aa-084686737a76}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fmod.h">
@@ -199,6 +202,16 @@
     <ClInclude Include="ARCHER.h" />
     <ClInclude Include="MIDDLE_BOSS.h" />
     <ClInclude Include="BOSS.h" />
+    <ClInclude Include="Tile_mgr.h">
+      <Filter>source\Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>source\Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene_Edit.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -352,6 +365,18 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="BOSS.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile_mgr.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_Edit.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="helper.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

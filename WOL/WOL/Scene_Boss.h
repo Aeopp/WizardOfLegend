@@ -11,6 +11,5 @@ public:
 	void update(float dt) override;
 	void initialize()override;
 	void release() override;
-
 };
 

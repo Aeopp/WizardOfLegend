@@ -6,10 +6,10 @@ Event object::update(float dt)
 	return Event::None;
 }
 
-void object::render(HDC hdc,vec camera_pos, vec size_factor)
+void object::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 
-}
+};
 
 void object::initialize()
 {

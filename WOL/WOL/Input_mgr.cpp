@@ -41,7 +41,7 @@ std::optional<vec> Input_mgr::GetWindowMousePos() const&
 std::optional<vec> Input_mgr::GetWorldMousePos() const&
 {
 	auto OMouse = GetWindowMousePos();
-	if (!OMouse) return OMouse;
+	if (!OMouse) return std::nullopt;
 
 	return *OMouse + object_mgr::instance().camera_pos;
 };

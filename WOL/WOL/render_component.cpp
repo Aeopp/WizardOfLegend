@@ -30,7 +30,6 @@ void render_component::LoadBmp(const std::wstring& _filename, const std::wstring
 void render_component::ChangeAnimDir(std::weak_ptr<class Bmp> p_wp_Image,float default_dt)
 {
 	// 만약 같은 방향이라면 그냥 아무것도 안함
-
 	// 다른 방향이라면 델타 초기화 해야함
 	auto p_sp_image = p_wp_Image.lock();
 	auto _sp_image = wp_Image.lock();
@@ -85,8 +84,6 @@ void render_component::Render(HDC hDC)
 		else
 			++RenderObj;
 	}
-	
-
 	_Anim.update();
 
 	HDC _BDC = sp_Image->Get_MemDC();
@@ -108,8 +105,5 @@ void render_component::Render(HDC hDC)
 	default:
 		break;
 	}
-
-
-	
 };
 

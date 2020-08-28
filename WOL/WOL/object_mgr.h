@@ -13,8 +13,7 @@ public:
 	vec camera_pos{};
 
 	std::weak_ptr<class Camera> _Camera;
-private:
-	std::map<uint32_t,std::list<std::shared_ptr<class object>>> object_map;
+	std::map<uint32_t, std::list<std::shared_ptr<class object>>> object_map;
 public:
 	template<typename object_type, typename ...param_Ty>
 	[[nodiscard]] auto insert_object(param_Ty&&... _params);

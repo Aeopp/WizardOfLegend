@@ -3,6 +3,7 @@
 #include "collision_component.h"
 #include "ESkillBarIcon.h"
 
+
 class Player :
     public actor
 {
@@ -13,7 +14,7 @@ public:
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
     void initialize()override;
     Event update(float dt)override;
-    
+
     void Hit(std::weak_ptr<object> _target)override;
 
     std::shared_ptr<class player_info> _player_info;

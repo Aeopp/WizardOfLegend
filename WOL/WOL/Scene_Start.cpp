@@ -22,8 +22,6 @@ void Scene_Start::render(HDC hdc, std::pair<float, float> size_factor)
 
 void Scene_Start::update(float dt)
 {
-	
-	
 	Timer& _Timer = Timer::instance();
 
 	_Timer.update();
@@ -66,9 +64,7 @@ void Scene_Start::initialize()
 
 void Scene_Start::release()
 {
-	
-	
-
+	Scene::release();
 }
 
 Scene_Start::~Scene_Start() noexcept

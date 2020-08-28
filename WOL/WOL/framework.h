@@ -14,6 +14,7 @@
 extern bool bDebug;
 extern float DeltaTime;
 extern bool bFrameLimit;
+extern HDC CurHdc;
 
 #include <memory>
 #include <mutex>

@@ -15,45 +15,48 @@
 #include "WIZARD.h"
 #include "BOSS.h"
 #include "MIDDLE_BOSS.h"
+#include "Tile_mgr.h"
 
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 {
+	Scene::render(hdc,size_factor);
+
 	{
 		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
 
-		Timer::instance().render(hdc);
-
+		Tile_mgr::instance().render(hdc, size_factor);
 		object_mgr::instance().render(hdc, size_factor);
 		collision_mgr::instance().render(hdc, size_factor);
+		Timer::instance().render(hdc);
 	}
 }
 
 void Scene_Stage::update(float dt)
 {
-	
-	static float q = 3.f;
-	q -= dt;
-	if (q < 0)
-	{
-		Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
-	}
+	Scene::update(dt);
+
 	Timer& _Timer = Timer::instance();
 
 	_Timer.update();
 
 	sound_mgr::instance().Frame(_Timer.delta());
 
-	object_mgr::instance().update();
+	Tile_mgr::instance().update(dt);
 
-	Input_mgr::instance().update();
+	object_mgr::instance().update();
 
 	collision_mgr::instance().update();
 
+	Input_mgr::instance().update();
 }
 
 void Scene_Stage::initialize()
 {
+	Scene::initialize();
+
+	Tile_mgr::instance().initialize();
+
 	// TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
@@ -64,6 +67,8 @@ void Scene_Stage::initialize()
 		_camera->_owner = _ptr;
 
 		obj_mgr._Camera = _camera;
+
+		manage_objs.push_back(_camera);
 
 		for (int i = 1; i < 10; ++i)
 		{
@@ -122,6 +127,9 @@ void Scene_Stage::initialize()
 
 void Scene_Stage::release()
 {
+	Scene::release();
+
+	Tile_mgr::instance().release();
 }
 
 Scene_Stage::~Scene_Stage() noexcept

@@ -5,6 +5,7 @@
 #include "Scene_Stage.h"
 #include "Scene_Start.h"
 #include "Scene_End.h"
+#include "Scene_Edit.h"
 
 void Scene_mgr::Scene_Change(ESceneID _ESceneID)
 {
@@ -26,6 +27,9 @@ void Scene_mgr::Scene_Change(ESceneID _ESceneID)
 			break;
 		case ESceneID::EEnd:
 			sp_scene = std::make_shared<Scene_End>();
+			break;
+		case ESceneID::EEdit:
+			sp_scene = std::make_shared<Scene_Edit>();
 			break;
 		case ESceneID::ENone:
 			break;

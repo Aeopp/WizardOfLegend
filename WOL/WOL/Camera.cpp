@@ -20,7 +20,7 @@ Event Camera::update(float dt)
 
 	vec& cp = _object_mgr->camera_pos;
 
-	cp = this->_transform->_location = _target_ptr->_transform->_location;
+	cp = _transform->_location = _target_ptr->_transform->_location;
 
 	cp.x -= width;
 	cp.y -= height;

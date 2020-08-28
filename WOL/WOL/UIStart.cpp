@@ -78,6 +78,7 @@ void UIStart::Click(vec hit_pos)
 		Scene_mgr::instance().Scene_Change(ESceneID::EStage);
 		break;
 	case UIStart::Option:
+		Scene_mgr::instance().Scene_Change(ESceneID::EEdit);
 		// 옵션 진입
 		break;
 	case UIStart::Quit:

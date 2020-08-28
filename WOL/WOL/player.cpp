@@ -27,7 +27,7 @@
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	actor::render(hdc, camera_pos, size_factor);
-}
+};
 
 void Player::initialize()
 {
@@ -48,7 +48,8 @@ void Player::initialize()
 
 	_Camera = object_mgr::instance()._Camera;
 
-	_player_info = std::make_shared<player_info>();
+	_player_info = game::instance()._player_info;
+	if (!_player_info)return;
 
 	//Anim SetUp
 	{
@@ -84,6 +85,7 @@ Event Player::update(float dt)
 
 	player_check(dt);
 
+	if (!_player_info) return Event::Die;
 	_player_info->hp -= dt * 1;
 	_player_info->mp -= dt * 10;
 
@@ -256,6 +258,7 @@ void Player::make_player_bar()
 	auto UI = _object_mgr.insert_object<UI_PlayerBar>();
 	if (!UI)return;
 	UI->_owner = _ptr;
+	if (!_player_info)return;
 	UI->_player_info = _player_info;
 
 	UI->late_initialize();

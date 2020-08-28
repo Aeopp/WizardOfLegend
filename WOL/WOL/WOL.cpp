@@ -17,7 +17,7 @@ HWND hWnd{};
 bool bDebug{ false };
 float DeltaTime{ 0.f };
 bool bFrameLimit{ true };
-
+HDC CurHdc {};
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -186,6 +186,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	
 	switch (message)
 	{
 	case WM_COMMAND:
@@ -223,9 +224,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		MemDC = CreateCompatibleDC(hdc);
 		BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
 		oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
-		PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
+		PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, BLACKNESS);
 		tmpDC = hdc;
-		hdc = MemDC;
+		CurHdc = hdc = MemDC;
 		MemDC = tmpDC;
 		// TODO: 여기에 그리기 코드를 추가합니다.
 

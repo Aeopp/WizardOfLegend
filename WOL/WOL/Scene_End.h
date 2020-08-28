@@ -6,7 +6,6 @@ class Scene_End :
 public:
 	~Scene_End()noexcept override;
 
-
 	void render(HDC hdc, std::pair<float, float> size_factor)override;
 	void update(float dt) override;
 	void initialize()override;

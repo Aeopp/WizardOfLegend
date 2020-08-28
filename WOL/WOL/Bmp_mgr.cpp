@@ -15,7 +15,7 @@ void Bmp_mgr::initialize()
 void Bmp_mgr::release()
 {
 
-}
+};
 
 std::weak_ptr<Bmp> Bmp_mgr::Insert_Bmp(std::wstring FileName, std::wstring ImageKey)
 {
@@ -39,11 +39,10 @@ std::weak_ptr<Bmp> Bmp_mgr::Insert_Bmp(std::wstring FileName, std::wstring Image
 	{
 		return iter->second;
 	}
-
 	return {};
 }
 
-std::weak_ptr<Bmp> Bmp_mgr::Find_Image(std::wstring ImageKey)
+std::weak_ptr<Bmp> Bmp_mgr::Find_Image_WP(std::wstring ImageKey)
 {
 	using namespace std;
 
@@ -53,7 +52,20 @@ std::weak_ptr<Bmp> Bmp_mgr::Find_Image(std::wstring ImageKey)
 		return {};
 
 	return iter->second;
-}
+};
+
+std::shared_ptr<Bmp> Bmp_mgr::Find_Image_SP(std::wstring ImageKey)
+{
+	using namespace std;
+
+	auto iter = bmp_map.find(ImageKey);
+
+	if (bmp_map.end() == iter)
+		return {};
+
+	return iter->second;
+};
+
 
 void Bmp_mgr::Release()
 {

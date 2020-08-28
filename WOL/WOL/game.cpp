@@ -7,6 +7,8 @@
 #include "Bmp_mgr.h"
 #include "object_mgr.h"
 #include "collision_mgr.h"
+#include "player_info.h"
+
 
 
 void game::render(HDC hdc)
@@ -28,6 +30,8 @@ void game::update()
 
 void game::initialize()
 {
+	_player_info = std::make_shared<player_info>();
+
 	Scene_mgr::instance().initialize();
 
 	Scene_mgr::instance().Scene_Change(ESceneID::EStart);
