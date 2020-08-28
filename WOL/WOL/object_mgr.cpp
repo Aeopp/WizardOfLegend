@@ -57,27 +57,29 @@ void object_mgr::update()
 			}
 		}
 	}
+
+	check_erase();
 };
 
 void object_mgr::initialize()
 {
-	auto _ptr = insert_object<Player>();
-
-	auto _camera = insert_object<Camera>();
-	_camera->_owner = _ptr;
-
-	this->_Camera = _camera;
-
-	for (int i = 1; i < 100; ++i)
-	{
-		auto _ptr2 = insert_object<Monster>();
-		_ptr2->_transform->_location = vec{ i *100,i*100};
-	}
 	
-	auto EMouse = insert_object<Mouse>();
 }
 
 void object_mgr::release()
 {
 	object_map.clear();
+}
+
+void object_mgr::check_erase()
+{
+	for (auto& [key, obj_list] : object_map)
+	{
+		obj_list.erase(
+
+			std::remove_if(std::begin(obj_list), std::end(obj_list),
+			[](auto& cur_obj) {if (!cur_obj)return true; return cur_obj->bDie; }),
+
+			std::end(obj_list));
+	};
 }

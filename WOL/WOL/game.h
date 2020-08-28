@@ -13,6 +13,12 @@ public:
 	void release();
 	void late_update();
 
+	void debug_cul_obj_setup(int cul_obj,int render_obj);
+
+	int	print_cul_obj{};
+	int print_render_obj{};
+
+
 	RECT client_rect{};
 	static constexpr int width = 1600;
 	static constexpr int height = 900;

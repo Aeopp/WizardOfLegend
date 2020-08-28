@@ -21,15 +21,10 @@ void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	if (!_render_component)return;
 
-	ps.x *= size_factor.x;
-	ps.y *= size_factor.y;
-
-	//loc.y *= size_factor.y;
-	//	loc.x *= size_factor.x;
-
 	loc -= _render_component->Dest_Paint_Size * 0.5f;
 
 	_render_component->Dest_Loc = loc;
+	_render_component->Dest_Paint_Size  = _render_component->Default_Dest_Paint_Size;
 	_render_component->Render(hdc);
 
 	if (bDebug)
@@ -56,11 +51,11 @@ void Mouse::initialize()
 	sp_collision->bPush = false;
 	sp_collision->bRender = false;
 
-	ShowCursor(false);
+	ShowCursor(true);
 
 	Input_mgr::instance()._Mouse = _ptr;
 
-	_render_component = render_component::MakeRenderComponent_SP(L"UI_MOUSE.bmp", L"UI_MOUSE");
+	_render_component = render_component::LoadRenderComponent_SP(L"UI_MOUSE.bmp", L"UI_MOUSE");
 	_render_component->_ColorKey = RGB(255, 0, 255);
 	_render_component->_Img_src = RECT{0,0,60,60};
 	_render_component->Default_Dest_Paint_Size = vec{ 30,30 };
@@ -82,6 +77,6 @@ Event Mouse::update(float dt)
 
 uint32_t Mouse::get_layer_id() const&
 {
-	return layer_type::EUI;
+	return layer_type::EUIMouse;
 };
 

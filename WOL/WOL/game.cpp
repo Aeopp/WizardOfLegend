@@ -1,65 +1,62 @@
 #include "pch.h"
 #include "game.h"
-#include "object_mgr.h"
-#include "collision_mgr.h"
-#include "Input_mgr.h"
+#include "Font.h"
+#include "Scene_mgr.h"
 #include "timer.h"
 #include "sound_mgr.h"
 #include "Bmp_mgr.h"
-#include "Font.h"
+#include "object_mgr.h"
+#include "collision_mgr.h"
+
 
 void game::render(HDC hdc)
 {
+	Scene_mgr::instance().render(hdc,size_factor());
+
+	if (bDebug)
 	{
-		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
-
-		Timer::instance().render(hdc);
-
-		object_mgr::instance().render(hdc, size_factor());
-
-		collision_mgr::instance().render(hdc, size_factor());
+		std::wstringstream wss;
+		wss << L"컬링 오브젝트 : " << print_cul_obj << L" 렌더링 오브젝트 " << print_render_obj << std::endl;
+		TextOut(hdc, 1000, 0, wss.str().c_str(), wss.str().size());
 	}
 }
 
 void game::update()
 {
-	Timer& _Timer = Timer::instance();
-
-	_Timer.update();
-
-	sound_mgr::instance().Frame(_Timer.delta());
-
-	object_mgr::instance().update();
-
-	collision_mgr::instance().update();
+	Scene_mgr::instance().update(Timer::instance().delta());
 }
 
 void game::initialize()
 {
-	AddFontResource(L"..\\..\\Resources\\Font\\NanumBarunGothicBold.ttf");
+	Scene_mgr::instance().initialize();
 
-	Timer::instance().initialize();
-
-	sound_mgr::instance().initialize();
-
-	Bmp_mgr::instance().initialize();
-
-	Input_mgr::instance().initialize();
-
-	object_mgr::instance().initialize();
+	Scene_mgr::instance().Scene_Change(ESceneID::EStart);
 }
 
 void game::release()
 {
+	Scene_mgr::instance().release();
+
 	Bmp_mgr::instance().release();
 
+	sound_mgr::instance().Release();
+
 	object_mgr::instance().release();
+
+	collision_mgr::instance().release();
 }
 
 void game::late_update()
 {
-	Input_mgr::instance().update();
+
 }
+
+void game::debug_cul_obj_setup(int cul_obj, int render_obj)
+{
+	print_cul_obj = cul_obj;
+	print_render_obj = render_obj;
+}
+
 
 std::pair<float, float> game::size_factor()
 {

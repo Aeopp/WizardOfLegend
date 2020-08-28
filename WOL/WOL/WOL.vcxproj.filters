@@ -42,6 +42,9 @@
     <Filter Include="source\object\UI">
       <UniqueIdentifier>{2719909b-850f-47f5-bf55-70009ee07776}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\Scene">
+      <UniqueIdentifier>{f43921a7-02d1-4798-93d0-518ae4daf4ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fmod.h">
@@ -166,6 +169,36 @@
     <ClInclude Include="UIInfo.h" />
     <ClInclude Include="UISkillIBarIcon.h" />
     <ClInclude Include="ESkillBarIcon.h" />
+    <ClInclude Include="ESceneID.h" />
+    <ClInclude Include="Scene.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene_Boss.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene_mgr.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene_Stage.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene_Start.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene_End.h">
+      <Filter>source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="UIStart.h">
+      <Filter>source\object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIInteraction.h" />
+    <ClInclude Include="Anim.h" />
+    <ClInclude Include="SwordMan.h" />
+    <ClInclude Include="EnemyInfo.h" />
+    <ClInclude Include="WIZARD.h" />
+    <ClInclude Include="ARCHER.h" />
+    <ClInclude Include="MIDDLE_BOSS.h" />
+    <ClInclude Include="BOSS.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -277,6 +310,48 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="UISkillIBarIcon.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_Boss.cpp">
+      <Filter>source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_mgr.cpp">
+      <Filter>source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_Stage.cpp">
+      <Filter>source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_Start.cpp">
+      <Filter>source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_End.cpp">
+      <Filter>source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="UIStart.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UIInteraction.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Anim.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="SwordMan.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="WIZARD.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="ARCHER.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="MIDDLE_BOSS.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="BOSS.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

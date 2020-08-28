@@ -21,7 +21,6 @@ void ICE_Crystal::initialize()
 	bSuccess = false;
 	_target = vec{ 0.f,0.f };
 	_speed = 300.f;
-
 }
 
 Event ICE_Crystal::update(float dt)

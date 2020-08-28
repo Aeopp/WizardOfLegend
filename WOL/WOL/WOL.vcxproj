@@ -150,14 +150,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="actor.h" />
+    <ClInclude Include="Anim.h" />
+    <ClInclude Include="ARCHER.h" />
     <ClInclude Include="Bmp.h" />
     <ClInclude Include="Bmp_mgr.h" />
+    <ClInclude Include="BOSS.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="collision_component.h" />
     <ClInclude Include="collision_mgr.h" />
     <ClInclude Include="collision_tag.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debuger.h" />
+    <ClInclude Include="ESceneID.h" />
     <ClInclude Include="ESkillBarIcon.h" />
     <ClInclude Include="event.h" />
     <ClInclude Include="fmod.h" />
@@ -175,7 +179,9 @@
     <ClInclude Include="Input_mgr.h" />
     <ClInclude Include="layer_type.h" />
     <ClInclude Include="math.h" />
+    <ClInclude Include="MIDDLE_BOSS.h" />
     <ClInclude Include="Monster.h" />
+    <ClInclude Include="EnemyInfo.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MY_RECT.h" />
     <ClInclude Include="object.h" />
@@ -185,9 +191,16 @@
     <ClInclude Include="player_info.h" />
     <ClInclude Include="render_component.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Scene_Boss.h" />
+    <ClInclude Include="Scene_End.h" />
+    <ClInclude Include="Scene_mgr.h" />
+    <ClInclude Include="Scene_Stage.h" />
+    <ClInclude Include="Scene_Start.h" />
     <ClInclude Include="shield.h" />
     <ClInclude Include="singleton_interface.h" />
     <ClInclude Include="sound_mgr.h" />
+    <ClInclude Include="SwordMan.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="transform.h" />
@@ -195,17 +208,23 @@
     <ClInclude Include="UIBar.h" />
     <ClInclude Include="UIGold.h" />
     <ClInclude Include="UIHPBar.h" />
+    <ClInclude Include="UIInteraction.h" />
     <ClInclude Include="UISkillIBarIcon.h" />
     <ClInclude Include="UIInfo.h" />
     <ClInclude Include="UIMpBar.h" />
     <ClInclude Include="UISkillBar.h" />
+    <ClInclude Include="UIStart.h" />
     <ClInclude Include="UI_PlayerBar.h" />
+    <ClInclude Include="WIZARD.h" />
     <ClInclude Include="WOL.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="actor.cpp" />
+    <ClCompile Include="Anim.cpp" />
+    <ClCompile Include="ARCHER.cpp" />
     <ClCompile Include="Bmp.cpp" />
     <ClCompile Include="Bmp_mgr.cpp" />
+    <ClCompile Include="BOSS.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="collision_component.cpp" />
     <ClCompile Include="collision_mgr.cpp" />
@@ -217,6 +236,7 @@
     <ClCompile Include="Input_mgr.cpp" />
     <ClCompile Include="layer_type.cpp" />
     <ClCompile Include="math.cpp" />
+    <ClCompile Include="MIDDLE_BOSS.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="MY_RECT.cpp" />
@@ -230,20 +250,30 @@
     </ClCompile>
     <ClCompile Include="player.cpp" />
     <ClCompile Include="render_component.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Scene_Boss.cpp" />
+    <ClCompile Include="Scene_End.cpp" />
+    <ClCompile Include="Scene_mgr.cpp" />
+    <ClCompile Include="Scene_Stage.cpp" />
+    <ClCompile Include="Scene_Start.cpp" />
     <ClCompile Include="shield.cpp" />
     <ClCompile Include="singleton_interface.cpp" />
     <ClCompile Include="sound_mgr.cpp" />
+    <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="UIBar.cpp" />
     <ClCompile Include="UIGold.cpp" />
     <ClCompile Include="UIHPBar.cpp" />
+    <ClCompile Include="UIInteraction.cpp" />
     <ClCompile Include="UISkillIBarIcon.cpp" />
     <ClCompile Include="UIInfo.cpp" />
     <ClCompile Include="UIMpBar.cpp" />
     <ClCompile Include="UISkillBar.cpp" />
+    <ClCompile Include="UIStart.cpp" />
     <ClCompile Include="UI_PlayerBar.cpp" />
+    <ClCompile Include="WIZARD.cpp" />
     <ClCompile Include="WOL.cpp" />
   </ItemGroup>
   <ItemGroup>

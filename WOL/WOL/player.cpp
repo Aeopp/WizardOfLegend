@@ -18,23 +18,50 @@
 #include "UIHPBar.h"
 #include "UIMpBar.h"
 #include "UISkillIBarIcon.h"
+#include "render_component.h"
+#include "Color.h"
+#include "Bmp_mgr.h"
 
 
+
+void Player::render(HDC hdc, vec camera_pos, vec size_factor)
+{
+	actor::render(hdc, camera_pos, size_factor);
+}
 
 void Player::initialize()
 {
-	object::initialize();
+	actor::initialize();
+	Bmp_mgr& BMgr = Bmp_mgr::instance();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ECircle);
+	AnimDirFileTable[(int)EAnimDir::back] = BMgr.Insert_Bmp(L"BACK_COMPLETE.bmp", L"BACK_COMPLETE");
+	AnimDirFileTable[(int)EAnimDir::front] = BMgr.Insert_Bmp(L"FRONT_COMPLETE.bmp", L"FRONT_COMPLETE");
+	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"LEFT_COMPLETE.bmp", L"LEFT_COMPLETE");
+	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"RIGHT_COMPLETE.bmp", L"RIGHT_COMPLETE");
+
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ERect);
 	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 
-	sp_collision->_size = { 50.f,50.0f };
+	sp_collision->_size = { 30.f,30.0f };
 
 	_Camera = object_mgr::instance()._Camera;
 
 	_player_info = std::make_shared<player_info>();
+
+	//Anim SetUp
+	{
+		_render_component = render_component::LoadRenderComponent_SP
+		(L"FRONT_COMPLETE.bmp", L"FRONT_COMPLETE");
+		// 174 182
+		_render_component->Default_Dest_Paint_Size = vec{ 182,182 };
+		_render_component->Dest_Paint_Size = vec{ 182*0.8,182*0.8 };
+		_render_component->_ColorKey = COLOR::MEGENTA();
+		_render_component->_Img_src = RECT{ 0,0,174,182 };
+		_render_component->_Anim.SetAnimationClip(
+			{ 1 ,10,8,8,8,2,7 }, 0.05f);
+	}
 
 	make_skill_bar();
 
@@ -46,6 +73,9 @@ void Player::initialize()
 	make_skillbar_icon(ESkill::BLAST);
 	make_skillbar_icon(ESkill::CRYSTAL);
 	make_skillbar_icon(ESkill::FIRE);
+
+	_speed = 400.f;
+
 };
 
 Event Player::update(float dt)
@@ -57,7 +87,24 @@ Event Player::update(float dt)
 	_player_info->hp -= dt * 1;
 	_player_info->mp -= dt * 10;
 
+
 	return _E;
+}
+void Player::Hit(std::weak_ptr<object> _target)
+{
+	Anim& MyAnim = _render_component->_Anim;
+
+	if(_player_info->hp>0)
+	{
+		MyAnim.AnimPlay((int)AnimTable::hit,0.3f);
+		MyAnim.SetDefaultClip((int)AnimTable::idle);
+	}
+	else
+	{
+		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
+		MyAnim.AnimPlay((int)AnimTable::dead, 0.3f);
+		MyAnim.SetDefaultClip((int)AnimTable::idle);
+	}
 };
 
 void Player::temp(float temp)
@@ -128,51 +175,32 @@ void Player::player_check(float dt)
 
 	if (_Input.Key_Pressing(VK_RIGHT))
 	{
-		if (_Input.Key_Pressing(VK_UP))
-		{
-			float f = 1 / sqrtf(2.f);
+		_render_component->ChangeAnim(AnimTable::walk,0.2f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::right]);
 
-			_transform->_location += vec{ +1,0 }*_speed * f * dt;
-			_transform->_location += vec{ 0,-1 }*_speed * f * dt;
-		}
-		if (_Input.Key_Pressing(VK_DOWN))
-		{
-			float f = 1 / sqrtf(2.f);
-
-			_transform->_location += vec{ +1,0 }*_speed * f * dt;
-			_transform->_location += vec{ 0,+1 }*_speed * f * dt;
-		}
-		else
-			_transform->_location += vec{ +1,0 }*_speed * dt;
+		_transform->_dir = vec{ +1,0 };
+		_transform->Move(_speed * dt);
 	}
-	if (_Input.Key_Pressing(VK_LEFT))
+	else if (_Input.Key_Pressing(VK_LEFT))
 	{
-		if (_Input.Key_Pressing(VK_UP))
-		{
-			float f = 1 / sqrtf(2.f);
+		_render_component->ChangeAnim(AnimTable::walk, 0.2f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::left]);
 
-			_transform->_location += vec{ -1,0 }*_speed * f * dt;
-			_transform->_location += vec{ 0,-1 }*_speed * f * dt;
-		}
-		if (_Input.Key_Pressing(VK_DOWN))
-		{
-			float f = 1 / sqrtf(2.f);
-
-			_transform->_location += vec{ -1,0 }*_speed * f * dt;
-			_transform->_location += vec{ 0,+1 }*_speed * f * dt;
-		}
-		else
-			_transform->_location += vec{ -1,0 }*_speed * dt;
+		_transform->_dir = vec{ -1,0 };
+		_transform->Move(_speed * dt);
 	}
-
-	if (_Input.Key_Pressing(VK_UP))
+	else if (_Input.Key_Pressing(VK_UP))
 	{
-		_transform->_location += vec{ 0,-1 }*_speed * dt;;
+		_render_component->ChangeAnim(AnimTable::walk, 0.2f, AnimTable::idle,AnimDirFileTable[(int)EAnimDir::back]);
+
+		_transform->_dir = vec{ 0,-1 };
+		_transform->Move(_speed * dt);
 	}
-	if (_Input.Key_Pressing(VK_DOWN))
+	else if (_Input.Key_Pressing(VK_DOWN))
 	{
-		_transform->_location += vec{ 0,+1 }*_speed * dt; ;
-	}
+		_render_component->ChangeAnim(AnimTable::walk, 0.2f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::front]);
+		_transform->_dir = vec{ 0,+1 };
+		_transform->Move(_speed * dt);
+	};
+
 
 	if (_Input.Key_Down('W'))
 	{
@@ -181,12 +209,28 @@ void Player::player_check(float dt)
 
 	if (_Input.Key_Down(VK_LBUTTON))
 	{
+		Anim& MyAnim = _render_component->_Anim;
+
+		if ((int)AnimTable::attack1 == MyAnim.CurClipRowIndex())
+		{
+			_render_component->ChangeAnim(AnimTable::attack2, 0.2f, AnimTable::idle);
+		}
+		else 
+		{
+			_render_component->ChangeAnim(AnimTable::attack1, 0.2f, AnimTable::idle);
+		}
+
 		Camera_Shake(5, vec{ 1,1 }, 0.1f);
 	}
 
 	if (_Input.Key_Down('Q'))
 	{
 		MakeShield();
+	}
+
+	if (_Input.Key_Down(VK_SPACE))
+	{
+		Dash();
 	}
 };
 
@@ -257,4 +301,10 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 		break;
 	}
 }
+
+void Player::Dash()
+{
+	_render_component->ChangeAnim(AnimTable::dash, 0.2f, AnimTable::idle);
+};
+
 

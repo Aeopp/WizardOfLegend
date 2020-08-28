@@ -13,7 +13,7 @@ void UIGold::initialize()
 	// 해상도 변경시 비율 조정을 위해서
 	auto [x, y] = game::instance().size_factor();
 
-	_render_component = render_component::MakeRenderComponent_SP(L"UI_MONEY.bmp", L"UI_MONEY");
+	_render_component = render_component::LoadRenderComponent_SP(L"UI_MONEY.bmp", L"UI_MONEY");
 	_render_component->Default_Dest_Paint_Size = vec{ 31 * x,31 * y };
 	_render_component->_ColorKey = COLOR::MEGENTA();
 	_render_component->_Img_src = RECT{ 0,0,31,31 };
@@ -44,7 +44,6 @@ void UIGold::render(HDC hdc, vec camera_pos, vec size_factor)
 		Font(hdc, L"");
 		//DrawText(hdc, str.c_str(), str.size(), &_rt, DT_CENTER);
 	}
-	
 }
 
 uint32_t UIGold::get_layer_id() const&

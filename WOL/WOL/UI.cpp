@@ -2,6 +2,7 @@
 #include "UI.h"
 #include "Debuger.h"
 #include "render_component.h"
+#include "Input_mgr.h"
 
 void UI::initialize()
 {
@@ -40,7 +41,12 @@ void UI::render(HDC hdc, vec camera_pos,vec size_factor)
 	_render_component->Render(hdc);
 }
 
+Event UI::update(float dt)
+{
+	return object::update(dt);
+}
+
 uint32_t UI::get_layer_id() const&
 {
 	return layer_type::EUI;
-}
+};

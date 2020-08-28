@@ -8,9 +8,11 @@ enum figure_type
 
 enum collision_tag
 {
+	EMAP,
 	EPlayer,
 	EMonster,
 	EMouse,
 	EShield,
 	EPlayerAttack,
+	EMonsterAttack,
 };

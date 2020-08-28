@@ -14,7 +14,7 @@ void UI_PlayerBar::initialize()
 	// 해상도 변경시 비율 조정을 위해서
 	auto [x, y] = game::instance().size_factor();
 
-	_render_component = render_component::MakeRenderComponent_SP(L"UI_PLAYERBAR.bmp", L"UI_PLAYERBAR");
+	_render_component = render_component::LoadRenderComponent_SP(L"UI_PLAYERBAR.bmp", L"UI_PLAYERBAR");
 	_render_component->Default_Dest_Paint_Size = vec{ 328/1.5* x,80/1.5* y };
 	_render_component->_ColorKey = COLOR::MEGENTA();
 	_render_component->_Img_src = RECT{ 0,0,328,80 };

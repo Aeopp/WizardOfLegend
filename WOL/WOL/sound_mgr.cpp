@@ -11,15 +11,15 @@ void sound_mgr::initialize()
 	namespace fs =   std::filesystem;
 
 	for (const fs::directory_entry& entry :
-		fs::directory_iterator(fs::current_path() /".."/".."/"Resources"/"Sound")) {
-		bool bLoad =Load(entry.path().string());
+		fs::directory_iterator(fs::current_path()/".."/".."/"Resources"/"Sound")) {
+		bool bLoad =Load(entry.path().string(),entry.path().stem().string());
 	}
-
-	Play(default_path + "MAIN_MENU_BGM.mp3",true,1.f);
 }
 
-bool sound_mgr::Play(const std::string& SoundKey,
+bool sound_mgr::Play( std::string SoundKey,
 	bool IsBgm, const float Volume) {
+
+	namespace fs = std::filesystem;
 
 	if (Sounds.empty() || (IsBgm == true && CurrentBgmKey == SoundKey)) {
 		return false;
@@ -31,7 +31,7 @@ bool sound_mgr::Play(const std::string& SoundKey,
 	if (auto iter = Sounds.find(SoundKey);
 		iter != std::end(Sounds)) {
 		auto& [System, Sound, Channel] = iter->second;
-		/*if (Channel != nullptr)*/ {
+		{
 			Channel->isPlaying(&isplay);
 
 			if (isplay == true && IsBgm == true) {
@@ -61,13 +61,13 @@ bool sound_mgr::Play(const std::string& SoundKey,
 	return false;
 };
 
-bool sound_mgr::Load(std::string FullPath) {
+bool sound_mgr::Load(std::string FullPath, std::string Key) {
 
 	if (FMOD_System == nullptr) {
 		return false;
 	};
 	// 사운드 새로 생성해서 삽입
-	if (auto iter = Sounds.find(FullPath);
+	if (auto iter = Sounds.find(Key);
 		iter == std::end(Sounds) == true) {
 		SoundType InsertSound;
 		auto& [System, Sound, Channel] = InsertSound;
@@ -80,7 +80,7 @@ bool sound_mgr::Load(std::string FullPath) {
 		};
 
 		Channel->setVolume(DefaultVolume);
-		Sounds.insert(iter, { std::move(FullPath)  , InsertSound });
+		Sounds.insert(iter, { std::move(Key)  , InsertSound });
 	}
 	// 이미 사운드가 있을때
 	else {

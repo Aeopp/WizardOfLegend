@@ -110,6 +110,12 @@ std::optional<vec> math::rectVSrect(RECT lhs, RECT rhs)
 
 	return std::nullopt;
 }
+bool math::RectInPoint(RECT rt, vec p)
+{
+	if (p.x >= rt.left && p.x <= rt.right && p.y >= rt.top && p.y <= rt.bottom)
+		return true;
+	return false;
+}
 float math::my_lerp(float start, float goal, float goal_time,float dt)
 {
 	float f = goal - start;
@@ -266,6 +272,11 @@ bool vec::operator>=(const vec& _rhs) const
 	l = this->length_2();
 	m = _rhs.length_2();
 	return l > m && EQUAL(l, m);
+}
+
+ vec vec::unit_diagonal_vec()
+{
+	return vec{ 0.7071067811865475 ,0.7071067811865475 };
 }
 
 

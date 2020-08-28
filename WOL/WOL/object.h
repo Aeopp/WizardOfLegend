@@ -21,6 +21,8 @@ public:
 	std::weak_ptr<object> _ptr{};
 	std::weak_ptr<object> _owner{};
 
-	void Hit(std::weak_ptr<object> _target);
+	virtual void Hit(std::weak_ptr<object> _target);
+
+	bool bDie{ false };
 };
 

@@ -96,7 +96,14 @@ void Input_mgr::Event_Update()
 
 void Input_mgr::update()
 {
+	if (Key_Down('P'))
+		bDebug = !bDebug;
+	if (Key_Down('O'))
+		bFrameLimit = !bFrameLimit;
+	
 	Key_Update();
+
+	
 
 	// Event_Update();
 };

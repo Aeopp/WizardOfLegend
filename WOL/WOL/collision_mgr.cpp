@@ -9,7 +9,7 @@ std::weak_ptr< collision_component>
 collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 	figure_type _type)
 {
-	std::shared_ptr<collision_component> _collision = std::make_shared< collision_component>();
+	std::shared_ptr<collision_component> _collision = std::make_shared<collision_component>();
 
 	_collision->_figure_type = _type;
 	_collision->set_owner(_owner);
@@ -18,66 +18,93 @@ collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 	return _collision;
 };
 
-void collision_mgr::render(HDC hdc, std::pair<float,float> size_factor)
+void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 {
 	if (!bRender)return;
 
 	RECT c_rect = game::instance().client_rect;
 
-	vec cpos  = object_mgr::instance().camera_pos;
+	vec cpos = object_mgr::instance().camera_pos;
 
 	int render_object_count = 0;
+	int comp_count{ 0 };
 
 	for (auto& [tag, collisions] : _collision_map)
 	{
 		for (auto& collision : collisions)
 		{
+			comp_count++;
+
 			if (!collision)continue;
 			if (!collision->bRender) continue;;
 			auto _owner = collision->get_owner().lock();
-			if (!_owner)continue;
+			if (!_owner)
+			{
+				collision->bDie = true;
+				continue;
+			}
+				vec _loc = _owner->_transform->_location;
+				vec _size = collision->_size;
 
-			vec _loc = _owner->_transform->_location;
-			vec _size = collision->_size;
-			
-			RECT _rt;
+				RECT _rt;
 
-			RECT _rhs{ _loc.x - _size.x
-					- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
-					- cpos.y };
-
-			if (!IntersectRect(&_rt, &c_rect, &_rhs))continue;
-
-			Debuger(hdc, [&]() {
-				if (collision->_figure_type == ERect)
-				{
-					Rectangle(hdc, _loc.x - _size.x
+				RECT _rhs{ _loc.x - _size.x
 						- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
-						- cpos.y);
+						- cpos.y };
 
-					++render_object_count;
-				}
-				else if (collision->_figure_type == ECircle)
-				{
-					Ellipse(hdc, _loc.x - _size.x
-						- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
-						- cpos.y);
+				if (!IntersectRect(&_rt, &c_rect, &_rhs))continue;
 
-					++render_object_count;
-				}
-				});
+				Debuger(hdc, [&]() {
+					if (collision->_figure_type == ERect)
+					{
+						Rectangle(hdc, _loc.x - _size.x
+							- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
+							- cpos.y);
+
+						++render_object_count;
+					}
+					else if (collision->_figure_type == ECircle)
+					{
+						Ellipse(hdc, _loc.x - _size.x
+							- cpos.x, _loc.y - _size.y - cpos.y, _loc.x + _size.x - cpos.x, _loc.y + _size.y
+							- cpos.y);
+
+						++render_object_count;
+					}
+					});
 			}
 		}
-			Debuger(hdc, [&]() {std::wstringstream wss;
-			wss << L"렌더링 되는 충돌체 : " << render_object_count << std::endl;
-			RECT _rt{ 1200,300,1600,400 };
-			DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
-	});
-}
+		Debuger(hdc, [&]() {std::wstringstream wss;
+		wss << L"렌더링 되는 충돌체 : " << render_object_count << std::endl;
+		RECT _rt{ 1200,300,1600,400 };
+		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+		std::wstring wstr = L" 충돌체의 개수 :" + std::to_wstring(comp_count);
+		TextOut(hdc, 1400, 100, wstr.c_str(), wstr.size());
+			});
+};
+
 
 void collision_mgr::update()
 {
 	collision(EMonster,EPlayer);
+
+	check_erase();
+}
+void collision_mgr::release()
+{
+	_collision_map.clear();
+}
+void collision_mgr::check_erase()&
+{
+	for (auto& [tag, collision_list] : _collision_map)
+	{
+		collision_list.erase(
+
+			std::remove_if(std::begin(collision_list), std::end(collision_list),
+				[](auto& collision_comp) {if (!collision_comp)return true; return collision_comp->bDie; }),
+
+			std::end(collision_list));
+	}
 };
 
 void collision_mgr::collision(collision_tag lhs, collision_tag rhs)

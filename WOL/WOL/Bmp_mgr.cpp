@@ -35,6 +35,10 @@ std::weak_ptr<Bmp> Bmp_mgr::Insert_Bmp(std::wstring FileName, std::wstring Image
 
 		return iter.first->second;
 	}
+	else
+	{
+		return iter->second;
+	}
 
 	return {};
 }

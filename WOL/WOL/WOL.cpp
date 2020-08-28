@@ -14,7 +14,9 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 HWND hWnd{};
-bool bDebug{ true };
+bool bDebug{ false };
+float DeltaTime{ 0.f };
+bool bFrameLimit{ true };
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -65,18 +67,39 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
-		if (_Timer.tick + (10) < GetTickCount())
+		if (bFrameLimit)
 		{
-			_Timer.dt = GetTickCount() - _Timer.tick;
+			if (_Timer.tick + (10) < GetTickCount())
+			{
+				_Timer.dt = GetTickCount() - _Timer.tick;
+				DeltaTime = (float)_Timer.dt / 1000.f;
 
-			_game.update();
-			_game.late_update();
-			//   _game.render(GetDC(_game.hWnd));
+				_game.update();
+				_game.late_update();
+				//   _game.render(GetDC(_game.hWnd));
 
-			InvalidateRect(hWnd, nullptr, false);
-			UpdateWindow(hWnd);
+				InvalidateRect(hWnd, nullptr, false);
+				UpdateWindow(hWnd);
 
-			_Timer.tick = GetTickCount();
+				_Timer.tick = GetTickCount();
+			}
+		}
+		else if (!bFrameLimit)
+		{
+			{
+				_Timer.dt = GetTickCount() - _Timer.tick;
+				_Timer.tick = GetTickCount();
+
+				DeltaTime = (float)_Timer.dt / 1000.f;
+
+				_game.update();
+				_game.late_update();
+				//   _game.render(GetDC(_game.hWnd));
+
+				InvalidateRect(hWnd, nullptr, false);
+				UpdateWindow(hWnd);
+
+			}
 		}
 	};
 

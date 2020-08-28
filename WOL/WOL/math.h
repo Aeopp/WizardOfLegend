@@ -45,6 +45,9 @@ struct vec
 	bool operator>(const vec& _rhs)const;
 	bool operator>=(const vec& _rhs)const;	
 
+	static vec unit_diagonal_vec();
+
+
 
 	
 };
@@ -104,6 +107,7 @@ public:
 	// 렉트는 충돌면적이 작은쪽으로 밀어주는게 자연스럽기 때문에.
 	static std::optional<vec> rectVSrect(RECT lhs, RECT rhs);
 
+	static bool RectInPoint(RECT rt, vec p);
 public:
 	static float my_lerp(float start, float goal, float goal_time,float dt);
 

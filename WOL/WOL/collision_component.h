@@ -21,5 +21,7 @@ public:
 
 	RECT make_rect();
 	circle make_circle();
+
+	bool bDie{ false };
 };
 

@@ -13,13 +13,13 @@ public:
 public:
 	void initialize();
 
-	bool Play(const std::string& SoundKey, bool IsBgm = false, const float Volume = DefaultVolume);
-	bool Load(std::string FullPath);
+	// 확장자없이 파일이름만 입력해주세요.
+	bool Play(std::string SoundKey, bool IsBgm = false, const float Volume = DefaultVolume);
+	bool Load(std::string FullPath,std::string Key);
 	bool Init();
 	bool Frame(const float DeltaTime);
 	bool Release();
 	bool IsPlay(const std::string& SoundKey);
 private:
 	std::string CurrentBgmKey;
-	const std::string default_path = "..\\..\\Resources\\Sound\\";
 };

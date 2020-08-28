@@ -18,6 +18,8 @@ private:
 public:
 	template<typename object_type, typename ...param_Ty>
 	[[nodiscard]] auto insert_object(param_Ty&&... _params);
+private:
+	void check_erase();
 };
 
 template<typename object_type, typename ...param_Ty>
