@@ -12,8 +12,6 @@
 #include "Camera.h"
 #include "Tile_mgr.h"
 
-
-
 Scene_Boss::~Scene_Boss() noexcept
 {
 	release();
@@ -59,6 +57,10 @@ void Scene_Boss::initialize()
 
 	Tile_mgr::instance().initialize();
 
+	Tile_mgr::instance().Load_Tile(Tile_mgr::BossStageFileName);
+
+	collision_mgr::instance().load_collision(collision_mgr::BossStageFileName);
+
 	// TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
@@ -79,5 +81,7 @@ void Scene_Boss::release()
 	Scene::release();
 
 	Tile_mgr::instance().release();
+
+	collision_mgr::instance().collision_tile_clear();
 
 }

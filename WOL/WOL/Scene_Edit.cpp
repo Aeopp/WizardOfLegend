@@ -13,6 +13,8 @@
 #include "Bmp.h"
 #include "Color.h"
 #include "Tile.h"
+#include "Debuger.h"
+
 
 
 void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
@@ -27,26 +29,38 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 
 		Timer::instance().render(hdc);
 
+		/*auto p =Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_#.bmp", L"MAPTILE_#");
+		auto wp = p.lock();
+		;
+		GdiTransparentBlt(hdc,0,0,438,511, wp->Get_MemDC(),
+			0, 0, 438, 511, RGB(255,0,255));*/
+
 		// 원활한 에디팅을 위해 타일 좌표만큼 사각형을 그린다.
-		/*for (int i = 0; i < game::TileNumY; ++i)
+
+		if (bDebug)
 		{
-			for (int j = 0; j < game::TileNumX; ++j)
+			Debuger _Debug;
+
+			for (int i = 0; i < game::TileNumY; ++i)
 			{
-				int left, top, right, bottom;
+				for (int j = 0; j < game::TileNumX; ++j)
+				{
+					int left, top, right, bottom;
 
-				left = j * game::TileWorldX;
-				top = i * game::TileWorldY;
-				right = left + game::TileWorldX;
-				bottom = top + game::TileWorldY;
+					left = j * game::TileWorldX;
+					top = i * game::TileWorldY;
+					right = left + game::TileWorldX;
+					bottom = top + game::TileWorldY;
 
-				left -= cp.x;
-				right -= cp.x;
-				top -= cp.y;
-				bottom -= cp.y;
+					left -= cp.x;
+					right -= cp.x;
+					top -= cp.y;
+					bottom -= cp.y;
 
-				Rectangle(hdc, left, top, right, bottom);
+					Rectangle(hdc, left, top, right, bottom);
+				}
 			}
-		}*/
+		}
 
 		Tile_mgr::instance().render(hdc, size_factor);
 
@@ -54,12 +68,15 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 
 		collision_mgr::instance().render(hdc, size_factor);
 
-		auto oMouseWorldPos = Input_mgr::instance().GetWorldMousePos();
-		if (!oMouseWorldPos.has_value())return;
-		std::wstringstream wss;
-		wss << L" X : " << oMouseWorldPos->x << L" Y : " << oMouseWorldPos->y << std::endl;
-		std::wstring wstr = wss.str();
-		TextOut(hdc, 150, 150, wstr.c_str(), wstr.size());
+		if (bDebug)
+		{
+			auto oMouseWorldPos = Input_mgr::instance().GetWorldMousePos();
+			if (!oMouseWorldPos.has_value())return;
+			std::wstringstream wss;
+			wss << L" X : " << oMouseWorldPos->x << L" Y : " << oMouseWorldPos->y << std::endl;
+			std::wstring wstr = wss.str();
+			TextOut(hdc, 150, 150, wstr.c_str(), wstr.size());
+		}
 	};
 
 	if(bSelect)
@@ -70,9 +87,11 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 		HDC hMemDC = SP_CurrentSelectImage->Get_MemDC();
 
 		vec dl = select_image_start_pos;
-		vec ds = { 916,620 };
+		vec ds, ss;
+		ss =ds = { 916,620 };
 		vec sl = { 0,0 };
-		vec ss = { 916,620 };
+
+		if (CurrentSelectImage == ETileSelect::Info_4) {ds = ss = { 438,511 };}
 
 		GdiTransparentBlt(hdc
 			, dl.x, dl.y
@@ -105,9 +124,6 @@ void Scene_Edit::update(float dt)
 	Input_Check_Scroll();
 
 	Input_mgr::instance().update();
-
-	
-
 };
 
 void Scene_Edit::initialize()
@@ -121,7 +137,7 @@ void Scene_Edit::initialize()
 	ImageSelectMap[ETileSelect::Info_1] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_1.bmp", L"MAPTILE_1"),L"MAPTILE_1" };
 	ImageSelectMap[ETileSelect::Info_2] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_2.bmp", L"MAPTILE_2"),L"MAPTILE_2"};
 	ImageSelectMap[ETileSelect::Info_3] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_3.bmp", L"MAPTILE_3"),L"MAPTILE_3"};
-	ImageSelectMap[ETileSelect::Info_4] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_4.bmp", L"MAPTILE_4"),L"MAPTILE_4"};
+	ImageSelectMap[ETileSelect::Info_4] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_#.bmp", L"MAPTILE_#"),L"MAPTILE_#"};
 }
 
 void Scene_Edit::release()
@@ -129,6 +145,9 @@ void Scene_Edit::release()
 	Scene::release();
 
 	Tile_mgr::instance().release();
+
+	collision_mgr::instance().collision_tile_clear();
+
 }
 
 
@@ -173,6 +192,9 @@ void Scene_Edit::Input_Check_Scroll()
 			std::pair<int, int> world_index = Tile_mgr::instance().CalcTileWorldIndex(*oWorldwpos, game::TileWorldX,
 				game::TileWorldY);
 
+			// 이미 해당 월드 자리에 타일이 있기때문에 인서트 안함
+			if (Tile_mgr::instance().IsContain(world_index))return;
+			
 			Tile_mgr::instance().Insert_Tile(CurrentSelectImage,
 				{ game::TileWorldX,game::TileWorldY }, { game::TileImgX,game::TileImgY },
 				{ CurrentImageStartPos.first + CurrentTileIndex.first * game::TileImgX,CurrentImageStartPos.second + CurrentTileIndex.second * game::TileImgY },
@@ -180,7 +202,21 @@ void Scene_Edit::Input_Check_Scroll()
 		}
 	}
 
-	if (_Input.Key_Pressing(VK_RBUTTON)) 
+	if (_Input.Key_Pressing(VK_RBUTTON))
+	{
+		auto oWorldwpos = _Input.GetWorldMousePos();
+		if (!oWorldwpos)return;
+		std::pair<int, int> world_loc = Tile_mgr::instance().CalcTileWorldIndex(*oWorldwpos, game::TileWorldX,
+			game::TileWorldY);
+
+		world_loc.first *= game::TileWorldX;
+		world_loc.second*= game::TileWorldY;
+
+		collision_mgr::instance().Insert_CollisionTile(world_loc); 
+	}
+
+
+	if (_Input.Key_Pressing(VK_BACK)) 
 	{
 		auto oWorldwpos = _Input.GetWorldMousePos();
 		if (!oWorldwpos)return;
@@ -190,34 +226,84 @@ void Scene_Edit::Input_Check_Scroll()
 		Tile_mgr::instance().Erase_Tile(world_index);
 	}
 
-	if (_Input.Key_Down('S'))
+	if (_Input.Key_Pressing(VK_DELETE))
+	{
+		auto oWorldwpos = _Input.GetWorldMousePos();
+		if (!oWorldwpos)return;
+		std::pair<int, int> world_loc = Tile_mgr::instance().CalcTileWorldIndex(*oWorldwpos, game::TileWorldX,
+			game::TileWorldY);
+
+		world_loc.first *= game::TileWorldX;
+		world_loc.second *= game::TileWorldY;
+
+		collision_mgr::instance().Erase_CollisionTile(world_loc);
+	}
+
+
+	if (_Input.Key_Down('Q'))
 	{
 		Tile_mgr::instance().Save_Tile();
 	}
 
-	if (_Input.Key_Down('L'))
+	if (_Input.Key_Down('W'))
 	{
 		Tile_mgr::instance().Load_Tile();
 	}
 
+	if (_Input.Key_Down('Z'))
+	{
+		Tile_mgr::instance().Save_Tile(Tile_mgr::BossStageFileName);
+	}
+
+	if (_Input.Key_Down('X'))
+	{
+		Tile_mgr::instance().Load_Tile(Tile_mgr::BossStageFileName);
+	}
+
+	if (_Input.Key_Down('R'))
+	{
+		collision_mgr::instance().save_collision(collision_mgr::StageFileName);
+	}
+
+	if (_Input.Key_Down('T'))
+	{
+		collision_mgr::instance().load_collision(collision_mgr::StageFileName);
+	}
+
+	if (_Input.Key_Down('V'))
+	{
+		collision_mgr::instance().save_collision(collision_mgr::BossStageFileName);
+	}
+
+	if (_Input.Key_Down('B'))
+	{
+		collision_mgr::instance().load_collision(collision_mgr::BossStageFileName);
+	}
 
 	if (_Input.Key_Down('1'))
 	{
+		Tile_image_start_pos = { {73,82},{515,82} };
+
 		CurrentSelectImage = ETileSelect::Info_1;
 	}
 
 	if (_Input.Key_Down('2'))
 	{
+		Tile_image_start_pos = { {73,82},{515,82} };
+
 		CurrentSelectImage = ETileSelect::Info_2;
 	}
 
 	if (_Input.Key_Down('3'))
 	{
+		Tile_image_start_pos = { {73,82},{515,82} };
+
 		CurrentSelectImage = ETileSelect::Info_3;
 	}
 
 	if (_Input.Key_Down('4'))
 	{
+		Tile_image_start_pos = { {0,0} ,{0,0} };
 		CurrentSelectImage = ETileSelect::Info_4;
 	}
 

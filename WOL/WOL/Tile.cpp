@@ -8,46 +8,79 @@
 
 void Tile::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	
-	auto BMP = Bmp_mgr::instance().Find_Image_SP(Scene_Edit::ImageSelectMap[_Info.Imagekey].second);
+	auto BMP = Bmp_mgr::instance().Find_Image_SP(Scene_Edit::ImageSelectMap[Imagekey].second);
 	if (!BMP)return;
 
-	vec l = _Info._location - camera_pos;
-	vec s = _Info._size;
-	vec pl = _Info._paint_location;
-	vec ps = _Info._paint_size;
-	COLORREF CK = _Info._ColorKey;
+	vec l = _location - camera_pos;
+	vec s = _size;
+	vec pl = _paint_location;
+	vec ps = _paint_size;
+	COLORREF CK = _ColorKey;
 
 	GdiTransparentBlt(hdc, l.x, l.y, s.x, s.y, BMP->Get_MemDC(), pl.x, pl.y, ps.x, ps.y, CK);
+};
+
+std::ostream& operator<<(std::ostream& os, const Tile& _Tile)
+{
+	// comma
+	char c{ ',' };
+	// boundary
+	char bd{ '|' };
+
+	auto& T = _Tile;
+
+	os << bd << T._location.x << c << T._location.y << c << T._size.x << c << T._size.y << c <<
+		T._paint_location.x << c << T._paint_location.y << c << T._paint_size.x << c << T._paint_size.y << c
+		<< (uint32_t)T.Imagekey << c << T._ColorKey << c << T.RowIndex << c << T.ColIndex << c << T.bRender << bd;
+
+	return os;
 }
 
-std::wostream& operator<<(std::wostream& os, const TileInfo& _TileInfo)
+std::istream& operator>>(std::istream& is, Tile& _Tile)
 {
-	return os << _TileInfo.bRender << _TileInfo.ColIndex << (uint32_t)_TileInfo.Imagekey << _TileInfo.RowIndex
-		<< _TileInfo._ColorKey << _TileInfo._location.x << _TileInfo._location.y << _TileInfo._paint_location.x << _TileInfo._paint_location.y  
-		<< _TileInfo._paint_size.x << _TileInfo._paint_size.y 
-		<< _TileInfo._size.x << _TileInfo._size.y;
-}
+	char temp{};
 
-std::wfstream& operator>>(std::wfstream& fs,  TileInfo& _TileInfo)
-{
-	fs >> _TileInfo.bRender;
-	fs >> _TileInfo.ColIndex;
-	uint32_t temp;
-	fs >> temp;
-	_TileInfo.Imagekey = (decltype(_TileInfo.Imagekey))temp;
-	fs >> _TileInfo.RowIndex;
-	fs >> _TileInfo._ColorKey;
-	fs >> _TileInfo._location.x;
-	fs >> _TileInfo._location.y;
+	auto& T = _Tile;
 
-	fs >> _TileInfo._paint_location.x;
-	fs >> _TileInfo._paint_location.y;
+	is >> temp;
+	is >> T._location.x;
+	is >> temp;
+	is >> T._location.y;
+	is >> temp;
+	is >> T._size.x;
+	is >> temp;
+	is >> T._size.y;
+	is >> temp;
+	is >> T._paint_location.x;
+	is >> temp;
 
-	fs >> _TileInfo._paint_size.x;
-	fs >> _TileInfo._paint_size.y;
-	fs >> _TileInfo._size.x;
-	fs >> _TileInfo._size.y;
+	is >> T._paint_location.y;
+	is >> temp;
 
-	 return fs;
+	is >> T._paint_size.x;
+	is >> temp;
+
+	is >> T._paint_size.y;
+	is >> temp;
+
+	uint32_t key;
+	is >> key;
+	T.Imagekey = (ETileSelect)key;
+
+	is >> temp;
+
+	is >> T._ColorKey;
+	is >> temp;
+
+	is >> T.RowIndex;
+	is >> temp;
+
+	is >> T.ColIndex;
+	is >> temp;
+
+	is >> T.bRender;
+
+	is >> temp;
+
+	return is;
 }

@@ -25,3 +25,29 @@ Debuger::~Debuger() noexcept
 		DeleteObject(Pen);
 	}
 }
+
+Debuger::Debuger()
+{
+	if (bDebug)
+	{
+		bDebugInit = true;
+
+		Brush = CreateSolidBrush(RGB(150,20, 200));
+		oBrush = (HBRUSH)SelectObject(hdc, Brush);
+		Pen = (HPEN)CreateSolidBrush(RGB(121,121, 0));
+		oPen = (HPEN)SelectObject(hdc, Pen);
+	}
+}
+
+Debuger::Debuger(HDC hdc,  COLORREF BrushColor, COLORREF PenColor)
+{
+	if (bDebug)
+	{
+		bDebugInit = true;
+
+		Brush = CreateSolidBrush(BrushColor);
+		oBrush = (HBRUSH)SelectObject(hdc, Brush);
+		Pen = (HPEN)CreateSolidBrush(PenColor);
+		oPen = (HPEN)SelectObject(hdc, Pen);
+	}
+}

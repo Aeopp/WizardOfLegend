@@ -15,8 +15,8 @@ public :
     void render(HDC hdc, std::pair<float, float> size_factor);
     void release();
 public:
-    void Save_Tile();
-    void Load_Tile();
+    void Save_Tile(std::wstring filename= StageFileName);
+    void Load_Tile(std::wstring filename= StageFileName);
 
     void Erase_Tile(std::pair<int, int> WorldIndex);
 
@@ -29,10 +29,16 @@ public:
     // 마우스 좌표를 월드의 타일 좌표중 어느 한곳의 인덱스와 매칭시켜줍니다.
     // 마우스의 월드 좌표와 타일의 월드기준 사이즈를 패스해주세요.
     std::pair<int, int>  CalcTileWorldIndex(vec mouse_world_pos, int TileWorldX, int TileWorldY);
-private:
-    std::vector<std::shared_ptr<class Tile>> _Tile_list;
 
+    bool IsContain(std::pair<int, int> WorldIndex)const;
     static inline const std::wstring DefaultTilePath = L"..\\..\\Resources\\MapInfo\\";
+    static inline const std::wstring BossStageFileName = L"BossTileInfo.txt";
+    static inline const std::wstring StageFileName = L"StageTileInfo.txt";
+
+private:
+    std::vector<Tile> _Tile_list;
+
+   
 };
 
  

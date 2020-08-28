@@ -57,6 +57,10 @@ void Scene_Stage::initialize()
 
 	Tile_mgr::instance().initialize();
 
+	Tile_mgr::instance().Load_Tile();
+
+	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
+
 	// TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
@@ -130,6 +134,8 @@ void Scene_Stage::release()
 	Scene::release();
 
 	Tile_mgr::instance().release();
+
+	collision_mgr::instance().collision_tile_clear();
 }
 
 Scene_Stage::~Scene_Stage() noexcept

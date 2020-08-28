@@ -26,10 +26,10 @@ public:
 	static constexpr int height = 900;
 
 	// 타일의 월드 사이즈를 지정합니다.
-	static constexpr int TileWorldX{ 107 };
+	static constexpr int TileWorldX{ 53 };
 	static constexpr int TileWorldY{ 52 };
 	// 타일의 이미지 사이즈를 지정합니다.
-	static constexpr int TileImgX{ 107 };
+	static constexpr int TileImgX{ 53 };
 	static constexpr int TileImgY{ 52 };
 	// 타일의 개수를 지정합니다
 	static constexpr int TileNumX{ 100 };
