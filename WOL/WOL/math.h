@@ -44,6 +44,9 @@ struct vec
 
 	float dot(const vec& _rhs)const;
 
+
+	// 0~180 0~-180 각도를 360도 기준 각도로 변환 
+
 	vec get_normalize()const;
 	float length()const;
 	float length_2()const;
@@ -84,7 +87,16 @@ struct circle
 class math
 {
 public:
+	enum class EDir : uint8_t
+	{
+		left,
+		right,
+		up,
+		down,
+	};
 	static inline float PI = std::numbers::pi;
+
+	static inline float cos45 = cosf(PI / 4);
 
 	static inline constexpr float degree_to_radian(const float degree)
 	{
@@ -98,6 +110,8 @@ public:
 
 		return factor * radian;
 	};
+	// 방향 리턴 
+	static EDir checkDir(vec dir);
 	// 전체 각으로부터 방향 리턴
 	static vec dir_from_angle(const float degree);
 	// 이미 존재하는 방향으로부터 새로 더할려는 앵글만큼 방향 회전시켜서 리턴
@@ -116,6 +130,7 @@ public:
 	// 벡터 길이는 교차한 만큼( 노멀라이즈 하지 않음)
 	// 렉트는 충돌면적이 작은쪽으로 밀어주는게 자연스럽기 때문에.
 	static std::optional<vec> rectVSrect(RECT lhs, RECT rhs);
+static 	float Angle360conversion(float degree);
 
 	static bool RectInPoint(RECT rt, vec p);
 public:

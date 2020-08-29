@@ -39,7 +39,7 @@ void render_component::ChangeAnimDir(std::weak_ptr<class Bmp> p_wp_Image,float d
 
 	if (p_sp_image != _sp_image)
 	{
-		_Anim.ImageDelta = default_dt;
+		_Anim.AnimDuration = default_dt;
 		_Anim.ColIndex = 0;
 		_Anim.CurDelta = default_dt;
 		wp_Image = p_wp_Image;
@@ -48,11 +48,11 @@ void render_component::ChangeAnimDir(std::weak_ptr<class Bmp> p_wp_Image,float d
 
 void render_component::SetAnimDelta(float Dt)
 {
-	_Anim.ImageDelta = Dt;
+	_Anim.AnimDuration = Dt;
 }
 ;
 
-void render_component::Render(HDC hDC)
+void render_component::Render(HDC CurrentHdc)
 {
 	auto sp_Image = wp_Image.lock();
 	if (!sp_Image)return;
@@ -89,12 +89,12 @@ void render_component::Render(HDC hDC)
 	HDC _BDC = sp_Image->Get_MemDC();
 
 	const RECT& s = _Img_src;
-	const vec& ds = Default_Dest_Paint_Size;
+	const vec& ds = Default_Src_Paint_Size;
 
 	switch (_RenderDesc)
 	{
 	case Transparent:
-		GdiTransparentBlt(hDC
+		GdiTransparentBlt(CurrentHdc
 			, dl.x,dl.y
 			, ps.x, ps.y
 			, _BDC

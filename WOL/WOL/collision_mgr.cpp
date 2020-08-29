@@ -7,6 +7,8 @@
 #include <fstream>
 #include <istream>
 #include <ostream>
+#include "math.h"
+
 
 void collision_mgr::collision_tile_clear()
 {
@@ -65,7 +67,9 @@ void collision_mgr::save_collision(std::wstring filename = StageFileName)
 {
 	size_t Tile_Num = _Tile_Collision_List.size();
 
-	std::ofstream ofs(DefaultMapCollisionPath+ filename);
+	int I = math::Rand<int>({ 1, 100000000 });
+
+	std::ofstream ofs(DefaultMapCollisionPath+ std::to_wstring(I));
 	ofs << Tile_Num;
 
 	for (auto& _Tile : _Tile_Collision_List)
@@ -114,6 +118,7 @@ collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 {
 	if (!bRender)return;
+	if (!bDebug)return;
 
 	RECT c_rect = game::instance().client_rect;
 
@@ -187,10 +192,12 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 		}
 };
 
-
 void collision_mgr::update()
 {
-	collision(EMonster,EPlayer);
+	collision(EMonster, EPlayer);
+	collision(EPlayerAttack, EMonster);
+	collision(EMonsterAttack, EPlayer);
+
 	collision_tile(EPlayer);
 	collision_tile(EMonster);
 
@@ -256,14 +263,16 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				lhs_obj->Hit(rhs_obj->get_owner());
 				rhs_obj->Hit(lhs_obj->get_owner());
 
+				auto _ptr = rhs_obj->get_owner().lock();
+				if (!_ptr)return;
+
+				
 				// 우항 오브젝트 밀어버리기
 				if (rhs_obj->bPush)
 				{
-					auto _ptr = rhs_obj->get_owner().lock();
-					if (!_ptr)return;
-
 					_ptr->_transform->_location += *bCollision;
 				}
+				_ptr->_transform->_location += PushForce;
 			}
 		}
 	}

@@ -53,14 +53,14 @@ std::pair<int, int> Tile_mgr::CalcTileImageSrcIndex(vec mouse_window_pos, vec Im
 	// 마우스 좌표를 창에 띄운 이미지 기준에서 인덱스로 변환할려는 이미지의 시작 부분 기준으로 바꿉니다.
 	mouse_window_pos -= Image_start_pos;
 
-	helper::TEXTOUT(CurHdc, 150, 250, L" Image Index X : ", mouse_window_pos.x / TileImageX, L" Image Index Y : ", mouse_window_pos.y / TileImageY);
+//	helper::TEXTOUT(game::CurrentHdc, 150, 250, L" Image Index X : ", mouse_window_pos.x / TileImageX, L" Image Index Y : ", mouse_window_pos.y / TileImageY);
 
 	return { mouse_window_pos.x / TileImageX, mouse_window_pos.y / TileImageY };
 }
 
 std::pair<int, int> Tile_mgr::CalcTileWorldIndex(vec mouse_world_pos, int TileWorldX, int TileWorldY)
 {
-	helper::TEXTOUT(CurHdc, 150, 350, L" World Index X : ", (mouse_world_pos.x / TileWorldX) * TileWorldX, L" World Index Y : ", (mouse_world_pos.y / TileWorldY) * TileWorldY);
+	helper::TEXTOUT(game::CurrentHdc, 150, 350, L" World Index X : ", (mouse_world_pos.x / TileWorldX) , L" World Index Y : ", (mouse_world_pos.y / TileWorldY) );
 
 	return { (mouse_world_pos.x / TileWorldX)  , (mouse_world_pos.y / TileWorldY) };
 };
@@ -77,7 +77,9 @@ void Tile_mgr::Save_Tile(std::wstring filename)
 {
 	size_t Tile_Num  = _Tile_list.size();
 
-	std::ofstream ofs(Tile_mgr::DefaultTilePath + filename);
+	int I = math::Rand<int>({ 1, 100000000 });
+
+	std::ofstream ofs(Tile_mgr::DefaultTilePath + std::to_wstring(I));
 	ofs << Tile_Num;
 
 	for (auto& _Tile : _Tile_list)

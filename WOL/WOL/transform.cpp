@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "transform.h"
 
-void Transform::Move(float _speed)
+void Transform::Move(vec dir,float _speed)
 {
-	_location += _dir * _speed;
+	_location += dir * _speed;
 }

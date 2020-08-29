@@ -21,7 +21,7 @@ RECT collision_component::make_rect()
 	if (!_ptr)return RECT{};
 
 	RECT _rt;
-	vec _loc = _ptr->_transform->_location;
+	vec _loc = _ptr->_transform->_location + correction;
 
 	_rt.left = _loc.x - _size.x;
 	_rt.right= _loc.x  + _size.x;
@@ -36,7 +36,7 @@ circle collision_component::make_circle()
 	auto _ptr = _owner.lock();
 	if (!_ptr)return circle{};
 
-	return { _ptr->_transform->_location ,_size.x };
+	return { _ptr->_transform->_location+correction ,_size.x };
 }
 
 

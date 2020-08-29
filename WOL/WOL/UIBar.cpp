@@ -21,7 +21,7 @@ void UIBar::render(HDC hdc, vec camera_pos, vec size_factor)
 	vec loc = _transform->_location;
 	vec s = _transform->_size;
 	vec ps = _render_component->Dest_Paint_Size;
-	vec ds = _render_component->Default_Dest_Paint_Size;
+	vec ds = _render_component->Default_Src_Paint_Size;
 
 	s.x *= size_factor.x;
 	s.y *= size_factor.y;
@@ -36,7 +36,7 @@ void UIBar::render(HDC hdc, vec camera_pos, vec size_factor)
 	loc.y *= size_factor.y;
 	loc.x *= size_factor.x;
 
-	loc -= _render_component->Default_Dest_Paint_Size * 0.5f;
+	loc -= _render_component->Default_Src_Paint_Size * 0.5f;
 
     _render_component->Dest_Loc = loc;
 	_render_component->Dest_Paint_Size.x = (ds.x * size_factor.x)*ratio;

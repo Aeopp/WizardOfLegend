@@ -19,8 +19,8 @@ public:
     template<typename ..._params>
     void event_regist(time_event _event, float time, _params&&... params);
 
-    std::list < std::pair<float, std::function<void()>> > once_events;
-    std::list <std::pair<float, std::function<void()>>> rewhile_events;
+    std::list < std::pair<float, std::function<bool()>> > once_events;
+    std::list <std::pair<float, std::function<bool()>>> rewhile_events;
     std::list <std::tuple<float, float, std::function<bool()>>> loop_events;
 
     int max_fps{1000};

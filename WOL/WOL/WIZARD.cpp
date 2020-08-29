@@ -29,7 +29,7 @@ void WIZARD::initialize()
 		// 200 216
 		vec _ImageDefaultSize{ 170,230};
 
-		_render_component->Default_Dest_Paint_Size = _ImageDefaultSize;
+		_render_component->Default_Src_Paint_Size = _ImageDefaultSize;
 		_render_component->Dest_Paint_Size = _ImageDefaultSize * 0.8;
 		_render_component->_ColorKey = COLOR::MEGENTA();
 		_render_component->_Img_src = RECT{ 0,0,170,230};
@@ -56,7 +56,7 @@ Event WIZARD::update(float dt)
 	_render_component->ChangeAnim(AnimTable::walk, 0.3f, AnimTable::idle);
 
 	_transform->_dir = to_dir;
-	_transform->Move(_speed * dt);
+	_transform->Move(_transform->_dir,_speed * dt);
 
 	if (!_EnemyInfo)return Event::None;
 
@@ -97,11 +97,12 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 	{
 		_render_component->ChangeAnim(AnimTable::dead, 0.4f, AnimTable::dead);
 
-		Timer::instance().event_regist(time_event::EOnce, 0.4f, [&_Die = this->bDie]
+		Timer::instance().event_regist(time_event::EOnce, 0.4f, std::move([&_Die = this->bDie]()->bool
 			{
 				_Die = true;
 				return true;
-			});
+
+			}));
 	};
 };
 

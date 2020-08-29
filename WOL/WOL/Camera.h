@@ -17,7 +17,7 @@ private:
 
 	float _force; 
 	vec _dir;
-	bool Shaking();
-	bool Shaking_End();
+	bool Shaking( );
+	bool Shaking_End( );
 };
 

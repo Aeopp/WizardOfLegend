@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Bmp_mgr.h"
 #include "bmp.h"
+#include "Shadow.h"
 
 Bmp_mgr::~Bmp_mgr()noexcept
 {
@@ -24,6 +25,16 @@ void Bmp_mgr::initialize()
 	 DecoTileInfoMap[EDecoTileInfo::chair_V] = { 219,242,291,510 };
 	 DecoTileInfoMap[EDecoTileInfo::pool_12] = { 0,438,145,510 };
 	 DecoTileInfoMap[EDecoTileInfo::pool_22] = { 292,365,437,510 };
+
+	 
+
+	 Shadow::ShadowImgInit();
+
+	 Insert_Bmp(DefaultPath + L"Back.bmp", L"Back");
+	 Insert_Bmp(DefaultPath + L"Back.bmp", L"BackBuffer");
+	 Insert_Bmp(DefaultPath + L"GAIA_ARMOR.bmp", L"GAIA_ARMOR");
+	 Insert_Bmp(DefaultPath + L"ICE_CRYSTAL.bmp", L"ICE_CRYSTAL");
+	 Insert_Bmp(DefaultPath + L"BOTTOM_HOLE.bmp", L"BOTTOM_HOLE");
 };
 
 void Bmp_mgr::release()

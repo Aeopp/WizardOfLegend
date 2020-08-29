@@ -34,7 +34,7 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 
 		if (bDebug)
 		{
-			Debuger _Debug;
+			Debuger _Debug(hdc, RGB(120, 120, 120), RGB(60, 60, 60));
 
 			for (int i = 0; i < game::TileNumY; ++i)
 			{

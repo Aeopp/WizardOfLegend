@@ -23,6 +23,8 @@ public:
 
 	bool bRender = true;
 
+	vec PushForce{};
+
 	void collision(collision_tag lhs, collision_tag rhs);
 	void render(HDC hdc, std::pair<float, float>  size_factor) ;
 	void update();

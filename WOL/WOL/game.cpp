@@ -8,19 +8,38 @@
 #include "object_mgr.h"
 #include "collision_mgr.h"
 #include "player_info.h"
+#include "Bmp.h"
 
-
-
-void game::render(HDC hdc)
+void game::render()
 {
-	Scene_mgr::instance().render(hdc,size_factor());
+	Bmp_mgr& bmp_mgr =Bmp_mgr::instance();
 
+	auto SP_Back =bmp_mgr.Find_Image_SP(L"Back");
+	if (!SP_Back)return;
+
+	auto SP_BackBuffer = bmp_mgr.Find_Image_SP(L"BackBuffer");
+	if (!SP_BackBuffer)return;
+
+	static HDC HMemDC; HDC HBackBuffer;
+
+	HMemDC = SP_Back->Get_MemDC();
+	HBackBuffer = SP_BackBuffer->Get_MemDC();
+
+	BitBlt(HBackBuffer, 0, 0, client_rect.right, client_rect.bottom, HMemDC, 0, 0, SRCCOPY);
+
+	CurrentHdc = HBackBuffer;
 	if (bDebug)
 	{
 		std::wstringstream wss;
 		wss << L"컬링 오브젝트 : " << print_cul_obj << L" 렌더링 오브젝트 " << print_render_obj << std::endl;
-		TextOut(hdc, 1000, 0, wss.str().c_str(), wss.str().size());
+		TextOut(CurrentHdc, 1400, 0, wss.str().c_str(), wss.str().size());
 	}
+
+	Scene_mgr::instance().render(HBackBuffer, size_factor());
+
+	BitBlt(hDC, 0, 0, client_rect.right, client_rect.bottom, HBackBuffer, 0, 0, SRCCOPY);
+
+	CurrentHdc = hDC;
 }
 
 void game::update()
@@ -30,6 +49,8 @@ void game::update()
 
 void game::initialize()
 {
+	hDC = GetDC(hWnd);
+
 	_player_info = std::make_shared<player_info>();
 
 	Scene_mgr::instance().initialize();
@@ -48,6 +69,8 @@ void game::release()
 	object_mgr::instance().release();
 
 	collision_mgr::instance().release();
+
+	ReleaseDC(hWnd, CurrentHdc);
 }
 
 void game::late_update()

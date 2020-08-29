@@ -18,7 +18,7 @@ public:
 	figure_type _figure_type{ figure_type::ERect };
 
 	vec _size;
-
+	vec correction{};
 	RECT make_rect();
 	circle make_circle();
 

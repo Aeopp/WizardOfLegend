@@ -34,7 +34,6 @@ public:
     static inline const std::wstring DefaultTilePath = L"..\\..\\Resources\\MapInfo\\";
     static inline const std::wstring BossStageFileName = L"BossTileInfo.txt";
     static inline const std::wstring StageFileName = L"StageTileInfo.txt";
-
 private:
     std::vector<Tile> _Tile_list;
     // 데코레이션 타일들 중복삽입 방지

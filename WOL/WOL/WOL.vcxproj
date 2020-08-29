@@ -176,6 +176,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="helper.h" />
+    <ClInclude Include="ICE_Blast.h" />
     <ClInclude Include="ICE_Crystal.h" />
     <ClInclude Include="Input_mgr.h" />
     <ClInclude Include="layer_type.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Scene_mgr.h" />
     <ClInclude Include="Scene_Stage.h" />
     <ClInclude Include="Scene_Start.h" />
+    <ClInclude Include="Shadow.h" />
     <ClInclude Include="shield.h" />
     <ClInclude Include="singleton_interface.h" />
     <ClInclude Include="sound_mgr.h" />
@@ -237,6 +239,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="helper.cpp" />
+    <ClCompile Include="ICE_Blast.cpp" />
     <ClCompile Include="ICE_Crystal.cpp" />
     <ClCompile Include="Input_mgr.cpp" />
     <ClCompile Include="layer_type.cpp" />
@@ -262,6 +265,7 @@
     <ClCompile Include="Scene_mgr.cpp" />
     <ClCompile Include="Scene_Stage.cpp" />
     <ClCompile Include="Scene_Start.cpp" />
+    <ClCompile Include="Shadow.cpp" />
     <ClCompile Include="shield.cpp" />
     <ClCompile Include="singleton_interface.cpp" />
     <ClCompile Include="sound_mgr.cpp" />

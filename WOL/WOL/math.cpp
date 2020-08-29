@@ -5,6 +5,31 @@
 
 // 전체 각으로부터 방향 리턴
 
+math::EDir math::checkDir(vec dir)
+{
+	dir = dir.get_normalize();
+
+	// 이 값보다 크면 45도 이내에 있음
+	
+	if (dir.dot(vec{ +1,0 }) > cos45)
+	{
+		return EDir::right;
+	}
+	else if (dir.dot(vec{ -1,0 }) > cos45)
+	{
+		return EDir::left;
+	}
+	else if (dir.dot(vec{ 0,+1 }) > cos45)
+	{
+		return EDir::up;
+	}
+	else if (dir.dot(vec{ 0,-1 }) > cos45)
+	{
+		return EDir::down;
+	}
+	return EDir();
+}
+
 vec math::dir_from_angle(const float degree)
 {
 	float _radian = degree_to_radian(degree);
@@ -20,7 +45,7 @@ vec math::rotation_dir_to_add_angle(const vec dir,
 	// 싸코 + 코싸
 	const auto _radian = math::degree_to_radian(degree);
 	const float b_cos = std::cosf(_radian);
-	const float b_sin = std::sinf(_radian);
+	const float b_sin = std::sinf(-_radian);
 
 	return { dir.x * b_cos - dir.y * b_sin,
 		dir.y * b_cos + dir.x * b_sin };
@@ -220,6 +245,14 @@ float  vec::operator*(const vec& _rhs) const
 float vec::dot(const vec& _rhs) const
 {
 	return x * _rhs.x + y * _rhs.y;
+}
+
+float math::Angle360conversion(float degree)
+{
+	if (degree < 0)
+		return degree *= -1;
+	else
+		return (180 + (180 - degree));
 }
 
 vec vec::get_normalize() const

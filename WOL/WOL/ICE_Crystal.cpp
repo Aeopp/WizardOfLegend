@@ -1,75 +1,79 @@
 #include "pch.h"
 #include "ICE_Crystal.h"
+
+#include "pch.h"
+#include "shield.h"
 #include "collision_mgr.h"
+#include "render_component.h"
+#include "Color.h"
+#include "Bmp_mgr.h"
 
 void ICE_Crystal::initialize()
 {
 	actor::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ERect);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
 	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 
-	sp_collision ->_size = { 50.f,50.0f };
-	sp_collision ->bRender = true;
-	sp_collision ->bPush = false;
-	sp_collision ->bCollision = true;
+	sp_collision->_size = { 25.f,25.0f };
 
-	Minimum_distance = 10.f;
-	bSuccess = false;
-	_target = vec{ 0.f,0.f };
-	_speed = 300.f;
+	Duration = 30.f;
+
+	PaintSizeX = 200;
+	PaintSizeY = 200;
+	float Scale = 0.8f;
+	// 자기자신의 회전속도임
+	_speed = 360.f;
+	RotationSpeedDegree = 240.f;
+	DistancefromCenter = 100.f;
+
+	_render_component = std::make_shared<render_component>();
+	_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"ICE_CRYSTAL");
+	_render_component->Default_Src_Paint_Size = vec{ PaintSizeX,PaintSizeY };
+	_render_component->Dest_Paint_Size = vec{ PaintSizeX * Scale,PaintSizeY * Scale };
+	_render_component->_ColorKey =RGB(200,230,250);
+	_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
+	_render_component->_Anim.SetAnimationClip(
+		{ 18 }, 360.f / _speed);
+
+	TickScale = 1.f;
+
 }
 
 Event ICE_Crystal::update(float dt)
 {
-	Event _Event = actor::update(dt);
+	Event _event = actor::update(dt);
 
-	vec& v = _transform->_location;
+	Duration -= dt;
+	if (Duration < 0)return Event::Die;
 
-	if (!bSuccess)
-	{
-		vec w = _target;
+	Tick += dt;
+	float c = (cosf(Tick)*TickScale) + TickScale;
 
-		vec d = w - v;
+	float _RotationSpeedDegree = RotationSpeedDegree * c;
+	float  _DistancefromCenter = DistancefromCenter * c;
+	float Animspeed = (360.f/_speed * c);
 
-		if (d.length() < Minimum_distance)
-		{
-			bSuccess = true;
-			return Event::None;
-		}
+	if (!_render_component)return Event::Die;
+	_render_component->_Anim.AnimDuration = Animspeed;
 
-		vec dir = d.get_normalize();
+	auto Owner = _owner.lock();
+	if (!Owner) return Event::Die;
 
-		v += (dir * (_speed * dt));
-	}
-	else
-	{
-		auto Owner = _owner.lock();
-		if (!Owner) return Event::Die;
+	vec w = Owner->_transform->_location;
+	vec& r = _transform->_dir;
+	r = math::rotation_dir_to_add_angle(r, _RotationSpeedDegree * dt);
 
-		vec w = Owner->_transform->_location;
+	_transform->_location = w + r * (DistancefromCenterMin+_DistancefromCenter);
 
-		vec d = w - v;
-
-		if (d.length() < Minimum_distance)
-		{
-			return Event::Die;
-		}
-
-		vec dir = d.get_normalize();
-
-		v += (dir * (_speed * dt));
-	};
-
-	return _Event;
+	return _event;
 }
 
 
 uint32_t ICE_Crystal::get_layer_id() const&
 {
 	return layer_type::EEffect;
-};
-
+}

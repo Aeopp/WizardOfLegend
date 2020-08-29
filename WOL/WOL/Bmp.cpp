@@ -11,10 +11,10 @@ void Bmp::Load_Bmp(const std::wstring& FileName)
 {
 	HWND _hWnd = game::instance().hWnd;
 
-	HDC hDC = GetDC(_hWnd);
+	HDC CurrentHdc = GetDC(_hWnd);
 
-	m_hMemDC = CreateCompatibleDC(hDC);
-	ReleaseDC(_hWnd, hDC);
+	m_hMemDC = CreateCompatibleDC(CurrentHdc);
+	ReleaseDC(_hWnd, CurrentHdc);
 
 	m_hBitmap = (HBITMAP)LoadImage(NULL, FileName.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	m_hOldBmp = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);

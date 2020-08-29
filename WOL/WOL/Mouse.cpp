@@ -24,7 +24,7 @@ void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 	loc -= _render_component->Dest_Paint_Size * 0.5f;
 
 	_render_component->Dest_Loc = loc;
-	_render_component->Dest_Paint_Size  = _render_component->Default_Dest_Paint_Size;
+	_render_component->Dest_Paint_Size  = _render_component->Default_Src_Paint_Size;
 	_render_component->Render(hdc);
 
 	if (bDebug)
@@ -58,7 +58,7 @@ void Mouse::initialize()
 	_render_component = render_component::LoadRenderComponent_SP(L"UI_MOUSE.bmp", L"UI_MOUSE");
 	_render_component->_ColorKey = RGB(255, 0, 255);
 	_render_component->_Img_src = RECT{0,0,60,60};
-	_render_component->Default_Dest_Paint_Size = vec{ 30,30 };
+	_render_component->Default_Src_Paint_Size = vec{ 30,30 };
 	_render_component->_RenderDesc = ERender::Transparent;
 }
 

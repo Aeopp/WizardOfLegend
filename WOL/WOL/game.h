@@ -7,13 +7,13 @@ class game : public singleton_interface<game>
 public:
 	friend class  std::shared_ptr<game>;
 public:
-	void render(HDC hdc);
+	void render();
 	void update();
 	void initialize();
 	void release();
 	void late_update();
 
-	void debug_cul_obj_setup(int cul_obj,int render_obj);
+	void debug_cul_obj_setup(int cul_obj, int render_obj);
 
 	int	print_cul_obj{};
 	int print_render_obj{};
@@ -22,8 +22,8 @@ public:
 	std::shared_ptr<class player_info> _player_info{};
 
 	RECT client_rect{};
-	static constexpr int width = 800;
-	static constexpr int height = 600;
+	static constexpr int width = 1600;
+	static constexpr int height = 900;
 
 	// 타일의 월드 사이즈를 지정합니다.
 	static constexpr int TileWorldX{ 53 };
@@ -36,8 +36,10 @@ public:
 	static constexpr int TileNumY{ 100 };
 	// 기본 해상도에서 변경될시 반환값에 사이즈를 곱해서 비율을 유지해주세요.
 	std::pair<float, float> size_factor();
+	HDC hDC;
 public:
-	HWND hWnd{};
+	static inline HWND hWnd{};
+	static inline  HDC CurrentHdc{};
 };
 
 

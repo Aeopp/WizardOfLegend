@@ -25,7 +25,7 @@ void UIStart::initialize()
 	wp_bmp_ready= Bmp_mgr::instance().Insert_Bmp(L"READY_MENU.bmp", L"READY_MENU");
 
 	_render_component = std::make_shared<render_component>();
-	_render_component->Default_Dest_Paint_Size = vec{ 1600 * x,900* y };
+	_render_component->Default_Src_Paint_Size = vec{ 1600 * x,900* y };
 	_render_component->_ColorKey = COLOR::MEGENTA();
 	_render_component->_Img_src = RECT{ 0,0,1920,1080};
 	_render_component->_RenderDesc = ERender::Transparent;
@@ -42,7 +42,7 @@ void UIStart::render(HDC hdc, vec camera_pos, vec size_factor)
 	object::render(hdc, camera_pos, size_factor);
 
 	vec loc = _transform->_location;
-	vec ds = _render_component->Default_Dest_Paint_Size;
+	vec ds = _render_component->Default_Src_Paint_Size;
 
 	_render_component->Dest_Loc = loc;
 	_render_component->Dest_Paint_Size = ds;

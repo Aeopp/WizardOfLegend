@@ -70,6 +70,7 @@ void Scene_Stage::initialize()
 		object_mgr& obj_mgr = object_mgr::instance();
 
 		auto _ptr = obj_mgr.insert_object<Player>();
+		_ptr->_transform->_location = { 500,500 };
 
 		auto _camera = obj_mgr.insert_object<Camera>();
 		_camera->_owner = _ptr;
@@ -78,58 +79,6 @@ void Scene_Stage::initialize()
 
 		manage_objs.push_back(_camera);
 
-		for (int i = 1; i < 10; ++i)
-		{
-			int x = math::Rand_N<int>({100, 1400});
-			int y = math::Rand_N<int>({100,900});
-			
-			auto mob = obj_mgr.insert_object<SwordMan>(_ptr);
-			mob->_transform->_location = vec{ x,y};
-
-			manage_objs.push_back(mob);
-		}
-
-		for (int i = 1; i < 10; ++i)
-		{
-			int x = math::Rand_N<int>({ 100, 1400 });
-			int y = math::Rand_N<int>({ 100,900 });
-
-			auto mob = obj_mgr.insert_object<ARCHER>(_ptr);
-			mob->_transform->_location = vec{ x,y };
-
-			manage_objs.push_back(mob);
-		}
-
-		for (int i = 1; i < 10; ++i)
-		{
-			int x = math::Rand_N<int>({ 100, 1400 });
-			int y = math::Rand_N<int>({ 100,900 });
-
-			auto mob = obj_mgr.insert_object<BOSS>(_ptr);
-			mob->_transform->_location = vec{ x,y };
-
-			manage_objs.push_back(mob);
-		}
-		for (int i = 1; i < 10; ++i)
-		{
-			int x = math::Rand_N<int>({ 100, 1400 });
-			int y = math::Rand_N<int>({ 100,900 });
-
-			auto mob = obj_mgr.insert_object<MIDDLE_BOSS>(_ptr);
-			mob->_transform->_location = vec{ x,y };
-
-			manage_objs.push_back(mob);
-		}
-		for (int i = 1; i < 10; ++i)
-		{
-			int x = math::Rand_N<int>({ 100, 1400 });
-			int y = math::Rand_N<int>({ 100,900 });
-
-			auto mob = obj_mgr.insert_object<WIZARD>(_ptr);
-			mob->_transform->_location = vec{ x,y };
-
-			manage_objs.push_back(mob);
-		}
 	}
 }
 

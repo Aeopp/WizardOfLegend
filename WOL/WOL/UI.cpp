@@ -18,7 +18,7 @@ void UI::render(HDC hdc, vec camera_pos,vec size_factor)
 	vec loc = _transform->_location;
 	vec s = _transform->_size;
 	vec ps = _render_component->Dest_Paint_Size;
-	vec ds = _render_component->Default_Dest_Paint_Size;
+	vec ds = _render_component->Default_Src_Paint_Size;
 
 	s.x *= size_factor.x;
 	s.y *= size_factor.y;

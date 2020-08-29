@@ -9,7 +9,6 @@ public:
 	vec _size{};
 
 	// 
-	// 방향을 미리 설정하고 호출해주세요. 델타타임을 곱해서 넘겨주세요 
-	void Move(float _speed);
+	void Move(vec dir ,float _speed);
 };
 

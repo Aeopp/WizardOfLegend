@@ -129,7 +129,6 @@
     <ClInclude Include="Input_mgr.h">
       <Filter>source\Util</Filter>
     </ClInclude>
-    <ClInclude Include="ICE_Crystal.h" />
     <ClInclude Include="event.h" />
     <ClInclude Include="Bmp_mgr.h" />
     <ClInclude Include="Bmp.h" />
@@ -212,6 +211,13 @@
       <Filter>source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="helper.h" />
+    <ClInclude Include="Shadow.h" />
+    <ClInclude Include="ICE_Blast.h">
+      <Filter>source\object\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="ICE_Crystal.h">
+      <Filter>source\object\Actor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -290,9 +296,6 @@
       <Filter>source\object\Actor</Filter>
     </ClCompile>
     <ClCompile Include="shield.cpp">
-      <Filter>source\object\Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="ICE_Crystal.cpp">
       <Filter>source\object\Actor</Filter>
     </ClCompile>
     <ClCompile Include="Color.cpp">
@@ -377,6 +380,15 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="helper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Shadow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="ICE_Blast.cpp">
+      <Filter>source\object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="ICE_Crystal.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

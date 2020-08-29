@@ -28,7 +28,7 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 		wss << L"오브젝트 개수 : " << count << std::endl; 
 		RECT _rt{ 1200 *sx,100*sy,  1400 *sx, 200*sy }; 
 
-		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
+		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
 	}
 };
 

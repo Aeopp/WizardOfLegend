@@ -50,7 +50,7 @@ void Camera::camera_shake(float force, vec dir,float duration  =0.05f)
 	Timer::instance().event_regist(time_event::EOnce, duration+0.005f, &Camera::Shaking_End, this);
 }
 
-bool Camera::Shaking()
+bool Camera::Shaking( )
 {
 	float  rand = math::Rand_N<float >({ -_force,+_force});
 

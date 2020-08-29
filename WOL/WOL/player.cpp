@@ -8,7 +8,7 @@
 #include "shield.h"
 #include "object_mgr.h"
 #include "Mouse.h"
-#include "ICE_Crystal.h"
+#include "ICE_Blast.h"
 #include "timer.h"
 #include "Bmp_mgr.h"
 #include "UISkillBar.h"
@@ -21,12 +21,33 @@
 #include "render_component.h"
 #include "Color.h"
 #include "Bmp_mgr.h"
-
+#include "helper.h"
+#include "ICE_Crystal.h"
+#include "Bmp.h"
 
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	actor::render(hdc, camera_pos, size_factor);
+
+
+
+	if (bDebug)
+	{
+		vec v = _transform->_location;
+		auto o = Input_mgr::instance().GetWorldMousePos();
+		vec r = *o - v;
+
+		vec n = r.get_normalize();
+		helper::TEXTOUT(hdc, 0, 300, L"Angle (Degree) : ", math::radian_to_degree(atan2f(n.y, n.x)));
+		helper::TEXTOUT(hdc, 0, 400, L"Distance : ",r.length());
+
+		v -= camera_pos;
+		*o -= camera_pos;
+
+		MoveToEx(hdc, v.x, v.y, nullptr);
+		LineTo(hdc, o->x, o->y);
+	}
 };
 
 void Player::initialize()
@@ -51,17 +72,22 @@ void Player::initialize()
 	_player_info = game::instance()._player_info;
 	if (!_player_info)return;
 
+	PaintSizeX = 180;
+	PaintSizeY = 182;
+
+	float Scale = 0.7f;
+
 	//Anim SetUp
 	{
 		_render_component = render_component::LoadRenderComponent_SP
 		(L"FRONT_COMPLETE.bmp", L"FRONT_COMPLETE");
 		// 174 182
-		_render_component->Default_Dest_Paint_Size = vec{ 182,182 };
-		_render_component->Dest_Paint_Size = vec{ 182*0.8,182*0.8 };
+		_render_component->Default_Src_Paint_Size = vec{ PaintSizeX,PaintSizeY };
+		_render_component->Dest_Paint_Size = vec{ PaintSizeX * Scale,PaintSizeY * Scale };
 		_render_component->_ColorKey = COLOR::MEGENTA();
-		_render_component->_Img_src = RECT{ 0,0,174,182 };
+		_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 		_render_component->_Anim.SetAnimationClip(
-			{ 1 ,10,8,8,8,2,7 }, 0.05f);
+			{ 1 ,10,8,8,8,2,7 }, 0.1f);
 	}
 
 	make_skill_bar();
@@ -77,6 +103,17 @@ void Player::initialize()
 
 	_speed = 400.f;
 
+	_Shadow.correction = { 0,(PaintSizeY * 0.47) /2.f };
+
+
+	Timer::instance().event_regist(time_event::ERemaingWhile, FLT_MAX,
+		[&bAttack = _player_info->bAttack,&AttackCheck = _player_info->CurrentAttackDuration]()->bool{
+		AttackCheck -= DeltaTime;
+		if (AttackCheck < 0)bAttack = false;
+		else  bAttack = true;
+
+		return true;
+	});
 };
 
 Event Player::update(float dt)
@@ -98,16 +135,23 @@ void Player::Hit(std::weak_ptr<object> _target)
 
 	if(_player_info->hp>0)
 	{
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		MyAnim.AnimPlay((int)AnimTable::hit,0.3f);
 		MyAnim.SetDefaultClip((int)AnimTable::idle);
 	}
 	else
 	{
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
 		MyAnim.AnimPlay((int)AnimTable::dead, 0.3f);
 		MyAnim.SetDefaultClip((int)AnimTable::idle);
 	}
 };
+
+void Player::StateCheck()
+{
+
+}
 
 void Player::temp(float temp)
 {
@@ -118,13 +162,11 @@ void Player::MakeShield()
 {
 	Input_mgr& _Input = Input_mgr::instance();
 
-	static float shield_distance = 150.0f;
-	static float shield_speed = 360.f;
 
 	object_mgr& _obj_mgr = object_mgr::instance();
 
 	float degree= 360.0f / 8.f;
-
+	
 	for (int i = 0; i < 8; ++i)
 	{
 		auto _shield = _obj_mgr.insert_object<shield>();
@@ -134,28 +176,57 @@ void Player::MakeShield()
 		if (!_shield) return;
 		_shield->_owner = _ptr;
 
-		_shield->_transform->_location = _transform->_location + _shield->_transform->_dir * shield_distance;
-
-		_shield->_shield_distance = shield_distance;
-		_shield->_speed = shield_speed;
+		_shield->HoleLocation = _shield->_transform->_location = _transform->_location + _shield->_transform->_dir * _shield->_shield_distance;
+		_shield->Angle = degree * i;
+		_shield->CalcIdx();
 	}
+	_player_info->bIdle = false;
+	_player_info->bAttack = true;
+
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->CurrentAttackDuration = _player_info->SkillShieldMotionDuration;
+
+	_render_component->ChangeAnim(AnimTable::attack2, _player_info->SkillShieldMotionDuration);
+
+	vec dir{ math::Rand<float>({ -10,+10 }), math::Rand<float>({ -0,+0 }) };
+	Camera_Shake(15, dir, 0.3f);
+
+
+	
 }
 
-void Player::ICE_CRYSTAL()
+void Player::ICE_BLAST()
 {
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
 	Input_mgr& _Input = Input_mgr::instance();
 
 	auto V= _Input.GetWorldMousePos();
 
 	if (!V) return;
 
-	auto _ICE = object_mgr::instance().insert_object<ICE_Crystal>();
+	auto _ICE = object_mgr::instance().insert_object<ICE_Blast>();
 
 	if (!_ICE) return;
+
+	_player_info->bIdle = false;
 
 	_ICE->_owner = _ptr;
 	_ICE->_target = *V;
 	_ICE->_transform->_location = _transform->_location;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
+
 
 }
 void Player::Camera_Shake(float force,vec dir,float duration)
@@ -175,66 +246,129 @@ void Player::player_check(float dt)
 {
 	Input_mgr& _Input = Input_mgr::instance();
 
-	if (_Input.Key_Pressing(VK_RIGHT))
-	{
-		_render_component->ChangeAnim(AnimTable::walk,0.2f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::right]);
+	_player_info->bIdle = true;
 
-		_transform->_dir = vec{ +1,0 };
-		_transform->Move(_speed * dt);
-	}
-	else if (_Input.Key_Pressing(VK_LEFT))
-	{
-		_render_component->ChangeAnim(AnimTable::walk, 0.2f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::left]);
+	if (!_player_info)return;
 
-		_transform->_dir = vec{ -1,0 };
-		_transform->Move(_speed * dt);
-	}
-	else if (_Input.Key_Pressing(VK_UP))
-	{
-		_render_component->ChangeAnim(AnimTable::walk, 0.2f, AnimTable::idle,AnimDirFileTable[(int)EAnimDir::back]);
+	Player_Move(dt);
 
-		_transform->_dir = vec{ 0,-1 };
-		_transform->Move(_speed * dt);
-	}
-	else if (_Input.Key_Pressing(VK_DOWN))
+	if (_Input.Key_Down('Q'))
 	{
-		_render_component->ChangeAnim(AnimTable::walk, 0.2f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::front]);
-		_transform->_dir = vec{ 0,+1 };
-		_transform->Move(_speed * dt);
-	};
 
-
-	if (_Input.Key_Down('W'))
-	{
-		ICE_CRYSTAL();
+		ICE_BLAST();
 	}
 
 	if (_Input.Key_Down(VK_LBUTTON))
 	{
-		Anim& MyAnim = _render_component->_Anim;
-
-		if ((int)AnimTable::attack1 == MyAnim.CurClipRowIndex())
-		{
-			_render_component->ChangeAnim(AnimTable::attack2, 0.2f, AnimTable::idle);
-		}
-		else 
-		{
-			_render_component->ChangeAnim(AnimTable::attack1, 0.2f, AnimTable::idle);
-		}
-
-		Camera_Shake(5, vec{ 1,1 }, 0.1f);
+		Attack();
 	}
 
-	if (_Input.Key_Down('Q'))
+	if (_Input.Key_Down('R'))
 	{
+
 		MakeShield();
+	}
+
+	if (_Input.Key_Down('E'))
+	{
+		
+		SkillIceCrystal(math::Rand<int>({ 1,12 }));
 	}
 
 	if (_Input.Key_Down(VK_SPACE))
 	{
-		Dash();
+		Dash(_player_info->dash_speed);
+	}
+
+	if (_player_info->bIdle && !_player_info->bAttack && !_player_info->bDash)
+	{
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
+
+		_render_component->ChangeAnim(AnimTable::idle, 0.1f, AnimTable::idle);
 	}
 };
+
+void Player::SkillIceCrystal(uint32_t Num)
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	float degree = 360.0f / Num;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		auto _Ice = _object_mgr.insert_object<ICE_Crystal>();
+
+		if (!_Ice)return;
+		_Ice->_owner = _ptr;
+		_Ice->_transform->_dir = math::dir_from_angle(degree * i);
+	}
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillICECrystalMotionDuration;
+
+	_render_component->ChangeAnim(AnimTable::attack1, _player_info->SkillICECrystalMotionDuration);
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+	Camera_Shake(10, dir, 0.5f);
+};
+
+void Player::CheckDirInput()
+{
+	Input_mgr& _Input = Input_mgr::instance();
+	if (_Input.Key_Pressing('D'))
+	{
+		if (_Input.Key_Pressing('W'))
+		{
+
+			_transform->_dir = vec::unit_diagonal_vec();
+			_transform->_dir.y *= -1;
+		}
+		else if (_Input.Key_Pressing('S'))
+		{
+
+			_transform->_dir = vec::unit_diagonal_vec();
+		}
+		else
+		{
+			_transform->_dir = vec{ +1,0 };
+		}
+	}
+	else if (_Input.Key_Pressing('A'))
+	{
+		if (_Input.Key_Pressing('W'))
+		{
+
+			_transform->_dir = vec::unit_diagonal_vec();
+			_transform->_dir *= -1;
+		}
+		else if (_Input.Key_Pressing('S'))
+		{
+
+			_transform->_dir = vec::unit_diagonal_vec();
+			_transform->_dir.x *= -1;
+		}
+		else
+		{
+
+			_transform->_dir = vec{ -1,0 };
+		}
+	}
+	else if (_Input.Key_Pressing('W'))
+	{
+
+		_transform->_dir = vec{ 0,-1 };
+	}
+	else if (_Input.Key_Pressing('S'))
+	{
+		_transform->_dir = vec{ 0,+1 };
+	}
+}
 
 void Player::make_gold_UI()
 {
@@ -291,23 +425,165 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 	case ESkill::BLAST:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 259,838 }, L"ICE_BLAST_SKILLBAR.bmp");
-		break;	
+		break;
 	case ESkill::CRYSTAL:
-			USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
-				vec{ 315,838 }, L"ICE_KRYSTAL_SKILLBAR.bmp");
-			break;
+		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
+			vec{ 315,838 }, L"ICE_KRYSTAL_SKILLBAR.bmp");
+		break;
 	case ESkill::ARMOR:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
-			vec{ 315+57,838 }, L"GAIA_ARMOR_SKILLBAR.bmp");
+			vec{ 315 + 57,838 }, L"GAIA_ARMOR_SKILLBAR.bmp");
 		break;
 	default:
 		break;
 	}
-}
-
-void Player::Dash()
-{
-	_render_component->ChangeAnim(AnimTable::dash, 0.2f, AnimTable::idle);
 };
 
+void Player::Dash(float speed)
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	_player_info->bDash = true;
+	// 대쉬전에 방향 다시금 설정
+	CheckDirInput();
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Timer::instance().event_regist(time_event::EOnce, _player_info->DashDuration,
+		[&bDash = _player_info->bDash]()->bool{
+		bDash = false; return true; });
+	_player_info->DashDuration;
+
+	Timer::instance().event_regist(time_event::ERemaingWhile, _player_info->DashDuration,
+		std::move([Transform=this->_transform,speed]()->bool {
+		if (!Transform)return false;
+
+		Transform->_location += Transform->_dir *(speed*DeltaTime);
+
+		return true;
+	}));
+	_render_component->ChangeUnstoppableAnim(AnimTable::dash, _player_info->DashDuration, AnimTable::idle);
+
+	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
+	Camera_Shake(5, dir, 0.1f);
+}
+
+void Player::Attack()
+{
+	if (_player_info->bDash)return;
+	Anim& MyAnim = _render_component->_Anim;
+	// 어택 듀레이션이 지난 다음에 어택을 풀어주기
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
+
+	_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+	if ((int)AnimTable::attack1 == MyAnim.CurClipRowIndex())
+	{
+		_render_component->ChangeAnim(AnimTable::attack2, _player_info->DefaultAttackDuration);
+	}
+	else
+	{
+		_render_component->ChangeAnim(AnimTable::attack1, _player_info->DefaultAttackDuration);
+	};
+
+	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
+	Camera_Shake(5, dir, 0.1f);
+};
+
+void Player::Player_Move(float dt)
+{
+	if (!_player_info)return;
+	if (_player_info->bAttack)return;
+	_player_info->bMove = false;
+	if (!_player_info->bDash)
+	{
+		Input_mgr& _Input =Input_mgr::instance();
+		if (_Input.Key_Pressing('D'))
+		{
+			_player_info->bMove = true;
+			if (_Input.Key_Pressing('W'))
+			{
+				_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+				_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::back]);
+				_player_info->bIdle = false;
+				_transform->_dir = vec::unit_diagonal_vec();
+				_transform->_dir.y *= -1;
+				_transform->Move(_transform->_dir, _speed * dt);
+			}
+			else if (_Input.Key_Pressing('S'))
+			{
+				_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+				_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::front]);
+				_transform->_dir = vec::unit_diagonal_vec();
+				_player_info->bIdle = false;
+				_transform->Move(_transform->_dir, _speed * dt);
+			}
+			else
+			{
+				_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+				_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::right]);
+				_player_info->bIdle = false;
+				_transform->_dir = vec{ +1,0 };
+				_transform->Move(_transform->_dir, _speed * dt);
+			}
+		}
+		else if (_Input.Key_Pressing('A'))
+		{
+			_player_info->bMove = true;
+			if (_Input.Key_Pressing('W'))
+			{
+				_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+				_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::back]);
+				_player_info->bIdle = false;
+				_transform->_dir = vec::unit_diagonal_vec();
+				_transform->_dir *= -1;
+				_transform->Move(_transform->_dir, _speed * dt);
+			}
+			else if (_Input.Key_Pressing('S'))
+			{
+				_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+				_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::front]);
+				_transform->_dir = vec::unit_diagonal_vec();
+				_transform->_dir.x *= -1;
+				_player_info->bIdle = false;
+				_transform->Move(_transform->_dir, _speed * dt);
+			}
+			else
+			{
+				_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+				_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::left]);
+				_player_info->bIdle = false;
+
+				_transform->_dir = vec{ -1,0 };
+				_transform->Move(_transform->_dir, _speed * dt);
+			}
+		}
+		else if (_Input.Key_Pressing('W'))
+		{
+			_player_info->bMove = true;
+			_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+			_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::back]);
+			_player_info->bIdle = false;
+			_transform->_dir = vec{ 0,-1 };
+			_transform->Move(_transform->_dir, _speed * dt);
+		}
+		else if (_Input.Key_Pressing('S'))
+		{
+			_player_info->bMove = true;
+			_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+			_player_info->bIdle = false;
+
+			_render_component->ChangeAnim(AnimTable::walk, 0.5f, AnimTable::idle, AnimDirFileTable[(int)EAnimDir::front]);
+			_transform->_dir = vec{ 0,+1 };
+			_transform->Move(_transform->_dir, _speed * dt);
+		}
+	}
+}
 
