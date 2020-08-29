@@ -21,7 +21,7 @@ public:
     void Erase_Tile(std::pair<int, int> WorldIndex);
 
     void Insert_Tile(ETileSelect ImageKey, std::pair<int, int> WorldSize, std::pair<int, int> ImgSize, std::pair<int, int> Paint_Loc, COLORREF ColorKey,
-        std::pair<int, int> WorldIndex);
+        std::pair<int, int> WorldIndex, bool bDeco = false);
     // 마우스 좌표를 이미지의 행 열 인덱스로 변환해줍니다.
 // 현재 윈도우 창에 띄운 이미지의 위치는 좌측상단 기준으로 패스해주세요.
 // 타일의 사이즈는 이미지의 타일 하나의 넓이로 패스해주세요.
@@ -37,8 +37,8 @@ public:
 
 private:
     std::vector<Tile> _Tile_list;
-
-   
+    // 데코레이션 타일들 중복삽입 방지
+    std::set<std::pair<int, int>> _Deco_Tile_Indexs;
 };
 
  

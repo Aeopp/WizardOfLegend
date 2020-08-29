@@ -8,7 +8,7 @@
 
 void Tile::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	auto BMP = Bmp_mgr::instance().Find_Image_SP(Scene_Edit::ImageSelectMap[Imagekey].second);
+	auto BMP = Bmp_mgr::instance().Find_Image_SP(Bmp_mgr::ImageSelectMap[Imagekey].second);
 	if (!BMP)return;
 
 	vec l = _location - camera_pos;

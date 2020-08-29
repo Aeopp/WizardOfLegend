@@ -22,8 +22,8 @@ public:
 	std::shared_ptr<class player_info> _player_info{};
 
 	RECT client_rect{};
-	static constexpr int width = 1600;
-	static constexpr int height = 900;
+	static constexpr int width = 800;
+	static constexpr int height = 600;
 
 	// 타일의 월드 사이즈를 지정합니다.
 	static constexpr int TileWorldX{ 53 };

@@ -29,6 +29,8 @@ void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 		object_mgr::instance().render(hdc, size_factor);
 		collision_mgr::instance().render(hdc, size_factor);
 		Timer::instance().render(hdc);
+		
+
 	}
 }
 
@@ -55,9 +57,11 @@ void Scene_Stage::initialize()
 {
 	Scene::initialize();
 
-	Tile_mgr::instance().initialize();
+	Tile_mgr& _Tile_mgr = Tile_mgr::instance();
 
-	Tile_mgr::instance().Load_Tile();
+	_Tile_mgr.initialize();
+
+	_Tile_mgr.Load_Tile(Tile_mgr::StageFileName);
 
 	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
 

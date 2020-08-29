@@ -1,8 +1,6 @@
 #include "Scene.h"
 #include "Tile.h"
 
-
-
 class Scene_Edit :
     public Scene
 {
@@ -19,12 +17,18 @@ public:
 	std::pair<vec, vec> Tile_image_start_pos{ {73,82},{515,82} };
 	int ImageMiddleX = 458;
 
+	ETileSelect CurrentSelectImage{};
+
 	bool bSelect{ false };
 	std::pair<int, int> CurrentTileIndex{};
 	std::pair<int, int> CurrentImageStartPos{};
 
-	static inline std::map<ETileSelect, std::pair<std::weak_ptr<class Bmp>,std::wstring>> ImageSelectMap{};
-	ETileSelect CurrentSelectImage{};
+	uint32_t CurrentTileImgSizeX{};
+	uint32_t CurrentTileImgSizeY{};
+
+	uint32_t CurrentTileWorldSizeX{};
+	uint32_t CurrentTileWorldSizeY{};
+
 
 	void Input_Check_Scroll();
 	void Camera_Scroll();

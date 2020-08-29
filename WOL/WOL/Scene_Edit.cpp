@@ -29,11 +29,6 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 
 		Timer::instance().render(hdc);
 
-		/*auto p =Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_#.bmp", L"MAPTILE_#");
-		auto wp = p.lock();
-		;
-		GdiTransparentBlt(hdc,0,0,438,511, wp->Get_MemDC(),
-			0, 0, 438, 511, RGB(255,0,255));*/
 
 		// 원활한 에디팅을 위해 타일 좌표만큼 사각형을 그린다.
 
@@ -81,7 +76,7 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 
 	if(bSelect)
 	{
-		auto SP_CurrentSelectImage = ImageSelectMap[CurrentSelectImage].first.lock();
+		auto SP_CurrentSelectImage = Bmp_mgr::ImageSelectMap[CurrentSelectImage].first.lock();
 		if (!SP_CurrentSelectImage)return;
 
 		HDC hMemDC = SP_CurrentSelectImage->Get_MemDC();
@@ -133,11 +128,9 @@ void Scene_Edit::initialize()
 
 	Tile_mgr::instance().initialize();
 
+
 	// 이미지들 대신 이니셜라이즈
-	ImageSelectMap[ETileSelect::Info_1] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_1.bmp", L"MAPTILE_1"),L"MAPTILE_1" };
-	ImageSelectMap[ETileSelect::Info_2] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_2.bmp", L"MAPTILE_2"),L"MAPTILE_2"};
-	ImageSelectMap[ETileSelect::Info_3] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_3.bmp", L"MAPTILE_3"),L"MAPTILE_3"};
-	ImageSelectMap[ETileSelect::Info_4] = { Bmp_mgr::instance().Insert_Bmp(L"MAPTILE_#.bmp", L"MAPTILE_#"),L"MAPTILE_#"};
+	
 }
 
 void Scene_Edit::release()
@@ -147,7 +140,6 @@ void Scene_Edit::release()
 	Tile_mgr::instance().release();
 
 	collision_mgr::instance().collision_tile_clear();
-
 }
 
 
@@ -169,21 +161,39 @@ void Scene_Edit::Input_Check_Scroll()
 		if (bSelect)
 		{
 			vec mp = *_Input.GetWindowMousePos() - select_image_start_pos;
-			
-			if (mp.x < ImageMiddleX)
+
+			if (CurrentSelectImage == ETileSelect::Info_4)
+			{
+				// 맵을 순회하며 찾기
+				for (auto& [k,ImgRt] : Bmp_mgr::DecoTileInfoMap)
+				{
+					if (math::RectInPoint(ImgRt, mp))
+					{
+						CurrentImageStartPos = {ImgRt.left, ImgRt.top};
+						CurrentTileWorldSizeX = CurrentTileImgSizeX =  ImgRt.right - ImgRt.left;
+						CurrentTileWorldSizeY  =CurrentTileImgSizeY = ImgRt.bottom- ImgRt.top;
+					}
+				}
+			}
+			else if (mp.x < ImageMiddleX)
 			{
 				CurrentImageStartPos = Tile_image_start_pos.first.Pair<int>();
+				CurrentTileWorldSizeX  = CurrentTileImgSizeX = game::TileImgX;
+				CurrentTileWorldSizeY = CurrentTileImgSizeY = game::TileImgY;
 			}
 			else if (mp.x > ImageMiddleX)
 			{
 				CurrentImageStartPos = Tile_image_start_pos.second.Pair<int>();
+				CurrentTileWorldSizeX  = CurrentTileImgSizeX = game::TileImgX;
+				CurrentTileWorldSizeY  = CurrentTileImgSizeY = game::TileImgY;
 			}
 
 			// 타일의 이미지 인덱스
+			// TODO ::  데코 이미지의 경우   CurrentImageStartPos 좌표를 충돌한 데코 이미지의 시작 부분으로 변경 해주기.
 			auto oWindowpos = _Input.GetWindowMousePos();
 			if (!oWindowpos)return;
 			CurrentTileIndex = Tile_mgr::instance().CalcTileImageSrcIndex(*oWindowpos
-				, select_image_start_pos, vec{ CurrentImageStartPos }, game::TileImgX, game::TileImgY);
+				, select_image_start_pos, vec{ CurrentImageStartPos }, CurrentTileImgSizeX, CurrentTileImgSizeY);
 		}
 		else if (!bSelect)
 		{
@@ -192,13 +202,18 @@ void Scene_Edit::Input_Check_Scroll()
 			std::pair<int, int> world_index = Tile_mgr::instance().CalcTileWorldIndex(*oWorldwpos, game::TileWorldX,
 				game::TileWorldY);
 
-			// 이미 해당 월드 자리에 타일이 있기때문에 인서트 안함
-			if (Tile_mgr::instance().IsContain(world_index))return;
-			
+			// 타일 위의 데코하는 타일들이 아니고 이미 타일이 자리잡았기 때문에 인서트를 취소
+			bool bDeco  = CurrentSelectImage == ETileSelect::Info_4;
+
+			if (!bDeco && Tile_mgr::instance().IsContain(world_index) )
+			{
+				return;
+			}
+
 			Tile_mgr::instance().Insert_Tile(CurrentSelectImage,
-				{ game::TileWorldX,game::TileWorldY }, { game::TileImgX,game::TileImgY },
-				{ CurrentImageStartPos.first + CurrentTileIndex.first * game::TileImgX,CurrentImageStartPos.second + CurrentTileIndex.second * game::TileImgY },
-				COLOR::MEGENTA(), world_index);
+				{ CurrentTileWorldSizeX,CurrentTileWorldSizeY }, { CurrentTileImgSizeX,CurrentTileImgSizeY },
+				{ CurrentImageStartPos.first + CurrentTileIndex.first * CurrentTileImgSizeX,CurrentImageStartPos.second + CurrentTileIndex.second * CurrentTileImgSizeY },
+				COLOR::MEGENTA(), world_index, bDeco);
 		}
 	}
 
@@ -236,18 +251,19 @@ void Scene_Edit::Input_Check_Scroll()
 		world_loc.first *= game::TileWorldX;
 		world_loc.second *= game::TileWorldY;
 
+
 		collision_mgr::instance().Erase_CollisionTile(world_loc);
 	}
 
 
 	if (_Input.Key_Down('Q'))
 	{
-		Tile_mgr::instance().Save_Tile();
+		Tile_mgr::instance().Save_Tile(Tile_mgr::StageFileName);
 	}
 
 	if (_Input.Key_Down('W'))
 	{
-		Tile_mgr::instance().Load_Tile();
+		Tile_mgr::instance().Load_Tile(Tile_mgr::StageFileName);
 	}
 
 	if (_Input.Key_Down('Z'))

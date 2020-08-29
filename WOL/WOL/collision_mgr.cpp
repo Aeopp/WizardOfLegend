@@ -191,6 +191,8 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 void collision_mgr::update()
 {
 	collision(EMonster,EPlayer);
+	collision_tile(EPlayer);
+	collision_tile(EMonster);
 
 	check_erase();
 }

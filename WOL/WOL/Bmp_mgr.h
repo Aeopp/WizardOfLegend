@@ -1,5 +1,6 @@
 #pragma once
 #include "singleton_interface.h"
+#include "Tile.h"
 
 class Bmp_mgr : public singleton_interface<Bmp_mgr>
 {
@@ -17,6 +18,11 @@ public:
 	void Release();
 
 	 std::wstring DefaultPath = L"..\\..\\Resources\\WOL_TEXTURE\\";
+
+	 static inline std::map<EDecoTileInfo, RECT> DecoTileInfoMap{};
+
+	 static inline std::map<ETileSelect, std::pair<std::weak_ptr<class Bmp>, std::wstring>> ImageSelectMap{};
+	 ETileSelect CurrentSelectImage{};
 private:
 	std::map<std::wstring, std::shared_ptr<class Bmp>>bmp_map;
 };

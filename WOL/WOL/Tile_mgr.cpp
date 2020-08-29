@@ -35,8 +35,8 @@ void Tile_mgr::render(HDC hdc, std::pair<float,float> size_factor)
 	for (auto& Tile : _Tile_list)
 	{
 		if (!Tile.bRender)continue;
-		Tile.render(hdc, cp, vec{ size_factor.first,size_factor.second});
-	}
+		Tile.render(hdc, cp, vec{ size_factor.first,size_factor.second });
+	};
 }
 
 void Tile_mgr::release()
@@ -115,8 +115,15 @@ void Tile_mgr::Erase_Tile(std::pair<int, int> WorldIndex)
 
 
 void Tile_mgr::Insert_Tile(ETileSelect ImageKey, std::pair<int, int> WorldSize, std::pair<int, int> ImgSize, std::pair<int, int> Paint_Loc, COLORREF ColorKey,
-	std::pair<int, int> WorldIndex)
+	std::pair<int, int> WorldIndex,bool bDeco)
 {
+	if (bDeco)
+	{
+		if (_Deco_Tile_Indexs.contains(WorldIndex))return;
+
+		_Deco_Tile_Indexs.insert(WorldIndex);
+	}
+
 	auto  v = WorldIndex;
 	if (game::TileNumX * game::TileNumY <= v.second * game::TileNumX + v.first)
 		return;
@@ -131,7 +138,7 @@ void Tile_mgr::Insert_Tile(ETileSelect ImageKey, std::pair<int, int> WorldSize, 
 	_Tile._location = { WorldIndex.first * game::TileWorldX, WorldIndex.second * game::TileWorldY };
 	_Tile._paint_location = vec{ Paint_Loc.first,Paint_Loc.second };
 	_Tile._paint_size = vec{ ImgSize.first,ImgSize.second };
-	_Tile._size = vec{ game::TileWorldX,game::TileWorldY };
+	_Tile._size = vec{ WorldSize.first,WorldSize.second };
 	_Tile.bRender = true;
 
 	// y¿Œµ¶Ω∫ ∞ˆ«œ±‚ x ªÁ¿Ã¡Ó  + x¿Œµ¶Ω∫

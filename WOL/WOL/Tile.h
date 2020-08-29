@@ -8,8 +8,20 @@ enum class ETileSelect : uint32_t
     Info_2,
     Info_3,
     Info_4,
+    end,
 };
 
+enum class EDecoTileInfo : uint32_t
+{
+    statue,
+    flag,
+    pillar,
+    chair_H,
+    chair_V,
+    pool_12,
+    pool_22,
+    end,
+};
 
 class Tile
 {
