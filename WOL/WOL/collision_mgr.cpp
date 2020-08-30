@@ -42,6 +42,7 @@ void collision_mgr::collision_tile(collision_tag rhs)
 					if (!_ptr)return;
 
 					_ptr->_transform->_location += *bCollision;
+					_ptr->HitTile(lhs_rect);
 				}
 			}
 		}
@@ -200,7 +201,7 @@ void collision_mgr::update()
 
 	collision_tile(EPlayer);
 	collision_tile(EMonster);
-
+	collision_tile(EPlayerAttack);
 	check_erase();
 }
 void collision_mgr::release()

@@ -25,6 +25,8 @@
 #include "ICE_Crystal.h"
 #include "Bmp.h"
 #include "Effect.h"
+#include "FireDragon.h"
+
 
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -208,36 +210,73 @@ void Player::ICE_BLAST(int Num)
 
 	Input_mgr& _Input = Input_mgr::instance();
 
-	auto V= _Input.GetWorldMousePos();
-	if (!V) return;
+	auto oMousePos= _Input.GetWorldMousePos();
+	if (!oMousePos) return;
 
 	Timer& _Timer = Timer::instance();
+
+	float BlastDistanceBetween = 45.f;
+	float BlastSpawnCycle = 0.07f;
+	int  IcePilarNum = 7;
+	float IcePilarDuration = 6.f;
+	int IcePilarDistribution = 300;
 
 	// 블라스트 생성 이펙트 한번 뿌려주기
 	object_mgr& obj_mgr = object_mgr::instance();
 	vec v = _transform->_location;
-	auto ICE_EFFECT = obj_mgr.insert_object<Effect>(v.x, v.y,
-		L"ICE_BLAST", layer_type::EEffect, 8, 0, 1.f, 1.f, 200, 250, ScaleX, ScaleY);
+	vec dis = *oMousePos - v;
+	vec dir = dis.get_normalize();
 
 	for (int i = 0; i < Num; ++i)
 	{
-		_Timer.event_regist(time_event::EOnce, i * 0.06f,[Loc = _transform->_location,_Ptr=this->_ptr,V = *V]()->bool{
+		vec blast_location = v + dir * (BlastDistanceBetween * i);
 
-			auto _ICE = object_mgr::instance().insert_object<ICE_Blast>();
-			if (!_ICE) return false;
-			_ICE->_owner = _Ptr;
-			_ICE->_target = V;
-			_ICE->_transform->_location = Loc;
-
-			return true; 
+		_Timer.event_regist(time_event::EOnce, i * BlastSpawnCycle, [blast_location]()->bool {
+			auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
+			BLAST->_transform->_location = blast_location;
+			return true;
 			});
-	}
+	};
+
+	vec w = v + dir * (BlastDistanceBetween * Num);
+
+	_Timer.event_regist(time_event::EOnce, Num * BlastSpawnCycle, [IcePilarDistribution,IcePilarDuration,BlastSpawnCycle, IcePilarNum,
+		&_Timer = _Timer, w = w, dir = dir]()->bool {
+
+				_Timer.event_regist(time_event::EOnce, 0.6f, [w, IcePilarDistribution,IcePilarDuration ,IcePilarNum]()->bool {
+
+					for (int i = 0; i < IcePilarNum; ++i)
+					{
+						auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
+						BLAST->_transform->_location = w + vec{ math::Rand<float>({-1,1}) , math::Rand<float>({0,0}) }
+						*math::Rand<int>({ -300, 300 });
+
+						BLAST->Duration = IcePilarDuration;
+					}
+					for (int i = 0; i < IcePilarNum; ++i)
+					{
+						auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
+						BLAST->_transform->_location = w + vec{ math::Rand<float>({0,0}) , math::Rand<float>({-1,1}) }
+						*math::Rand<int>({ -300, 300 });
+
+						BLAST->Duration = IcePilarDuration;
+					}
+					return true; 
+					});
+			
+		return true;
+		});
+
 
 	_Shadow.CurrentShadowState = EShadowState::BIG;
 	Anim& MyAnim = _render_component->_Anim;
+	_render_component->ChangeAnim(AnimTable::attack2, _player_info->SkillICEBlastMotionDuration);
 	_player_info->bIdle = false;
-	_player_info->bAttack = true;
+	_player_info->bAttack = true;	
 	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
+
+	vec Dir{ math::Rand<float>({ 0,0 }), math::Rand<float>({ -10,+10 }) };
+	Camera_Shake(10, Dir, 0.5f);
 }
 void Player::Camera_Shake(float force,vec dir,float duration)
 {
@@ -265,12 +304,17 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('Q'))
 	{
 
-		ICE_BLAST(10);
+		ICE_BLAST(15);
 	}
 
 	if (_Input.Key_Down(VK_LBUTTON))
 	{
 		Attack();
+	}
+
+	if (_Input.Key_Down(VK_RBUTTON)) 
+	{
+		SkillFireDragon();
 	}
 
 	if (_Input.Key_Down('R'))
@@ -284,6 +328,8 @@ void Player::player_check(float dt)
 		
 		SkillIceCrystal(math::Rand<int>({ 1,12 }));
 	}
+
+
 
 	if (_Input.Key_Down(VK_SPACE))
 	{
@@ -326,6 +372,67 @@ void Player::SkillIceCrystal(uint32_t Num)
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 	Camera_Shake(10, dir, 0.5f);
+}
+void Player::SkillFireDragon()
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+	static int UpDown = 1;
+
+	 auto mp  =  Input_mgr::instance().GetWorldMousePos(); 
+	 if (!mp)return;
+
+	 vec FireDir = (*mp - _transform->_location).get_normalize();
+	float FireInitDistance = 30.f;
+	auto _Fire = object_mgr::instance().insert_object<FireDragon>();
+
+	if (!_Fire)return;
+
+	_Fire->_transform->_location = _transform->_location + (FireDir * FireInitDistance);
+	_Fire->rotation_center = _transform->_location + (FireDir * FireInitDistance);
+	_Fire->_transform->_dir = FireDir;
+	_Fire->rotation_center_dir = FireDir;
+	_Fire->Updown = UpDown;
+	_player_info->bIdle = false;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
+
+	vec dis = *Input_mgr::instance().GetWorldMousePos() - _transform->_location;
+
+	math::EDir _Dir = math::checkDir(dis.get_normalize());
+
+	switch (_Dir)
+	{
+	case math::EDir::left:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::left]);
+		break;
+	case math::EDir::right:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::right]);
+		break;
+	case math::EDir::up:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::front]);
+		break;
+	case math::EDir::down:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::back]);
+		break;
+	default:
+		break;
+	}
+
+	if (UpDown > 0)
+		_render_component->ChangeAnim(AnimTable::attack1, _player_info->SkillFireDragonMotionDuration);
+	else 
+		_render_component->ChangeAnim(AnimTable::attack2, _player_info->SkillFireDragonMotionDuration);
+	
+	_player_info->bAttack = true;
+
+	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
+	Camera_Shake(5, dir, 0.25f);
+
+	UpDown *= -1;
 };
 
 void Player::CheckDirInput()

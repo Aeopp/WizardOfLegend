@@ -18,7 +18,7 @@ void ICE_Blast::initialize()
 		PaintSizeY = 250;
 		ScaleY = ScaleX = 0.7f;
 		COLORREF _ColorRef = COLOR::MEGENTA();
-		float AnimDuration = 0.5f;
+		float AnimDuration = 0.7f;
 
 		_render_component = std::make_shared<render_component>();
 		_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"ICE_BLAST");
@@ -27,14 +27,8 @@ void ICE_Blast::initialize()
 		_render_component->_ColorKey = _ColorRef;
 		_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 		_render_component->_Anim.SetAnimationClip(
-			{ 8 }, AnimDuration);
-
-
-		// 해당 스킬만을 위한 세팅....
-		{
-			_render_component->_Anim.ColIndex = 2;
-			_render_component->_Anim.CurDelta = FLT_MAX;
-		}
+			{ 3}, AnimDuration);
+		_render_component->_Anim.EndMotionColIndex = 2;
 	};
 	// 콜리전 셋업
 	{
@@ -46,68 +40,36 @@ void ICE_Blast::initialize()
 
 		sp_collision->_size = { 30.f,30.0f };
 		sp_collision->bRender = true;
-		sp_collision->bSlide = false;
+		sp_collision->bSlide = true;
 		sp_collision->bCollision = true;
 	};
 
-	Minimum_distance = 10.f;
-	bSuccess = false;
-	_target = vec{ 0.f,0.f };
-	_speed = 500.f;
-
+	_Shadow.bShadow = false;
 	_Shadow.correction = { 0,60 };
-}
 
+
+	Duration = 0.8f;
+}
 
 
 Event ICE_Blast::update(float dt)
 {
 	Event _Event = actor::update(dt);
-
-	vec& v = _transform->_location;
-
-	if (!bSuccess)
+	Duration -= dt;
+	if (Duration < 0.3f)
 	{
-		vec w = _target;
-
-		vec d = w - v;
-
-		if (d.length() < Minimum_distance)
-		{
-			bSuccess = true;
-			return Event::None;
-		}
-
-		vec dir = d.get_normalize();
-
-		v += (dir * (_speed * dt));
+		_render_component->_Anim.EndMotionColIndex = 7;
 	}
-	else
-	{
-		auto Owner = _owner.lock();
-		if (!Owner) return Event::Die;
-
-		vec w = Owner->_transform->_location;
-
-		vec d = w - v;
-
-		if (d.length() < Minimum_distance)
-		{
-			auto ICE_EFFECT = object_mgr::instance().insert_object<Effect>(v.x, v.y,
-				L"ICE_BLAST", layer_type::EEffect, 8, 0, 0.3f, 0.3f, 200, 250, ScaleX, ScaleY);
-			ICE_EFFECT->CurrentCol = 3;
-
-			return Event::Die;
-		}
-
-		vec dir = d.get_normalize();
-
-		v += (dir * (_speed * dt));
-	};
+	if (Duration < 0)
+		_Event = Event::Die;
 
 	return _Event;
-}
+};
 
+void ICE_Blast::IceEffectPlay()
+{
+	
+}
 
 uint32_t ICE_Blast::get_layer_id() const&
 {

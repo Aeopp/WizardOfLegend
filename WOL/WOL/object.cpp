@@ -36,5 +36,9 @@ void object::Hit(std::weak_ptr<object> _target)
 {
 	auto _ptr = _target.lock();
 	if (!_ptr)	return;
-};
+}
+void object::HitTile(RECT TileRt)
+{
+}
+;
 

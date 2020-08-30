@@ -226,6 +226,9 @@
       <Filter>Effect</Filter>
     </ClInclude>
     <ClInclude Include="GoldEffect.h" />
+    <ClInclude Include="FireDragon.h">
+      <Filter>source\object\Actor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -406,6 +409,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="GoldEffect.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="FireDragon.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

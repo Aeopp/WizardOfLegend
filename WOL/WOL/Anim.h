@@ -16,6 +16,7 @@ public:
 	// 인덱스에는 이미지의 행을 원소에는 이미지의 해당 행의 열의 개수
 	std::vector<int> Anim_Info{};
 	int DefaultClip{ 0 };
+	int EndMotionColIndex{ 0 };
 
 	bool bChangeable = true;
 public:

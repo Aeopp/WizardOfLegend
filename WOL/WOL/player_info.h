@@ -23,6 +23,7 @@ struct player_info
 	float SkillICECrystalMotionDuration = 1.0f;
 	float SkillICEBlastMotionDuration = 1.0f;
 	float SkillShieldMotionDuration = 1.0f;
+	float SkillFireDragonMotionDuration = 0.4f;
 };
 
 struct PlayerAnimInfo

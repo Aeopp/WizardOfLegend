@@ -13,8 +13,6 @@ public:
 	std::weak_ptr<class collision_component>  _collision_component;
 	uint32_t get_layer_id()const& override;
 
-
-
 	float DistancefromCenterMin{ 80.f };
 	float Tick{};
 	float TickScale{ 1.f };

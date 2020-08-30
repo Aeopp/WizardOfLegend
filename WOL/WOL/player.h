@@ -60,6 +60,7 @@ private:
     void player_check(float dt);
 
     void SkillIceCrystal(uint32_t Num);
+    void SkillFireDragon();
 
     void CheckDirInput();
     void make_gold_UI();

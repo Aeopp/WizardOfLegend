@@ -110,6 +110,8 @@ public:
 
 		return factor * radian;
 	};
+	template<typename T>
+	static T LOOP(std::pair<T, T> Range, T Target);
 	// 방향 리턴 
 	static EDir checkDir(vec dir);
 	// 전체 각으로부터 방향 리턴
@@ -117,7 +119,8 @@ public:
 	// 이미 존재하는 방향으로부터 새로 더할려는 앵글만큼 방향 회전시켜서 리턴
 	static vec rotation_dir_to_add_angle(const vec dir, const float degree);
 
-
+	// 디그리 기준  360도 기준으로 반환
+	static float AngleFromVec(vec v);
 	// 사각형과 원의 충돌 사각형의 네개의 꼭짓점이 원안에 있는지 검사합니다.
 	// 값이 세팅되있다면 충돌 아니라면 충돌이 아님.
 	// 반환되는 벡터의 방향은 충돌한 꼭짓점이 시점 서클의 중심점이 종점이고
@@ -154,6 +157,21 @@ static  bool EQUAL(const float lhs, const float rhs)
 	// else 
 	return false;
 };
+
+template<typename T>
+ T math::LOOP(std::pair<T, T> Range,T Target)
+{
+	 auto [left, right]  = Range;
+
+	 if (Target <= left)
+	 {
+		 return right - (left - Target);
+	 }
+	 else if (Target >= right)
+	 {
+		 return (Target - right) + left;
+	 }
+}
 
 template<typename Ty>
 Ty math::Rand_Normal(std::pair<Ty, Ty> range)

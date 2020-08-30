@@ -5,6 +5,8 @@
 
 // 전체 각으로부터 방향 리턴
 
+
+
 math::EDir math::checkDir(vec dir)
 {
 	dir = dir.get_normalize();
@@ -49,6 +51,12 @@ vec math::rotation_dir_to_add_angle(const vec dir,
 
 	return { dir.x * b_cos - dir.y * b_sin,
 		dir.y * b_cos + dir.x * b_sin };
+}
+
+float math::AngleFromVec(vec v)
+{
+	return math::Angle360conversion(
+		math::radian_to_degree(atan2f(v.y, v.x)));
 }
 
 

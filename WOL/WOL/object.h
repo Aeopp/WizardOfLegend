@@ -22,6 +22,7 @@ public:
 	std::weak_ptr<object> _owner{};
 
 	virtual void Hit(std::weak_ptr<object> _target);
+	virtual void HitTile(RECT TileRt);
 
 	bool bDie{ false };
 };

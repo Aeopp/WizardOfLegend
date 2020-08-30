@@ -40,6 +40,7 @@ void ICE_Crystal::initialize()
 		{ 18 }, 360.f / _speed);
 
 	TickScale = 1.f;
+	sp_collision->bSlide = false;
 
 	//_Shadow.bShadow = true;
 	//_Shadow.correction = { 0,120 };

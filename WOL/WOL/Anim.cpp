@@ -40,8 +40,8 @@ void Anim::update()
 		CurDelta = (AnimDuration/(float)Anim_Info[RowIndex]);
 		++ColIndex;
 		if (ColIndex >= Anim_Info[RowIndex])
-		{
-			ColIndex = 0;
+		{			
+			ColIndex = EndMotionColIndex;
 			RowIndex = DefaultClip;
 		}
 	}

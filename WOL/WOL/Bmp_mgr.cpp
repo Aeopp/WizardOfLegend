@@ -48,6 +48,8 @@ void Bmp_mgr::initialize()
 	 Insert_Bmp(DefaultPath + L"HITEFFECT.bmp", L"HITEFFECT");
 
 	 Insert_Bmp(DefaultPath + L"MONEY.bmp", L"MONEY");
+	 Insert_Bmp(DefaultPath + L"SKILL_FIREDRAGON_COM.bmp", L"SKILL_FIREDRAGON_COM");
+	 Insert_Bmp(DefaultPath + L"FIRE_PARTICLE.bmp", L"FIRE_PARTICLE");
 };
 
 void Bmp_mgr::release()

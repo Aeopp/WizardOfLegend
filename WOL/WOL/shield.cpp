@@ -43,9 +43,8 @@ Event shield::update(float dt)
 	vec w = Owner->_transform->_location;
 
 	vec& r = _transform->_dir;
-	//Angle += ( _speed* dt);
 	r = math::rotation_dir_to_add_angle(r, _speed*dt);
-	//CalcIdx();
+
 
 	_transform->_location = w + r * _shield_distance;
 
@@ -96,6 +95,7 @@ void shield::late_initialize(Transform _Transform)
 	auto sp_collision = _collision_component.lock();
 	if (!sp_collision)return;
 
+	sp_collision->bSlide = false;
 	sp_collision->PushForce = 10.f;
 	sp_collision->bPush = true;
 	sp_collision->_size = { 50.f,50.0f };
