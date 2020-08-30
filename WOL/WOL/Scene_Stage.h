@@ -9,6 +9,8 @@ public:
 	void initialize()override;
 	void release() override ;
 
+	vec PlayerSpawnLocation = { 500,500 };
+
 	~Scene_Stage()noexcept override;
 private:
 	

@@ -21,6 +21,7 @@ public:
 	//   전체경로를 컨트롤 하려면 매니저의 디폴트 path 를 수정해주세요 . 
 	void LoadBmp(const std::wstring& _filename,const std::wstring& ImageKey);
 	std::weak_ptr<class Bmp> wp_Image{};
+
 	COLORREF _ColorKey{RGB(255,0,255) };
 
 	template<typename T>
@@ -29,6 +30,8 @@ public:
 	template<typename T>
 	void ChangeUnstoppableAnim(T AnimPlay, float Duration, T DefaultClip = {}, std::weak_ptr<class Bmp> p_wp_Image = {});
 
+
+	void ChangeImg(std::weak_ptr<class Bmp>p_wp_Image);
 
 	void ChangeAnimDir(std::weak_ptr<class Bmp>p_wp_Image, float default_dt);
 

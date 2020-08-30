@@ -9,6 +9,8 @@ class actor :
 public:
     void initialize()override;
 
+    float ScaleX;
+    float ScaleY;
     int PaintSizeX;
     int PaintSizeY;
     std::shared_ptr<class render_component> _render_component{};

@@ -27,6 +27,14 @@ void render_component::LoadBmp(const std::wstring& _filename, const std::wstring
 	wp_Image = Bmp_mgr::instance().Insert_Bmp(_filename, ImageKey);
 };
 
+void render_component::ChangeImg(std::weak_ptr<class Bmp> p_wp_Image)
+{
+	if (!p_wp_Image.expired())
+	{
+		wp_Image = std::move(p_wp_Image);
+	}
+}
+
 void render_component::ChangeAnimDir(std::weak_ptr<class Bmp> p_wp_Image,float default_dt)
 {
 	// 만약 같은 방향이라면 그냥 아무것도 안함

@@ -48,6 +48,9 @@
     <Filter Include="source\Tile">
       <UniqueIdentifier>{99dc1fbd-8ef8-4bd7-80aa-084686737a76}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Effect">
+      <UniqueIdentifier>{f2373270-ad6f-4ba2-98d4-d46b8f45e2fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fmod.h">
@@ -218,6 +221,11 @@
     <ClInclude Include="ICE_Crystal.h">
       <Filter>source\object\Actor</Filter>
     </ClInclude>
+    <ClInclude Include="Effect.h" />
+    <ClInclude Include="Money.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="GoldEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -389,6 +397,15 @@
       <Filter>source\object\Actor</Filter>
     </ClCompile>
     <ClCompile Include="ICE_Crystal.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Money.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="GoldEffect.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

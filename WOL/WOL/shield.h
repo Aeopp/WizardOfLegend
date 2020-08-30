@@ -12,10 +12,9 @@ public :
 	uint32_t get_layer_id()const& override;
 	vec HoleLocation{};
 
+	void late_initialize(Transform _Transform);
 
-	bool bHoleRender{ true };
-	float HoleDuration{};
-	float _shield_distance{ 150.0f };
+	float _shield_distance{ 135.0f };
 	float duration{};
 	float DegreePerSecond{};
 	float DegreeTick{};

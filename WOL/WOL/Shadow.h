@@ -15,14 +15,16 @@ class Shadow
 public:
 	static inline std::map<EShadowState, std::tuple<int,int,int,int>> ShadowStates_Size
 	{ 
-		{EShadowState::MIDDLE, {106,35,75,50} },
-		{EShadowState::BIG_VER,{70,94,100,50}  },
-		{EShadowState::NORMAL, {70,35,30,30}  },
-		{EShadowState::BIG,    {117,35,50,100} } 
+							 // 페인트 사이즈 , 월드 사이즈
+		{EShadowState::MIDDLE, {106,35,75,35} },
+		{EShadowState::BIG_VER,{70,94,100,43}  },
+		{EShadowState::NORMAL, {70,35,35,35}  },
+		{EShadowState::BIG,    {117,35,50,80} } 
 	};
 
 	static void ShadowImgInit();
 public:
+	bool bShadow = true;
 	std::shared_ptr<class Bmp> FindImgByState();
 	void SetState(EShadowState _State) { CurrentShadowState = _State;  }
 	void update();

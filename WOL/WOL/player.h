@@ -55,7 +55,7 @@ private:
 
     void temp(float temp);
     void MakeShield();
-    void ICE_BLAST();
+    void ICE_BLAST(int Num);
     void Camera_Shake(float force, vec dir, float duration);
     void player_check(float dt);
 

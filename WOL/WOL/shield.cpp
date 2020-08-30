@@ -5,41 +5,20 @@
 #include "Color.h"
 #include "Bmp_mgr.h"
 #include "Bmp.h"
-
-
-
-
+#include "Effect.h"
+#include "object_mgr.h"
 
 void shield::initialize()
 {
 	actor::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
-
-	auto sp_collision = _collision_component.lock();
-
-	if (!sp_collision)return;
-
-	sp_collision->_size = { 50.f,50.0f };
-
-	duration = 15.f;
-	HoleDuration = 5.f;
-	PaintSizeX = 100;
-	PaintSizeY = 105;
-	float Scale = 1.f;
-	_speed = 120.f;
-
-	_render_component = std::make_shared<render_component>();
-	_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"GAIA_ARMOR");
-	_render_component->Default_Src_Paint_Size = vec{ PaintSizeX,PaintSizeY };
-	_render_component->Dest_Paint_Size = vec{ PaintSizeX * Scale,PaintSizeY * Scale };
-	_render_component->_ColorKey = COLOR::MEGENTA();
-	_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
-	_render_component->_Anim.SetAnimationClip(
-		{ 12}, 360.f/_speed);
-
-
-
+	// Shadow SetUp
+	{
+		_Shadow.bShadow = true;
+		_Shadow.correction = { 0,60 };
+		_Shadow.world_size_correction = { -20,0 };
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+	}
 }
 
 Event shield::update(float dt)
@@ -48,10 +27,6 @@ Event shield::update(float dt)
 
 	duration -= dt;
 	if (duration < 0)return Event::Die;
-
-	HoleDuration -= dt;
-	if (HoleDuration < 0)bHoleRender = false;
-
 
 	DegreeTick -= dt;
 	if (DegreeTick < 0) {
@@ -68,8 +43,9 @@ Event shield::update(float dt)
 	vec w = Owner->_transform->_location;
 
 	vec& r = _transform->_dir;
-
-	r = math::rotation_dir_to_add_angle(r, _speed* dt);
+	//Angle += ( _speed* dt);
+	r = math::rotation_dir_to_add_angle(r, _speed*dt);
+	//CalcIdx();
 
 	_transform->_location = w + r * _shield_distance;
 
@@ -79,18 +55,7 @@ Event shield::update(float dt)
 
 void shield::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-
-	if (bHoleRender)
-	{
-		static auto sp_Hole = Bmp_mgr::instance().Find_Image_SP(L"BOTTOM_HOLE");
-		if (sp_Hole) 
-		{
-			vec v = HoleLocation - camera_pos;
-			GdiTransparentBlt(hdc, v.x, v.y, 200, 150, sp_Hole->Get_MemDC(),
-				0, 0, 200, 150, COLOR::MEGENTA());
-		}
-	}
-
+	
 	actor::render(hdc, camera_pos, size_factor);
 }
 
@@ -107,4 +72,46 @@ void shield::CalcIdx()
 uint32_t shield::get_layer_id() const&
 {
 	return layer_type::EEffect;
+}
+void shield::late_initialize(Transform _Transform)
+{
+	if (!_transform)return;
+
+	*_transform = std::move(_Transform);
+
+
+	object_mgr& obj_mgr = object_mgr::instance();
+
+	vec cp = obj_mgr.camera_pos;
+
+	vec w = _transform->_location + (_transform->_dir * _shield_distance);
+
+	auto Effect_SUMMON = obj_mgr.insert_object<Effect>
+		(w.x, w.y,
+			L"BOTTOM_HOLE", layer_type::EMapDeco, 1, 0, 5.f, FLT_MAX, 200, 150,
+			0.8f, 0.8f);
+
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
+
+	auto sp_collision = _collision_component.lock();
+	if (!sp_collision)return;
+
+	sp_collision->PushForce = 10.f;
+	sp_collision->bPush = true;
+	sp_collision->_size = { 50.f,50.0f };
+
+	duration = 15.f;
+	PaintSizeX = 100;
+	PaintSizeY = 105;
+	float Scale = 1.f;
+	_speed = 120.f;
+
+	_render_component = std::make_shared<render_component>();
+	_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"GAIA_ARMOR");
+	_render_component->Default_Src_Paint_Size = vec{ PaintSizeX,PaintSizeY };
+	_render_component->Dest_Paint_Size = vec{ PaintSizeX * Scale,PaintSizeY * Scale };
+	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
+	_render_component->_Anim.SetAnimationClip(
+		{ 12 }, 360.f / _speed);
 };

@@ -22,9 +22,9 @@ void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 	if (!_render_component)return;
 
 	loc -= _render_component->Dest_Paint_Size * 0.5f;
-
+	
 	_render_component->Dest_Loc = loc;
-	_render_component->Dest_Paint_Size  = _render_component->Default_Src_Paint_Size;
+	_render_component->Dest_Paint_Size = _render_component->Default_Src_Paint_Size * 1.3f;
 	_render_component->Render(hdc);
 
 	if (bDebug)
@@ -40,6 +40,8 @@ void Mouse::initialize()
 {
 	UI::initialize();
 
+	ShowCursor(false);
+
 	_transform->_size = { 10,10 };
 
 	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMouse, ECircle);
@@ -48,10 +50,8 @@ void Mouse::initialize()
 	if (!sp_collision)return;
 
 	sp_collision->_size = { 10.f,10.0f };
-	sp_collision->bPush = false;
+	sp_collision->bSlide = false;
 	sp_collision->bRender = false;
-
-	ShowCursor(true);
 
 	Input_mgr::instance()._Mouse = _ptr;
 

@@ -45,6 +45,8 @@ std::shared_ptr<class Bmp> Shadow::FindImgByState()
 
 void Shadow::update()
 {
+	if (!bShadow)return;
+
 	// 오너의 방향을 체크한다음 
 	// 자기자신 쉐도우 정보를 변경 하기
 	
@@ -58,6 +60,8 @@ void Shadow::initialize()
 
 void Shadow::render(HDC hdc, vec camera_pos)
 {
+	if (!bShadow)return;
+
 	auto sp_owner = _owner.lock();
 	if (!sp_owner)return;
 

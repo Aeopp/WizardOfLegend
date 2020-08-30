@@ -36,7 +36,7 @@ void collision_mgr::collision_tile(collision_tag rhs)
 			if (bCollision.has_value())
 			{
 				// 우항 오브젝트 밀어버리기
-				if (rhs_obj->bPush)
+				if (rhs_obj->bSlide)
 				{
 					auto _ptr = rhs_obj->get_owner().lock();
 					if (!_ptr)return;
@@ -265,14 +265,17 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 
 				auto _ptr = rhs_obj->get_owner().lock();
 				if (!_ptr)return;
-
 				
 				// 우항 오브젝트 밀어버리기
-				if (rhs_obj->bPush)
+				if (rhs_obj->bSlide)
 				{
 					_ptr->_transform->_location += *bCollision;
 				}
-				_ptr->_transform->_location += PushForce;
+				if (lhs_obj->bPush)
+				{
+					_ptr->_transform->_location += (*bCollision).get_normalize()
+					* lhs_obj->PushForce;
+				}
 			}
 		}
 	}

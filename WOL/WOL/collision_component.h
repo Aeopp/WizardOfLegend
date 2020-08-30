@@ -13,10 +13,13 @@ public:
 
 	void set_owner(std::weak_ptr<object> _owner)&;
 	std::weak_ptr<object> get_owner()const { return _owner; }
-	bool bPush{ true };
+	bool bSlide{ true };
 	void Hit(std::weak_ptr<class object> _target);
 	figure_type _figure_type{ figure_type::ERect };
 
+	bool bPush{ false };
+
+	float PushForce{};
 	vec _size;
 	vec correction{};
 	RECT make_rect();

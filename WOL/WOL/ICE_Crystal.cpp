@@ -41,6 +41,9 @@ void ICE_Crystal::initialize()
 
 	TickScale = 1.f;
 
+	//_Shadow.bShadow = true;
+	//_Shadow.correction = { 0,120 };
+
 }
 
 Event ICE_Crystal::update(float dt)

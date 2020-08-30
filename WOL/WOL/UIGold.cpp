@@ -38,7 +38,7 @@ void UIGold::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	{
 		std::wstring str = std::to_wstring((int)sp_info->gold);
-		RECT _rt = { loc.x + (36* size_factor.x),(loc.y-3) + (0* size_factor.y),loc.x + (76 * size_factor.x),(loc.y-3) + (39 * size_factor.y) };
+		RECT _rt = { loc.x + (36* size_factor.x),(loc.y-3) + (0* size_factor.y),loc.x + (68 * size_factor.x),(loc.y-3) + (39 * size_factor.y) };
 		Font(hdc, str, (_rt.right - _rt.left), RGB(200, 200, 200), _rt.left, _rt.top);
 
 		Font(hdc, L"");

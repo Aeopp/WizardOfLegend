@@ -16,6 +16,7 @@
 #include "BOSS.h"
 #include "MIDDLE_BOSS.h"
 #include "Tile_mgr.h"
+#include "GoldEffect.h"
 
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
@@ -65,20 +66,42 @@ void Scene_Stage::initialize()
 
 	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
 
+	auto Effect_SUMMON = object_mgr::instance().insert_object<Effect>
+		(PlayerSpawnLocation.x,0,
+			L"SUMMON", layer_type::EEffect, 8, 0, 0.9f, 0.9f, 225, 730,
+			1.f, 1.6f);
+
+	/*late_initialize(int ImgLocationX, int ImgLocationY,
+		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
+		int AnimRowIndex, float Duration, float AnimDuration,
+		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 	// TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
 
-		auto _ptr = obj_mgr.insert_object<Player>();
-		_ptr->_transform->_location = { 500,500 };
+
+		auto _Player = obj_mgr.insert_object<Player>();
+		_Player->_transform->_location = PlayerSpawnLocation;
 
 		auto _camera = obj_mgr.insert_object<Camera>();
-		_camera->_owner = _ptr;
+		_camera->_owner = _Player;
 
 		obj_mgr._Camera = _camera;
 
-		manage_objs.push_back(_camera);
 
+		for (int i = 6; i < 20; ++i)
+		{
+			auto _gold = obj_mgr.insert_object<GoldEffect>(i * 100, i * 100,
+				L"MONEY", layer_type::EEffect, 2,
+				math::Rand<int>({ 1,3 }), FLT_MAX, 0.2f, 24, 24, 1.f, 1.f);
+
+			_gold->_transform->_location = { i * 100, i * 100};
+			_gold->_owner = _Player;
+
+		}
+
+
+		manage_objs.push_back(_camera);
 	}
 }
 

@@ -139,7 +139,7 @@ public:
 	static inline std::random_device rd;
 
 	template<typename Ty>
-	static Ty Rand_N(std::pair<Ty, Ty> range);
+	static Ty Rand_Normal(std::pair<Ty, Ty> range);
 
 	template<typename Ty>
 	static Ty Rand(std::pair<Ty, Ty> range);
@@ -156,7 +156,7 @@ static  bool EQUAL(const float lhs, const float rhs)
 };
 
 template<typename Ty>
-Ty math::Rand_N(std::pair<Ty, Ty> range)
+Ty math::Rand_Normal(std::pair<Ty, Ty> range)
 {
 	static std::mt19937 gen(rd());
 

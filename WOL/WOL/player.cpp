@@ -24,14 +24,13 @@
 #include "helper.h"
 #include "ICE_Crystal.h"
 #include "Bmp.h"
+#include "Effect.h"
 
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	actor::render(hdc, camera_pos, size_factor);
-
-
-
+	
 	if (bDebug)
 	{
 		vec v = _transform->_location;
@@ -114,6 +113,7 @@ void Player::initialize()
 
 		return true;
 	});
+
 };
 
 Event Player::update(float dt)
@@ -169,14 +169,16 @@ void Player::MakeShield()
 	
 	for (int i = 0; i < 8; ++i)
 	{
-		auto _shield = _obj_mgr.insert_object<shield>();
+		if (!_transform)return;
 
-	   _shield->_transform->_dir = math::dir_from_angle(degree * i);
+		Transform _Transform;
+		_Transform._location = _transform->_location;
+		_Transform._dir = math::dir_from_angle(degree * i);
 
+		auto _shield = _obj_mgr.insert_object<shield>(std::move(_Transform));
 		if (!_shield) return;
 		_shield->_owner = _ptr;
 
-		_shield->HoleLocation = _shield->_transform->_location = _transform->_location + _shield->_transform->_dir * _shield->_shield_distance;
 		_shield->Angle = degree * i;
 		_shield->CalcIdx();
 	}
@@ -196,38 +198,46 @@ void Player::MakeShield()
 
 	vec dir{ math::Rand<float>({ -10,+10 }), math::Rand<float>({ -0,+0 }) };
 	Camera_Shake(15, dir, 0.3f);
-
-
-	
 }
 
-void Player::ICE_BLAST()
+void Player::ICE_BLAST(int Num)
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
+	if (!_transform)return;
 
 	Input_mgr& _Input = Input_mgr::instance();
 
 	auto V= _Input.GetWorldMousePos();
-
 	if (!V) return;
 
-	auto _ICE = object_mgr::instance().insert_object<ICE_Blast>();
+	Timer& _Timer = Timer::instance();
 
-	if (!_ICE) return;
+	// 블라스트 생성 이펙트 한번 뿌려주기
+	object_mgr& obj_mgr = object_mgr::instance();
+	vec v = _transform->_location;
+	auto ICE_EFFECT = obj_mgr.insert_object<Effect>(v.x, v.y,
+		L"ICE_BLAST", layer_type::EEffect, 8, 0, 1.f, 1.f, 200, 250, ScaleX, ScaleY);
 
-	_player_info->bIdle = false;
+	for (int i = 0; i < Num; ++i)
+	{
+		_Timer.event_regist(time_event::EOnce, i * 0.06f,[Loc = _transform->_location,_Ptr=this->_ptr,V = *V]()->bool{
 
-	_ICE->_owner = _ptr;
-	_ICE->_target = *V;
-	_ICE->_transform->_location = _transform->_location;
+			auto _ICE = object_mgr::instance().insert_object<ICE_Blast>();
+			if (!_ICE) return false;
+			_ICE->_owner = _Ptr;
+			_ICE->_target = V;
+			_ICE->_transform->_location = Loc;
+
+			return true; 
+			});
+	}
+
 	_Shadow.CurrentShadowState = EShadowState::BIG;
-
 	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bIdle = false;
 	_player_info->bAttack = true;
 	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
-
-
 }
 void Player::Camera_Shake(float force,vec dir,float duration)
 {
@@ -255,7 +265,7 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('Q'))
 	{
 
-		ICE_BLAST();
+		ICE_BLAST(10);
 	}
 
 	if (_Input.Key_Down(VK_LBUTTON))
@@ -472,10 +482,33 @@ void Player::Dash(float speed)
 void Player::Attack()
 {
 	if (_player_info->bDash)return;
+	if (!_transform)return;
 	Anim& MyAnim = _render_component->_Anim;
 	// 어택 듀레이션이 지난 다음에 어택을 풀어주기
 	_player_info->bAttack = true;
 	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
+
+	vec dis = 	*Input_mgr::instance().GetWorldMousePos() - _transform->_location;
+
+	math::EDir _Dir = math::checkDir(dis.get_normalize());
+
+	switch (_Dir)
+	{
+	case math::EDir::left:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::left]);
+		break;
+	case math::EDir::right:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::right]);
+		break;
+	case math::EDir::up:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::front]);
+		break;
+	case math::EDir::down:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::back]);
+		break;
+	default:
+		break;
+	}
 
 	_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 

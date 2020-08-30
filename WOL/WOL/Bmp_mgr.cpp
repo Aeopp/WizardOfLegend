@@ -35,6 +35,19 @@ void Bmp_mgr::initialize()
 	 Insert_Bmp(DefaultPath + L"GAIA_ARMOR.bmp", L"GAIA_ARMOR");
 	 Insert_Bmp(DefaultPath + L"ICE_CRYSTAL.bmp", L"ICE_CRYSTAL");
 	 Insert_Bmp(DefaultPath + L"BOTTOM_HOLE.bmp", L"BOTTOM_HOLE");
+	 Insert_Bmp(DefaultPath + L"SUMMON.bmp", L"SUMMON");
+	 Insert_Bmp(DefaultPath + L"ICE_BLAST.bmp", L"ICE_BLAST");
+
+	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK.bmp", L"SWORDMAN_ATTACK");
+	 Insert_Bmp(DefaultPath + L"WOL_NORMAL_ATTACK.bmp", L"WOL_NORMAL_ATTACK");
+	 Insert_Bmp(DefaultPath + L"SUMMON_CARD_ARCHER.bmp", L"SUMMON_CARD_ARCHER");
+	 Insert_Bmp(DefaultPath + L"SUMMON_CARD_SWORDMAN.bmp", L"SUMMON_CARD_SWORDMAN");
+	 Insert_Bmp(DefaultPath + L"SUMMON_CARD_WIZARD.bmp", L"SUMMON_CARD_WIZARD");
+	 Insert_Bmp(DefaultPath + L"SUMMON_CARD_WIZARDBALL.bmp", L"SUMMON_CARD_WIZARDBALL");
+	 Insert_Bmp(DefaultPath + L"FIRE_PARTICLE.bmp", L"FIRE_PARTICLE");
+	 Insert_Bmp(DefaultPath + L"HITEFFECT.bmp", L"HITEFFECT");
+
+	 Insert_Bmp(DefaultPath + L"MONEY.bmp", L"MONEY");
 };
 
 void Bmp_mgr::release()

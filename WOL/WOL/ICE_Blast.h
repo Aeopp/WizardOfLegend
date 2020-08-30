@@ -5,6 +5,7 @@ class ICE_Blast :
 {
 public:
 	void initialize()override;
+	//void late_initialize(vec _location);
 	Event update(float dt)override;
 	std::weak_ptr<class collision_component>  _collision_component;
 

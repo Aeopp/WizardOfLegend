@@ -161,6 +161,7 @@
     <ClInclude Include="collision_tag.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Debuger.h" />
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="ESceneID.h" />
     <ClInclude Include="ESkillBarIcon.h" />
     <ClInclude Include="event.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="GoldEffect.h" />
     <ClInclude Include="helper.h" />
     <ClInclude Include="ICE_Blast.h" />
     <ClInclude Include="ICE_Crystal.h" />
@@ -182,6 +184,7 @@
     <ClInclude Include="layer_type.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="MIDDLE_BOSS.h" />
+    <ClInclude Include="Money.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="EnemyInfo.h" />
     <ClInclude Include="Mouse.h" />
@@ -236,8 +239,10 @@
     <ClCompile Include="collision_mgr.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debuger.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="GoldEffect.cpp" />
     <ClCompile Include="helper.cpp" />
     <ClCompile Include="ICE_Blast.cpp" />
     <ClCompile Include="ICE_Crystal.cpp" />
@@ -245,6 +250,7 @@
     <ClCompile Include="layer_type.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="MIDDLE_BOSS.cpp" />
+    <ClCompile Include="Money.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="MY_RECT.cpp" />

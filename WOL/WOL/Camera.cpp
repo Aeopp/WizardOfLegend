@@ -52,7 +52,7 @@ void Camera::camera_shake(float force, vec dir,float duration  =0.05f)
 
 bool Camera::Shaking( )
 {
-	float  rand = math::Rand_N<float >({ -_force,+_force});
+	float  rand = math::Rand_Normal<float >({ -_force,+_force});
 
 	shake = _dir* rand;
 

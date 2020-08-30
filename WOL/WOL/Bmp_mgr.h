@@ -15,6 +15,7 @@ public:
 	std::weak_ptr<class Bmp> Find_Image_WP(std::wstring ImageKey);
 	// 소유권을 바깥으로 전파합니다.
 	std::shared_ptr<class Bmp> Find_Image_SP(std::wstring ImageKey); 
+
 	void Release();
 
 	 std::wstring DefaultPath = L"..\\..\\Resources\\WOL_TEXTURE\\";
