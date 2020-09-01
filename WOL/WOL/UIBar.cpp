@@ -11,6 +11,7 @@ Event UIBar::update(float dt)
 	current = math::my_lerp(current, target, goal_time, dt);
 
 	ratio = current / max;
+
 	return Event::None;
 };
 
@@ -26,7 +27,8 @@ void UIBar::render(HDC hdc, vec camera_pos, vec size_factor)
 	s.x *= size_factor.x;
 	s.y *= size_factor.y;
 
-	Debuger(hdc, [&] {Rectangle(hdc, loc.x - s.x, loc.y - s.y, loc.x + s.x, loc.y + s.y); });
+	if (bDebug)
+		Rectangle(hdc, loc.x - s.x, loc.y - s.y, loc.x + s.x, loc.y + s.y);
 
 	if (!_render_component)return;
 

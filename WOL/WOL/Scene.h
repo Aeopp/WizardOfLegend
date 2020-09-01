@@ -8,7 +8,7 @@ public:
 	virtual ~Scene()noexcept;
 public:
 	virtual void render(HDC hdc, std::pair<float, float> size_factor) {};
-	virtual void update(float dt) {};
+	virtual void update(float dt);
 	virtual void initialize() {};
 	virtual void release();
 public:

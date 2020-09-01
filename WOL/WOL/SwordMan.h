@@ -10,7 +10,11 @@ public:
     void Hit(std::weak_ptr<object> _target)override;
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
 
-    std::shared_ptr<class SwordManAttack> NormalAttack{};
+    float StalkerDuration;
+
+    static inline const std::wstring SummonCardImgKey = L"SUMMON_CARD_SWORDMAN";
+
+    std::weak_ptr<class SwordManAttack> NormalAttack{};
 
     /*static const inline std::unordered_map<EMonsterState, uint32_t> AnimRowIdxTable
     {

@@ -17,6 +17,8 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 bool bDebug{ false };
 float DeltaTime{ 0.f };
 bool bFrameLimit{ false };
+bool bDeltaTimeUnFixed{ false };
+constexpr int ConstDelta = 1000 / 60;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -66,35 +68,46 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			GetMessage(&msg, NULL, 0, 0);
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-			
 		}
 
 		if (bFrameLimit)
 		{
-			if (_Timer.tick + (10) < GetTickCount())
+			if (_Timer.tick + (1) < GetTickCount())
 			{
-				_Timer.dt = GetTickCount64() - _Timer.tick;
-				DeltaTime = (float)_Timer.dt / 1000.f;
+				if (bDeltaTimeUnFixed)
+				{
+					_Timer.dt = ConstDelta;
+				}
+				else
+				{
+					_Timer.dt = GetTickCount64() - _Timer.tick;
+				}
+				
+				DeltaTime = _Timer.delta();
+				_Timer.tick = GetTickCount64();
 
 				_game.update();
 				_game.late_update();
 				_game.render();
-				_Timer.tick = GetTickCount64();
-
 			}
 		}
 		else if (!bFrameLimit)
 		{
-			
+			if (bDeltaTimeUnFixed)
+			{
+				_Timer.dt = ConstDelta;
+			}
+			else
+			{
 				_Timer.dt = GetTickCount64() - _Timer.tick;
-				_Timer.tick = GetTickCount64();
+			}
 
-				DeltaTime = (float)_Timer.dt / 1000.f;
+				DeltaTime = _Timer.delta();
+				_Timer.tick = GetTickCount64();
 
 				_game.update();
 				_game.late_update();
 				_game.render();
-
 		}
 			
 	};

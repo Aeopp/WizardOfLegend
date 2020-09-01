@@ -81,9 +81,9 @@ void Timer::render(HDC hdc)
 	if (bDebug)
 	{
 		std::wstringstream wss;
-		wss << "FPS : " << fps << "DeltaTime : " << dt << std::endl;
+ 		wss << "FPS : " << fps << "DeltaTime : " << dt << std::endl;
 
-		RECT _rt{ 1200,200,1600,300 };
+		RECT _rt{ 0,200,1600,300 };
 
 		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
 	}
@@ -96,5 +96,8 @@ void Timer::initialize()
 
 float Timer::delta()
 {
-	return dt /1000.f * time_scale;
+    return (1000.f / fps) * 0.001 * time_scale;
+	//return 0.016f;
+
+	//return dt /1000.f * time_scale;
 }

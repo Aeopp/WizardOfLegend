@@ -29,7 +29,6 @@ math::EDir math::checkDir(vec dir)
 	else if (dir.dot(vec{ 0,-1 }) > cos45)
 	{
 		return EDir::down;
-		
 	}
 	return EDir();
 }

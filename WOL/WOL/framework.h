@@ -14,7 +14,7 @@
 extern bool bDebug;
 extern float DeltaTime;
 extern bool bFrameLimit;
-
+extern bool bDeltaTimeUnFixed;
 #include <memory>
 #include <mutex>
 #include <map>
@@ -22,6 +22,7 @@ extern bool bFrameLimit;
 #include <unordered_map>
 #include <set>
 #include <array>
+#include <execution>
 
 #include <algorithm>
 #include <functional>

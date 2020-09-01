@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "game.h"
 #include "Font.h"
+#include "helper.h"
 
 void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 {
@@ -26,31 +27,21 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 
 			return lhs->_transform->_location.y < rhs->_transform->_location.y;
 		});
+
+	size_t RenderObjCount = 0;
+
 	for (auto& obj : RenderSortY)
 	{
+		
 		vec culling_obj_pos = obj->_transform->_location - camera_pos;
 		if (math::RectInPoint(game::client_rect, culling_obj_pos))
 		{
+			RenderObjCount++;
+
 			obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
 		}
 	}
 	RenderSortY.clear();
-
-	/*for (auto& [object_layer, obj_list] : object_map)
-	{
-		if (object_layer == layer_type::EObject)continue;
-
-		for (auto& obj : obj_list)
-		{
-			if (!obj->_transform)continue;
-
-			if(object_layer >= layer_type::EEffect)
-			{
-				count++;
-				obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
-			}
-		}
-	}*/
 
 	for (auto& [_Color,TEffects ]: TextEffectMap)
 	{
@@ -59,7 +50,8 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 			vec v = TEffect->pos - camera_pos;
 
 			Font FontOn = Font(hdc, _Color, v.x, v.y,
-				TEffect->size, TEffect->Text, TEffect->Text, TEffect->Text, TEffect->Text);
+				TEffect->size, TEffect->Text/*, TEffect->Text, TEffect->Text, TEffect->Text*/
+			);
 
 			TEffect->pos -= TEffect->dir;
 			TEffect->duration -= DeltaTime;
@@ -76,22 +68,27 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 	}
 
 
-	/*if (bDebug)
+	if (bDebug)
 	{
 		auto [sx, sy] = size_factor;
 
 		std::wstringstream wss;
-		wss << L"오브젝트 개수 : " << count << std::endl; 
-		RECT _rt{ 1200 *sx,100*sy,  1400 *sx, 200*sy }; 
-
-		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
-	}*/
+		wss << L"드로우 오브젝트 개수 : " << RenderObjCount << std::endl;
+		//RECT _rt{ 900 *sx,100*sy,  1200*sx, 200*sy }; 
+		Font(hdc, RGB(111, 111, 111), 900, 200, 30, wss.str());
+		//DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+		int count = 0;
+		for (auto& [Tag, Object_List] : object_map)
+		{
+			count+=Object_List.size();
+		}
+		helper::TEXTOUT(hdc, 900, 100, L"오브젝트 개수 : ", count);
+	}
 };
 
 void object_mgr::update()
 {
 	using namespace std;
-
 
 	float dt = Timer::instance().delta();
 
@@ -116,7 +113,6 @@ void object_mgr::update()
 	}
 
 	check_erase();
-
 };
 
 void object_mgr::initialize()

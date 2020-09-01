@@ -8,6 +8,18 @@
 #include "Effect.h"
 #include "object_mgr.h"
 
+void shield::DefenseMsg(vec loc)
+{
+	vec randvec = math::RandVec();
+	randvec.y = (abs(randvec.y));
+	vec v = std::move(loc);
+	v.y -= 35;
+	//	v.x += math::Rand<int>({ -40,+40 });
+
+	object_mgr::instance().TextEffectMap[RGB(255, 248, 127)].
+		push_back({ v,vec{0,1}*3,2.f,17,L"Defense!" });
+}
+
 void shield::initialize()
 {
 	actor::initialize();
@@ -18,11 +30,12 @@ void shield::initialize()
 		_Shadow.correction = { 0,60 };
 		_Shadow.world_size_correction = { -20,0 };
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
-	}
+	};
 
-	id = object::ID::player_attack;
+	id = object::ID::player_shield;
 
 	bAttacking = true;
+	Attack = { 5,10 };
 }
 
 Event shield::update(float dt)
@@ -49,7 +62,6 @@ Event shield::update(float dt)
 	vec& r = _transform->_dir;
 	r = math::rotation_dir_to_add_angle(r, _speed*dt);
 
-
 	_transform->_location = w + r * _shield_distance;
 
 	return _E;
@@ -58,8 +70,19 @@ Event shield::update(float dt)
 
 void shield::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	
 	actor::render(hdc, camera_pos, size_factor);
+}
+
+void shield::Hit(std::weak_ptr<object> _target)
+{
+	object::Hit(_target);
+	auto sp_target = _target.lock();
+	// 공격 무효화
+	bool bNullAttack = sp_target->bInvalidatedefense;
+	if (bNullAttack)
+	{
+
+	}
 }
 
 void shield::CalcIdx()
@@ -75,13 +98,13 @@ void shield::CalcIdx()
 uint32_t shield::get_layer_id() const&
 {
 	return layer_type::EObject;
-}
+};
+
 void shield::late_initialize(Transform _Transform)
 {
 	if (!_transform)return;
 
 	*_transform = std::move(_Transform);
-
 
 	object_mgr& obj_mgr = object_mgr::instance();
 
@@ -119,5 +142,6 @@ void shield::late_initialize(Transform _Transform)
 	_render_component->_Anim.SetAnimationClip(
 		{ 12 }, 360.f / _speed);
 
+	id = object::ID::player_shield;
 
 };

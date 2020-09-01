@@ -27,6 +27,7 @@ void UIHPBar::initialize()
 Event UIHPBar::update(float dt)
 {
 	auto sp_info = wp_info.lock();
+	if (!sp_info)return Event::None;
 	if (sp_info)
 	{
 		target = sp_info->GetHP();

@@ -39,6 +39,9 @@ void ICE_Crystal::initialize()
 	_render_component->_Anim.SetAnimationClip(
 		{ 18 }, 360.f / _speed);
 
+	Attack = { 10,19 };
+	bAttacking = true;
+
 	TickScale = 1.f;
 	sp_collision->bSlide = false;
 	id = object::ID::player_attack;

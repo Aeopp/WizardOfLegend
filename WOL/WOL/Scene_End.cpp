@@ -29,6 +29,8 @@ void Scene_End::render(HDC hdc, std::pair<float, float> size_factor)
 
 void Scene_End::update(float dt)
 {
+	Scene::update(dt);
+
 	Timer& _Timer = Timer::instance();
 
 	_Timer.update();

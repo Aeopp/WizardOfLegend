@@ -35,6 +35,7 @@ public:
 	circle make_circle();
 	vec make_center();
 
+	collision_tag _Tag{};
 
 	bool bDie{ false };
 };

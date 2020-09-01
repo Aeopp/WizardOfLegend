@@ -12,6 +12,7 @@
 #include "Bmp.h"
 #include "helper.h"
 
+#include "Font.h"
 
 
 void collision_mgr::collision_tile_clear()
@@ -22,19 +23,42 @@ void collision_mgr::collision_tile_clear()
 
 void collision_mgr::collision_tile(collision_tag rhs)
 {
+
 	auto& rhs_list = _collision_map[rhs];
+
+	// 임의의 범위내에서만 충돌검사를 수행한다.
+	RECT CameraRange = game::client_rect;
+	CameraRange.left -= CollisionRangeX;
+	CameraRange.top -= CollisionRangeY;
+	CameraRange.right += CollisionRangeX;
+	CameraRange.bottom += CollisionRangeY;
+
+	vec cp =object_mgr::instance().camera_pos;
+	
+	int x = game::TileWorldX / 2;
+	int y = game::TileWorldY / 2;
+
+	CollisionTileNum = 0;
 
 	for (auto& _Tile_Col : _Tile_Collision_List)
 	{
+		vec TileCenter = { _Tile_Col.first + x,_Tile_Col.second + y };
+		if (!math::RectInPoint(CameraRange, TileCenter - cp))continue;
+		++CollisionTileNum;
+
 		for (auto& rhs_obj : rhs_list)
 		{
 			if (!rhs_obj->bCollision)continue;
+			vec collision_pos = rhs_obj->make_center();
+			if(!math::RectInPoint(CameraRange, collision_pos - cp))continue;
 
 			auto rhs_figure = rhs_obj->_figure_type;
 
 			std::optional<vec> bCollision{ std::nullopt };
 
-			RECT lhs_rect = { _Tile_Col.first,_Tile_Col.second , _Tile_Col.first + game::TileWorldX, _Tile_Col.second + game::TileWorldY };
+			RECT lhs_rect = { _Tile_Col.first,_Tile_Col.second , 
+			_Tile_Col.first + game::TileWorldX, _Tile_Col.second + game::TileWorldY };
+
 			bCollision = math::rectVSrect(lhs_rect, rhs_obj->make_rect());
 
 			if (bCollision.has_value())
@@ -75,7 +99,6 @@ void collision_mgr::save_collision(std::wstring filename = StageFileName)
 {
 	size_t Tile_Num = _Tile_Collision_List.size();
 	auto FileName = std::to_wstring(math::Rand<uint32_t>({ 2020,7070 }));
-
 
 	std::ofstream ofs(DefaultMapCollisionPath+ FileName);
 
@@ -141,6 +164,8 @@ collision_mgr::insert(std::weak_ptr<class object> _owner, collision_tag _tag,
 
 	_collision->_figure_type = _type;
 	_collision->set_owner(_owner);
+	_collision->_Tag = _tag;
+
 	_collision_map[_tag].push_back(_collision);
 
 	return _collision;
@@ -194,8 +219,6 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 				wx, wy, srcDC, col * 230, row * 230, 230, 230, RGB(255, 250, 255));
 		}
 	}
-
-
 
 	if (!bDebug)return;
 
@@ -260,21 +283,45 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 		std::wstring wstr = L" 충돌체의 개수 :" + std::to_wstring(comp_count);
 		TextOut(hdc, 1400, 100, wstr.c_str(), wstr.size());
 			});
-};
 
+		if (bDebug)
+		{
+			{
+				std::wstringstream wss;
+				wss << L"충돌검사 범위 안 타일 개수 : " << CollisionTileNum << std::endl;
+				Font(game::hDC, RGB(111, 111, 111), 0, 400, 30, wss.str());
+			}
+			
+			std::wstringstream wss;
+
+			wss << L"충돌검사 범위 안 오브젝트 개수 : " << CollisionObjNum << std::endl;
+			Font(game::hDC, RGB(111, 111, 111), 0, 200, 30, wss.str());
+
+		}
+};
 void collision_mgr::update()
 {
-	// collision(EMonster, EMonster);
+	CollisionRangeX = (game::client_rect.right - game::client_rect.left) / 2;
+	CollisionRangeY = (game::client_rect.bottom - game::client_rect.top) / 2;
+
+	CollisionObjNum = 0;
+
+	collision(EMonster, EMonster);
 	collision(EMonster, EPlayer);
 	collision(EPlayerAttack, EMonster);
 	collision(EFireDragon, EMonster);
 	collision(EMonsterAttack, EPlayer);
 	collision(EShield, EMonster);
+	collision(EShield,EMonsterAttack);
+
 
 
 	collision_tile(EPlayer);
 	collision_tile(EMonster);
 	collision_tile(EFireDragon);
+	collision_tile(EPlayerAttack);
+	collision_tile(EMonsterAttack);
+
 	check_erase();
 }
 void collision_mgr::release()
@@ -283,6 +330,27 @@ void collision_mgr::release()
 
 	collision_tile_clear();
 }
+bool collision_mgr::IsHitEffectMappingTag(collision_tag lhs, collision_tag rhs)
+{
+	if (lhs == collision_tag::EMonster && rhs == collision_tag::EMonster)return false;
+
+	return true;
+}
+bool collision_mgr::IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs)
+{
+	if (lhs == collision_tag::EMonster && rhs == collision_tag::EMonster)
+	{
+
+		int i = 0;
+
+
+
+
+		return true;
+	}
+
+	return false;
+}
 void collision_mgr::check_erase()&
 {
 	for (auto& [tag, collision_list] : _collision_map)
@@ -290,8 +358,10 @@ void collision_mgr::check_erase()&
 		collision_list.erase(
 
 			std::remove_if(std::begin(collision_list), std::end(collision_list),
-				[](std::shared_ptr<collision_component>& collision_comp) {if (!collision_comp)return true;
-		return collision_comp->bDie || collision_comp->get_owner().expired(); }),
+				[](std::shared_ptr<collision_component>& collision_comp) {
+					if (!collision_comp)return true;
+					return collision_comp->bDie;
+				}),
 
 			std::end(collision_list));
 	}
@@ -302,14 +372,29 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 	auto& lhs_list = _collision_map[lhs];
 	auto& rhs_list= _collision_map[rhs];
 
+	RECT CameraRange = game::client_rect;
+	CameraRange.left -= CollisionRangeX;
+	CameraRange.top -= CollisionRangeY;
+	CameraRange.right += CollisionRangeX;
+	CameraRange.bottom += CollisionRangeY;
+
+	vec cp = object_mgr::instance().camera_pos;
+
+	int x = game::TileWorldX / 2;
+	int y = game::TileWorldY / 2;
+
 	for (auto&   lhs_obj : lhs_list)
 	{
 		if (!lhs_obj->bCollision)continue;
+		if (!math::RectInPoint(CameraRange, lhs_obj->make_center()- cp))continue;
 
 		for (auto& rhs_obj : rhs_list)
 		{
 			if (!rhs_obj->bCollision)continue;
 			if (&lhs_obj == &rhs_obj)continue;
+			if (!math::RectInPoint(CameraRange, rhs_obj->make_center() - cp))continue;
+
+			++CollisionObjNum;
 			// 도형 정보에 따라 충돌 다르게 수행
 			auto lhs_figure = lhs_obj->_figure_type;
 			auto rhs_figure = rhs_obj->_figure_type;
@@ -339,28 +424,38 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				rhs_obj->Hit(lhs_obj->get_owner());
 
 				auto _ptr = rhs_obj->get_owner().lock();
-				if (!_ptr)return;
+
+				if (!_ptr)
+				{
+					rhs_obj->bDie = true;
+					return;
+				}
 				
 				// 우항 오브젝트 밀어버리기
-				if (lhs_obj->bPush)
+				if (lhs_obj->bPush    )
 				{
 					_ptr->_transform->_location += (*bCollision).get_normalize()
 						* lhs_obj->PushForce;
 				}
-				if (lhs_obj->bObjectSlide)
+				if (lhs_obj->bObjectSlide || IsObjectSlideMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))
 				{
 					_ptr->_transform->_location += *bCollision;
 				}
 				if (lhs_obj->bHitEffect)
 				{
-					auto sp_owner = lhs_obj->get_owner().lock();
-					if (!sp_owner) continue;
+					if (!_ptr->_transform)continue;
+					if (false == IsHitEffectMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))return;
 
+					auto sp_owner = lhs_obj->get_owner().lock();
+					if (!sp_owner)
+					{
+						lhs_obj->bDie = true;
+						continue;
+					}
+					
 					float dt = CollisionHitEffectDelta;
 					int Row = math::Rand<int>({ 0,3 });
 					int Col = 0;
-
-					if (!_ptr->_transform)continue;
 
 					vec r = _ptr->_transform->_location + math::RandVec() * math::Rand<int>({ -30,30});
 

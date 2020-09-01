@@ -24,6 +24,8 @@ void Scene_Start::render(HDC hdc, std::pair<float, float> size_factor)
 
 void Scene_Start::update(float dt)
 {
+	Scene::update(dt);
+
 	Timer& _Timer = Timer::instance();
 
 	_Timer.update();
@@ -55,8 +57,6 @@ void Scene_Start::initialize()
 	{
 		sound_mgr::instance().Play("MAIN_MENU_BGM", true, 1.f);
 
-
-
 		auto EMouse = object_mgr::instance().insert_object<Mouse>();
 
 		auto _UIStart = object_mgr::instance().insert_object<UIStart>();
@@ -68,6 +68,7 @@ void Scene_Start::initialize()
 
 void Scene_Start::release()
 {
+
 	Scene::release();
 }
 

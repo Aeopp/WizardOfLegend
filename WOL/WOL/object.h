@@ -12,6 +12,9 @@ public:
 	virtual void initialize();
 	virtual void release();
 	void late_initialize() {};
+	virtual void Hit(std::weak_ptr<object> _target);
+	virtual void HitTile(RECT TileRt);
+
 public:
 	enum class ID
 	{
@@ -21,6 +24,7 @@ public:
 		player,
 		monster_attack,
 		player_attack,
+		player_shield,
 	};
 	ID id{ ID::object };
 
@@ -32,11 +36,10 @@ public:
 	std::weak_ptr<object> _ptr{};
 	std::weak_ptr<object> _owner{};
 
-	virtual void Hit(std::weak_ptr<object> _target);
-	virtual void HitTile(RECT TileRt);
 
+	bool bInvalidatedefense = false;
 	bool bDie{ false };
 	bool bAttacking{ false };
-	int Attack{ 0 };
+	std::pair<int, int> Attack;
 };
 

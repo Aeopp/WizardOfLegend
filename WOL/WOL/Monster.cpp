@@ -81,11 +81,9 @@ void Monster::Hit(std::weak_ptr<object> _target)
 
 void Monster::late_initialize(std::weak_ptr<class object> SetTarget, vec SetLocation)
 {
-	_AttackTarget = std::move(SetTarget);
+	_AttackTarget = (SetTarget);
 	if(_transform)
-	_transform->_location = std::move(SetLocation); 
-
-	CardEffect(SummonCardImgKey);
+	_transform->_location = (SetLocation); 
 }
 
 
@@ -95,12 +93,9 @@ void Monster::late_initialize(std::weak_ptr<class object> SetTarget, vec SetLoca
 		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 		// TOOD :: Scene Dependent Init 
 
-void Monster::CardEffect(std::wstring ImageKey)
+void Monster::CardEffect(vec v,std::wstring ImageKey)
 {
-	vec  v = _transform->_location;
-
 	object_mgr::instance().insert_object<Effect>(v.x,
-		v.y,std::move(ImageKey),layer_type::EEffect,
-		32,0,2.7f,2.7f,150,230,1.0f,1.0f);
-}
-;
+		v.y,ImageKey,layer_type::EEffect,
+		32,0,4.0f,3.0f,150,230,1.0f,1.0f);
+};

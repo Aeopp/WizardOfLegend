@@ -127,6 +127,8 @@ void Scene_Edit::update(float dt)
 
 void Scene_Edit::initialize()
 {
+	
+
 	// TOOD :: Scene Dependent Init
 	Scene::initialize();
 
@@ -260,23 +262,23 @@ void Scene_Edit::Input_Check_Scroll()
 	}
 
 
-	if (_Input.Key_Down('Q'))
+	//if (_Input.Key_Down('W'))
+	//{
+	//	Tile_mgr::instance().Load_Tile(Tile_mgr::BossStageFileName);
+	//}
+	//if (_Input.Key_Down('Q'))
+	//{
+	//	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
+	//}
+
+	if (_Input.Key_Down(VK_F11))
 	{
 		Tile_mgr::instance().Load_Tile(Tile_mgr::StageFileName);
 	}
 
-	if (_Input.Key_Down('W'))
+	if (_Input.Key_Down(VK_F12))
 	{
-		Tile_mgr::instance().Load_Tile(Tile_mgr::BossStageFileName);
-	}
-	if (_Input.Key_Down('Q'))
-	{
-		collision_mgr::instance().load_collision(Tile_mgr::StageFileName);
-	}
-
-	if (_Input.Key_Down('W'))
-	{
-		collision_mgr::instance().load_collision(Tile_mgr::BossStageFileName);
+		collision_mgr::instance().load_collision(collision_mgr::BossStageFileName);
 	}
 
 

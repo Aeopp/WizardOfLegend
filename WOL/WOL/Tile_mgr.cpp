@@ -7,6 +7,7 @@
 #include <istream>
 #include <fstream>
 #include <ostream>
+#include "Font.h"
 
 
 Tile_mgr::~Tile_mgr() noexcept
@@ -31,14 +32,17 @@ void Tile_mgr::late_update()
 void Tile_mgr::render(HDC hdc, vec camera_pos , std::pair<float,float> size_factor)
 {
 	/*vec cp = object_mgr::instance().camera_pos;*/
+	size_t RenderObjCount = 0;
+
+	RECT CameraRange = game::client_rect;
+	CameraRange.left -= game::TileWorldX;
+	CameraRange.top -= game::TileWorldY;
 
 	for (auto& _Tile : _Tile_list)
 	{
-		if (!_Tile.bRender)continue;
-		RECT CameraRange = game::client_rect;
-		CameraRange.left -= _Tile._size.x;
-		CameraRange.top -= _Tile._size.y;
 		
+		if (!_Tile.bRender)continue;
+
 		if (!math::RectInPoint(CameraRange, _Tile._location - camera_pos))continue;
 
 		if (_Tile.bDeco)
@@ -46,9 +50,20 @@ void Tile_mgr::render(HDC hdc, vec camera_pos , std::pair<float,float> size_fact
 			DecoVec.push_back(_Tile);
 			continue; 
 		}
-
 		_Tile.render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
 	};
+
+
+	if (bDebug)
+	{
+		auto [sx, sy] = size_factor;
+
+		std::wstringstream wss;
+		wss << L"드로우 타일 개수 : " << RenderObjCount << std::endl;
+		//RECT _rt{ 900 *sx,100*sy,  1200*sx, 200*sy }; 
+		Font(hdc, RGB(111, 111, 111), 600, 200, 30, wss.str());
+		//DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
+	}
 }
 
 void Tile_mgr::DecoRender(HDC hdc,vec camera_pos)

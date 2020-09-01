@@ -25,7 +25,7 @@ void GoldEffect::initialize()
 {
     Effect::initialize();
 
-    Gold = math::Rand<int>({ 1,30 });
+    Gold = math::Rand<int>({ 20,40 });
 
     if (!_transform)return;
 }
@@ -34,6 +34,7 @@ Event GoldEffect::update(float dt)
 {
     Event _event = Effect::update(dt);
     initLife -= dt;
+    if (initLife > 0)return _event;
 
     auto sp_player = std::dynamic_pointer_cast<Player>(_owner.lock());
     if (!sp_player) return Event::Die;
@@ -41,7 +42,7 @@ Event GoldEffect::update(float dt)
 
     vec dis = sp_player->_transform->_location - _transform->_location;
 
-    if (dis.length() < distance && initLife <0.f)
+    if (dis.length() < distance)
     {
         sp_player->_player_info->gold += Gold;
 

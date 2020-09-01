@@ -41,7 +41,7 @@ public:
 	std::weak_ptr<class object> _AttackTarget;
 	EnemyInfo _EnemyInfo{};
 public:
-	void CardEffect(std::wstring ImageKey);
+	static void CardEffect(vec v,std::wstring ImageKey);
 protected:
 	// 페인트 사이즈 랑 페인트 스케일도 초기화
 	// 에너미 인포 값들도 초기화
@@ -51,7 +51,7 @@ protected:
 	std::pair<int,int>shadow_correction;
 	std::vector<int> MyAnimInfo{};
 	float MyAnimDuration;
-	std::wstring SummonCardImgKey;
 	std::pair<int,int> ShadowWorldSizeCorrection;
+	float InitTime;
 };
 

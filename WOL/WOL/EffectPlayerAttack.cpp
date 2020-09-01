@@ -52,9 +52,8 @@ Event EffectPlayerAttack::update(float dt)
 		AttackEnd();
 	}
 
-
-//	auto sp_owner = _owner.lock();
-//	if (!sp_owner)return;
+	auto sp_owner = _owner.lock();
+	if (!sp_owner)return _event;
 
 	int AnimStart{}, AnimEnd{};
 	switch (CurrentAttackNum)
@@ -113,7 +112,7 @@ void EffectPlayerAttack::initialize()
 	_collision_component_lower = 
 	collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
-	Attack = 10.f;
+	Attack = { 8,13 };
 
 		// 콜리전 셋업
 	{

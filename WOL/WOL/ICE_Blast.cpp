@@ -51,6 +51,10 @@ void ICE_Blast::initialize()
 	bAttacking = true;
 
 	Duration = 0.8f;
+
+	bAttacking = true;
+
+	Attack = { 15,25 };
 }
 
 

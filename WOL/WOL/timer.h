@@ -24,9 +24,9 @@ public:
     std::list <std::tuple<float, float, std::function<bool()>>> loop_events;
 
     int max_fps{1000};
-    int fps{ 0};
+    int fps{ 65 };
 
-    float time_scale{ 1.f };
+    float time_scale{ 1.0f };
     float dt{ 0.f };
     float tick{ 0.f };
 };

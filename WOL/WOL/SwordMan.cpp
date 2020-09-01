@@ -20,7 +20,6 @@ void SwordMan::initialize()
 
 	lower_size = { 20,45 };
 
-	SummonCardImgKey = L"SUMMON_CARD_SWORDMAN";
 
 	LeftAnimKey = L"SWORDMAN_LEFT";
 	RightAnimKey = L"SWORDMAN_RIGHT";
@@ -28,12 +27,12 @@ void SwordMan::initialize()
 	_EnemyInfo.HP = 100.f;
 	_EnemyInfo.DeadTimer = 15.f;
 	_EnemyInfo.AttackRange = { 10,20 };
-	_EnemyInfo.AttackStartDistance = 120.f;
+	_EnemyInfo.AttackStartDistance = 170.f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 209;
-	ScaleX = 0.8f;
-	ScaleY = 0.8f;
+	ScaleX = 0.7f;
+	ScaleY = 0.7f;
 
 	MyAnimDuration = 1.f;
 	MyAnimInfo = {1,6,3,2,6};
@@ -46,9 +45,14 @@ void SwordMan::initialize()
 		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 
 	NormalAttack = object_mgr::instance().insert_object<SwordManAttack>(0, 0,
-		L"SWORDMAN_ATTACK", layer_type::EEffect, 4, 0, 0.5f, 0.5f, 200, 200, 0.4f, 0.4f);
+		L"SWORDMAN_ATTACK", layer_type::EEffect, 4, 0, 1.f, 1.f, 200, 200, 1.0f, 1.0f);
+	auto sp_NormalAttack = NormalAttack.lock();
+	if (!sp_NormalAttack)return;
+	sp_NormalAttack->_owner = _ptr;
 
 	DefaultHitDuration = 0.25f;
+	Attack = { 40,50 };
+	InitTime = 4.7f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
@@ -56,11 +60,13 @@ void SwordMan::initialize()
 
 Event SwordMan::update(float dt)
 {
+	InitTime -= dt;
 	if (bDie)
 	{
 		return Event::Die;
 	}
 	if (bDying)return Event::None;
+	if(InitTime>0)return Event::None;
 	
 	StateDuration -= dt;
 
@@ -80,7 +86,7 @@ Event SwordMan::update(float dt)
 	if (distance < Attack_distance && !_EnemyInfo.bHit && !_EnemyInfo.bAttack)
 	{
 		_EnemyInfo.bAttack = true;
-
+		_transform->_dir = dir;
 		_render_component->ChangeAnim(EAnimState::Attack, 0.6f);
 		_render_component->_Anim.ColIndex = 0;
 		_render_component->_Anim.bOn = false;
@@ -90,9 +96,10 @@ Event SwordMan::update(float dt)
 		[&bOn = _render_component->_Anim.bOn,
 		&bParticle = NormalAttack,dir = _transform->_dir,loc = _transform->_location,
 		&_Shadow = _Shadow](){
-
-			if (!bParticle)return true; 
-			bParticle->EffectStart(1.f,dir,loc+dir*45.f);
+			auto sp_Particle = bParticle.lock();
+			if (!sp_Particle)return true;
+			sp_Particle->EffectStart(dir,loc+dir*90.f);
+		
 			_Shadow.CurrentShadowState = EShadowState::BIG;
 			bOn = true;
 			return true; 
@@ -106,9 +113,16 @@ Event SwordMan::update(float dt)
 	}
 	else if (Attack_distance<distance && !_EnemyInfo.bHit && !_EnemyInfo.bAttack)
 	{
-		_transform->_dir = dir;
+		vec rand_dir = dir;
+
+		StalkerDuration -= dt;
+		if (StalkerDuration < 0)
+		{
+			_transform->_dir = math::rotation_dir_to_add_angle(dir, math::Rand<float>({ -55,55 }));
+			StalkerDuration = 1.f;
+		}
 		_transform->_location += _transform->_dir * dt * _speed;
-		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
+		_render_component->ChangeAnim(EAnimState::Walk, 1.f);
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	}
 	else if (!_EnemyInfo.bHit && !_EnemyInfo.bAttack)
@@ -118,26 +132,33 @@ Event SwordMan::update(float dt)
 
 	return _E;
 };
-
 void SwordMan::Hit(std::weak_ptr<object> _target)
 {
+	if (InitTime > 0)return;
+	
 	Monster::Hit(_target);
 
-	
 	if (bDying)return;
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
 	if (!sp_target->bAttacking)return;
+	if (sp_target->id == object::ID::player_shield)return;
+	if (sp_target->id == object::ID::monster)return;
+	if (sp_target->id == object::ID::monster_attack)return;
+
+
 	if (bInvincible)return;
 
+
+
 	Timer::instance().event_regist(time_event::EOnce, InvincibleTime,
-		[&bInvincible = bInvincible]()->bool {  bInvincible = false; return true;  });
+	[&bInvincible = bInvincible]()->bool {  bInvincible = false; return true;  });
 
 	bInvincible = true;
 	StateDuration = DefaultHitDuration;
 	CurrentState = EMonsterState::Hit;
 
-	float Atk = sp_target->Attack;
+	float Atk = math::Rand<int>(sp_target->Attack);
 	_EnemyInfo.HP -= Atk;
 	_EnemyInfo.bHit = true;
 
@@ -146,12 +167,10 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 	vec v = _transform->_location;
 	v.y -= 35;
 	v.x += math::Rand<int>({ -40,+40 });
-	Atk = math::Rand<int>({ -20,20 });
-	int Size = 23;
 
 	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
 		push_back({ v ,vec{0,1}*3,
-		   1.f,Size,std::to_wstring((int)Atk) });
+		   1.f,int(Atk),std::to_wstring((int)Atk) });
 
 	Timer::instance().event_regist(time_event::EOnce, DefaultHitDuration,
 		[&bHit = _EnemyInfo.bHit](){
@@ -166,7 +185,7 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 	{
 		bDying = true;
 		CurrentState = EMonsterState::Dead;
-		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 1.f, EAnimState::Dead);
+		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.8f, EAnimState::Dead);
 
 		Timer::instance().event_regist(time_event::EOnce, 1,
 
@@ -174,15 +193,20 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 		{
 			bDie = true;
 
-		auto _gold = GoldEffect::MakeGold(v.x, v.y,
-			L"MONEY", layer_type::EEffect, 2,
-			math::Rand<int>({ 1,3 }), FLT_MAX, 0.2f, 24, 24, 1.3f, 1.3f, AttackTarget);
-		return true;
+			auto _gold = GoldEffect::MakeGold(v.x, v.y,
+				L"MONEY", layer_type::EEffect, 2,
+				math::Rand<int>({ 0,2 }), FLT_MAX, 0.5f, 24, 24, 1.0f, 1.0f, AttackTarget);
+			return true;
 		});
+
+		auto sp_col = _collision_component_lower.lock();
+		if (!sp_col)return;
+		sp_col->bDie = true;
 	};
 }
 void SwordMan::render(HDC hdc, vec camera_pos, vec size_factor)
 {
+	if (InitTime > 0)return;
 
 	Monster::render(hdc, camera_pos, size_factor);
 }

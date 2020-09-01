@@ -23,9 +23,8 @@ public:
 
 	std::shared_ptr<class Bmp> HitEffectImg{};
 	//            이펙트 위치 이펙트 현재 컬럼 로우  이펙트의 현재 컬럼 델타
-	float CollisionHitEffectDelta = 0.05f;
+	float CollisionHitEffectDelta = 0.15f;
 	std::list<std::tuple<vec, int,int,float>> CollisionHitEffectList{};
-
 
 	void collision(collision_tag lhs, collision_tag rhs);
 	void render(HDC hdc, std::pair<float, float>  size_factor) ;
@@ -38,7 +37,15 @@ public:
 		L"InfoStage.txt";
 	static inline const std::wstring BossStageFileName =
 		L"InfoBoss.txt";
+
+	bool IsHitEffectMappingTag(collision_tag lhs,collision_tag rhs);
+	bool IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs);
 private:
 	void check_erase()&;
+	int CollisionRangeX;
+	int CollisionRangeY;
+	int CollisionTileNum{};
+
+	int CollisionObjNum{};
 };
 

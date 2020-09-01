@@ -8,6 +8,7 @@
 #include "Bmp.h"
 #include "player.h"
 #include "player_info.h"
+#include "shield.h"
 
 
 void ArcherBow::initialize()
@@ -27,32 +28,39 @@ void ArcherBow::initialize()
 Event ArcherBow::update(float dt)
 {
 	Event _Event = object::update(dt);
+	
+	auto sp_owner = _owner.lock();
+	if (!sp_owner)return _Event;
+	if (!sp_owner->_transform)return _Event;
+	if (!_transform)return _Event;
 
 	vec dir = _transform->_dir;
+	BowCorrection = math::RandVec();
+	_transform->_location = sp_owner->_transform->_location+ BowCorrection;
+
+	if (dir.x < 0)
+	{
+		sp_Img = Bmp_mgr::instance().Find_Image_SP(L"ARCHER_BOW_LEFT");
+		CurrentBowRow = BowSpriteAngleTable.first[math::AngleFromVec(dir) / 20];
+		
+	}
+	else
+	{
+		sp_Img = Bmp_mgr::instance().Find_Image_SP(L"ARCHER_BOW_RIGHT");
+		CurrentBowRow = BowSpriteAngleTable.second[math::AngleFromVec(dir) / 20];
+	}
 
 	if (bPreparation)
 	{
 		auto sp_Target = wp_Target.lock();
 		if (!sp_Target)return Event::None;
-		
-
-		if (dir.x < 0)
-		{
-			sp_Img = Bmp_mgr::instance().Find_Image_SP(L"ARCHER_BOW_LEFT");
-			  CurrentBowRow = BowSpriteAngleTable.first[math::AngleFromVec(dir) / 20];
-		}
-		else
-		{
-			sp_Img = Bmp_mgr::instance().Find_Image_SP(L"ARCHER_BOW_RIGHT");
-		 CurrentBowRow = BowSpriteAngleTable.second[math::AngleFromVec(dir) / 20];
-		}
 	
 		CurrentBowAnimDelta -= dt;
 		if (CurrentBowAnimDelta < 0)
 		{
 			++CurrentBowCol;
 			CurrentBowAnimDelta = DefaultBowAnimDelta;
-			if (CurrentBowCol > 3)
+			if (CurrentBowCol > 4)
 			{
 				CurrentBowCol = 0;
 			}
@@ -87,8 +95,8 @@ void ArcherBow::render(HDC hdc, vec camera_pos, vec size_factor)
 		vec v = owner_loc - camera_pos;
 		v.x -= (BowPaintSizeX / 2);
 		v.y -= (BowPaintSizeY / 2);
-		vec bow_correction{ 0,0 };
-		v -= bow_correction;
+		vec bow_correction{ 13,30 };
+		v += bow_correction;
 		GdiTransparentBlt(hdc, v.x, v.y, 
 			BowPaintSizeX*BowScaleX, 
 			BowPaintSizeY*BowScaleY,
@@ -100,17 +108,6 @@ void ArcherBow::render(HDC hdc, vec camera_pos, vec size_factor)
 void ArcherBow::Hit(std::weak_ptr<object> _target)
 {
 	object::Hit(_target);
-
-	auto sp_Target = _target.lock()	;
-	if (!sp_Target)return;
-
-	if ((sp_Target->id !=object::ID::player) )return;
-
-	auto sp_Player = std::dynamic_pointer_cast<Player>(sp_Target);
-
-	if (!sp_Player)return;
-	
-	sp_Player->_player_info->AddHp(-Attack);
 };
 
 void ArcherBow::Preparation(bool Set)

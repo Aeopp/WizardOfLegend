@@ -136,26 +136,30 @@ void Player::initialize()
 	sp_nAttack->_owner = _ptr;
 
 	id = object::ID::player;
+
+	CurrentInvincibletime = DefaultInvincibletime = 0.1f;
 };
 
 Event Player::update(float dt)
 {
 	Event _E = object::update(dt);
+	CurrentInvincibletime -= dt;
 
 	player_check(dt);
-
 	if (!_player_info) return Event::Die;
-	_player_info->AddHp(-dt * 1);
-	_player_info->AddMp(-dt * 10);
+
+	_player_info->AddHp(_player_info->HpRegenerationAtSec * dt);
+	_player_info->AddMp(_player_info->MpRegenerationAtSec* dt);
 
 	return _E;
 }
 void Player::Hit(std::weak_ptr<object> _target)
 {
+	if (CurrentInvincibletime > 0)return;
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
 	if (sp_target->id != object::ID::monster_attack)return;
-	
+
 	if(_player_info->GetHP()>0)
 	{
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
@@ -166,15 +170,37 @@ void Player::Hit(std::weak_ptr<object> _target)
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
 		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f,	AnimTable::dead);
+
+		Timer::instance().time_scale = 0.0f;
+		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!", 
+		MB_OK);
+		Timer::instance().time_scale = 1.0f;
+		DeltaTime = 0.0f;
+		_player_info->SetHp(_player_info->max_hp);
+		_player_info->SetMp(_player_info->max_mp);
 	}
 	
-	float Atk = sp_target->Attack;
+	float Atk = math::Rand<int>(sp_target->Attack);
 
-	Camera_Shake(Atk*0.1, 
+	_player_info->AddHp(-Atk);
+
+	vec randvec = math::RandVec();
+	randvec.y = (abs(randvec.y));
+	vec v = _transform->_location;
+	v.y -= 35;
+	v.x += math::Rand<int>({ -40,+40 });
+
+	object_mgr::instance().TextEffectMap[RGB(255, 50, 64)].
+		push_back({ v ,vec{0,1}*3,
+		1.f,int(Atk),std::to_wstring((int)Atk) });
+
+	Camera_Shake(Atk, 
 		(_transform->_location - sp_target->_transform->_location).get_normalize(),
-		Atk * 0.1f);
+		0.15f);
 
 	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
+
+	CurrentInvincibletime = DefaultInvincibletime;
 };
 
 void Player::StateCheck()
@@ -227,6 +253,7 @@ void Player::MakeShield()
 
 	vec dir{ math::Rand<float>({ -10,+10 }), math::Rand<float>({ -0,+0 }) };
 	Camera_Shake(15, dir, 0.3f);
+	_player_info->AddMp(-200);
 }
 
 void Player::ICE_BLAST(int Num)
@@ -242,21 +269,22 @@ void Player::ICE_BLAST(int Num)
 
 	Timer& _Timer = Timer::instance();
 
-	float BlastDistanceBetween = 45.f;
-	float BlastSpawnCycle = 0.07f;
-	int  IcePilarNum = 5;
+	float BlastDistanceBetween = 75.f;
+	float BlastSpawnCycle = 0.1f;
+	int    IcePilarNum = 3;
 	float IcePilarDuration = 5.f;
 	int IcePilarDistribution = 300;
+	float IcePilarBeetWeen = 115.f;
 
 	// 블라스트 생성 이펙트 한번 뿌려주기
 	object_mgr& obj_mgr = object_mgr::instance();
-	vec v = _transform->_location;
-	vec dis = *oMousePos - v;
+	vec PlayerLocation = _transform->_location;
+	vec dis = *oMousePos - PlayerLocation;
 	vec dir = dis.get_normalize();
 
 	for (int i = 0; i < Num; ++i)
 	{
-		vec blast_location = v + dir * (BlastDistanceBetween * i);
+		vec blast_location = PlayerLocation + dir * (BlastDistanceBetween * i);
 
 		_Timer.event_regist(time_event::EOnce, i * BlastSpawnCycle, [blast_location]()->bool {
 			auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
@@ -265,35 +293,55 @@ void Player::ICE_BLAST(int Num)
 			});
 	};
 
-	vec w = v + dir * (BlastDistanceBetween * Num);
+	vec PilarSpwanLocation = PlayerLocation + dir * (BlastDistanceBetween * Num);
 
-	_Timer.event_regist(time_event::EOnce, Num * BlastSpawnCycle, [IcePilarDistribution,IcePilarDuration,BlastSpawnCycle, IcePilarNum,
-		&_Timer = _Timer, w = w, dir = dir]()->bool {
+	_Timer.event_regist(time_event::EOnce, Num * BlastSpawnCycle, [
+		IcePilarBeetWeen,IcePilarDistribution,IcePilarDuration,BlastSpawnCycle, IcePilarNum,
+		&_Timer = _Timer, PilarSpwanLocation = PilarSpwanLocation, dir = dir]()->bool {
 
-				_Timer.event_regist(time_event::EOnce, 0.6f, [w, IcePilarDistribution,IcePilarDuration ,IcePilarNum]()->bool {
+				_Timer.event_regist(time_event::EOnce, 0.6f, 
+				[IcePilarBeetWeen,PilarSpwanLocation, IcePilarDistribution,IcePilarDuration ,IcePilarNum]()->bool {
 
-					for (int i = 0; i < IcePilarNum; ++i)
-					{
-						auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
-						BLAST->_transform->_location = w + vec{ math::Rand<float>({-1,1}) , math::Rand<float>({0,0}) }
-						*math::Rand<int>({ -300, 300 });
+						vec left = vec{ -1,0 };
+						vec right = vec{ +1,0 };
+						vec up = vec{ 0,1 };
+						vec down = vec{ 0,-1 };
 
-						BLAST->Duration = IcePilarDuration;
-					}
-					for (int i = 0; i < IcePilarNum; ++i)
-					{
-						auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
-						BLAST->_transform->_location = w + vec{ math::Rand<float>({0,0}) , math::Rand<float>({-1,1}) }
-						*math::Rand<int>({ -300, 300 });
+						vec CurrentDir{};
+						// 4방향 기둥 생성
+						for (int i = 0; i < 4; ++i)
+						{
+							switch (i)
+							{
+							case 0:
+								CurrentDir = left;
+								break;
+							case 1:
+								CurrentDir = right;
+								break;
+							case 2:
+								CurrentDir = up; 
+								break;
+							case 3:
+								CurrentDir = down;
+								break;
+							default:
+								break;
+							}
+							for (int i = 0; i < IcePilarNum; ++i)
+							{
+								auto BLAST = object_mgr::instance().insert_object<ICE_Blast>();
+								BLAST->Duration = IcePilarDuration;
+								BLAST->_transform->_location = PilarSpwanLocation + (CurrentDir * IcePilarBeetWeen * i);
+							}
+						}
 
-						BLAST->Duration = IcePilarDuration;
-					}
+
 					return true; 
 					});
 			
 		return true;
 		});
-
 
 	_Shadow.CurrentShadowState = EShadowState::BIG;
 	Anim& MyAnim = _render_component->_Anim;
@@ -304,6 +352,8 @@ void Player::ICE_BLAST(int Num)
 
 	vec Dir{ math::Rand<float>({ 0,0 }), math::Rand<float>({ -10,+10 }) };
 	Camera_Shake(10, Dir, 0.5f);
+
+	_player_info->AddMp(-150);
 }
 void Player::Camera_Shake(float force,vec dir,float duration)
 {
@@ -390,7 +440,7 @@ void Player::SkillBoomerang(uint32_t Num)
 
 		if (!_Ice)return;
 		_Ice->_owner = _ptr;
-		_Ice->_transform->_dir = math::dir_from_angle(degree * i);
+		_Ice->_transform->_dir = math::dir_from_angle(degree*i);
 		;
 		_Ice->_render_component->_Anim.RowIndex = math::Rand<int>({ 0,5 });
 	}
@@ -400,13 +450,16 @@ void Player::SkillBoomerang(uint32_t Num)
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillICECrystalMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
 
-	_render_component->ChangeAnim(AnimTable::attack2, _player_info->SkillICECrystalMotionDuration);
+	_render_component->ChangeAnim(AnimTable::attack2,
+	_player_info->SkillBoomerangMotionDuration);
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 
 	Camera_Shake(10, dir, 0.5f);
+
+	_player_info->AddMp(-50);
 }
 
 void Player::SkillIceCrystal(uint32_t Num)
@@ -437,6 +490,8 @@ void Player::SkillIceCrystal(uint32_t Num)
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 	Camera_Shake(10, dir, 0.5f);
+
+	_player_info->AddMp(-100);
 }
 void Player::SkillFireDragon()
 {
@@ -499,6 +554,8 @@ void Player::SkillFireDragon()
 	Camera_Shake(5, dir, 0.25f);
 
 	UpDown *= -1;
+
+	//_player_info->AddMp(-25);
 };
 
 void Player::CheckDirInput()
@@ -643,14 +700,12 @@ void Player::Dash(float speed)
 		if (!Transform)return false;
 
 		Transform->_location += Transform->_dir *(speed*DeltaTime);
-
 		return true;
 	}));
 	_render_component->ChangeUnstoppableAnim(AnimTable::dash, _player_info->DashDuration, AnimTable::idle);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(3, dir, 0.05f);
-
+	Camera_Shake(1, dir, 0.025f);
 	
 	sound_mgr::instance().RandSoundKeyPlay("DASH", { 1,4 },1.f);
 }
@@ -726,9 +781,8 @@ void Player::Attack()
 		fDegree);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(2, dir, 0.03f);
+	Camera_Shake(1, dir, 0.01f);
 	sound_mgr::instance().RandSoundKeyPlay("NORMAL_ATTACK_", { 1,3 }, 1);
-
 };
 
 void Player::Player_Move(float dt)

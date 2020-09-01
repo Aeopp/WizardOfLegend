@@ -17,7 +17,7 @@ void ArcherArrow::launch(vec init,vec dir, int Row, std::shared_ptr<class Bmp> S
 
 	auto sp_comp = wp_collision.lock();
 	if (!sp_comp)return;
-	sp_comp->bPush = true;
+	sp_comp->bPush = false;
 	sp_comp->bObjectSlide = false;
 	sp_comp->bHitEffect = true;
 	sp_comp->bCollision= true;
@@ -79,7 +79,9 @@ void ArcherArrow::initialize()
 	speed = 1100.f;
 	id = object::ID::monster_attack;
 
-	Attack = math::Rand<int>({ 20, 40 });
+	Attack={ 20,40 };
+	// 방어하는 스킬과 상호작용
+	bInvalidatedefense = true;
 }
 
 uint32_t ArcherArrow::get_layer_id() const&
@@ -91,11 +93,16 @@ void ArcherArrow::Hit(std::weak_ptr<object> _target)
 {
 	object::Hit(_target);
 
-	/*auto sp_Target =_target.lock();
-	auto sp_IsShield = std::dynamic_pointer_cast<shield>(sp_Target);
-	if (sp_IsShield)
+
+	auto sp_target = _target.lock();
+	if (!sp_target)return;
+	if (!_transform)return;
+
+
+	if (sp_target->id == object::ID::player_shield)
 	{
 		bDie = true;
-	}*/
+		shield::DefenseMsg(_transform->_location);
+	}
 };
 

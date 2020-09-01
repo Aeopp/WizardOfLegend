@@ -1,4 +1,8 @@
 #include "pch.h"
+
+
+#include "ARCHER.h"
+
 #include "Scene_Boss.h"
 #include "collision_mgr.h"
 #include "Scene_mgr.h"
@@ -11,6 +15,7 @@
 #include "player.h"
 #include "Camera.h"
 #include "Tile_mgr.h"
+#include "Monster.h"
 
 Scene_Boss::~Scene_Boss() noexcept
 {
@@ -50,9 +55,9 @@ void Scene_Boss::update(float dt)
 
 	object_mgr::instance().update();
 
-	collision_mgr::instance().update();
-
 	Input_mgr::instance().update();
+
+	collision_mgr::instance().update();
 }
 
 void Scene_Boss::initialize()
@@ -69,13 +74,36 @@ void Scene_Boss::initialize()
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
 
-		auto _ptr = obj_mgr.insert_object<Player>();
+		auto _Player = obj_mgr.insert_object<Player>();
 
 		auto _camera = obj_mgr.insert_object<Camera>();
-		_camera->_owner = _ptr;
+		_camera->_owner = _Player;
 		obj_mgr._Camera = _camera;
 
 		manage_objs.push_back(_camera);
+		manage_objs.push_back(_Player);
+
+		_Player->_transform->_location = PlayerSpawnLocation;
+
+		float Angle = 360.f / 16.f;
+		float s = 0.f;
+		float Distance = 400.f;
+
+		for (int i = 0; i < 16; ++i)
+		{
+			s += Angle;
+			vec v = PlayerSpawnLocation;
+			vec w{ Distance * std::cosf(s),
+			Distance * std::sinf(s) };
+			v += w;
+
+			Monster::CardEffect(v, ARCHER::SummonCardImgKey);
+
+			auto archer = obj_mgr.insert_object<ARCHER>
+				(_Player, v);
+			manage_objs.push_back(archer);
+		}
+
 	};
 }
 
