@@ -6,21 +6,77 @@
 #include "Mouse.h"
 #include "timer.h"
 #include "Camera.h"
+#include "game.h"
+#include "Font.h"
 
 void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 {
-	int count = 0;
+	std::vector<std::shared_ptr<class object>> RenderSortY;
 
-	for (auto& [f, obj_list] : object_map)
+	RenderSortY.reserve(object_map[layer_type::EObject].size());
+
+	std::copy(std::begin(object_map[layer_type::EObject]),
+		std::end(object_map[layer_type::EObject]),
+		std::back_inserter(RenderSortY));
+
+	std::sort(std::begin(RenderSortY), std::end(RenderSortY),
+		[](std::shared_ptr<object>& lhs, std::shared_ptr<object>& rhs) {
+			if (!lhs->_transform) return false;
+			if (!rhs->_transform) return false;
+
+			return lhs->_transform->_location.y < rhs->_transform->_location.y;
+		});
+	for (auto& obj : RenderSortY)
 	{
-		for (auto& obj : obj_list)
+		vec culling_obj_pos = obj->_transform->_location - camera_pos;
+		if (math::RectInPoint(game::client_rect, culling_obj_pos))
 		{
-			count++; 
 			obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
 		}
 	}
+	RenderSortY.clear();
 
-	if (bDebug)
+	/*for (auto& [object_layer, obj_list] : object_map)
+	{
+		if (object_layer == layer_type::EObject)continue;
+
+		for (auto& obj : obj_list)
+		{
+			if (!obj->_transform)continue;
+
+			if(object_layer >= layer_type::EEffect)
+			{
+				count++;
+				obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
+			}
+		}
+	}*/
+
+	for (auto& [_Color,TEffects ]: TextEffectMap)
+	{
+		for (auto TEffect= std::begin(TEffects);TEffect!= std::end(TEffects);)
+		{
+			vec v = TEffect->pos - camera_pos;
+
+			Font FontOn = Font(hdc, _Color, v.x, v.y,
+				TEffect->size, TEffect->Text, TEffect->Text, TEffect->Text, TEffect->Text);
+
+			TEffect->pos -= TEffect->dir;
+			TEffect->duration -= DeltaTime;
+
+			if (TEffect->duration < 0)
+			{
+				TEffect = TEffects.erase(TEffect);
+			}
+			else
+			{
+				++TEffect;
+			}
+		}
+	}
+
+
+	/*if (bDebug)
 	{
 		auto [sx, sy] = size_factor;
 
@@ -29,12 +85,13 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 		RECT _rt{ 1200 *sx,100*sy,  1400 *sx, 200*sy }; 
 
 		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
-	}
+	}*/
 };
 
 void object_mgr::update()
 {
 	using namespace std;
+
 
 	float dt = Timer::instance().delta();
 
@@ -59,6 +116,7 @@ void object_mgr::update()
 	}
 
 	check_erase();
+
 };
 
 void object_mgr::initialize()
@@ -71,6 +129,18 @@ void object_mgr::release()
 	object_map.clear();
 }
 
+void object_mgr::UIEffectRender(HDC hdc, vec camera_pos, std::pair<float, float> size_factor)
+{
+	for (int i = layer_type::EEffect; i <= layer_type::ENone; ++i)
+	{
+		for (auto& obj : object_map[i])
+		{
+			if (!obj->_transform)continue;
+			obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
+		}
+	}
+}
+
 void object_mgr::check_erase()
 {
 	for (auto& [key, obj_list] : object_map)
@@ -78,7 +148,8 @@ void object_mgr::check_erase()
 		obj_list.erase(
 
 			std::remove_if(std::begin(obj_list), std::end(obj_list),
-			[](auto& cur_obj) {if (!cur_obj)return true; return cur_obj->bDie; }),
+			[](auto& cur_obj) {if (!cur_obj)return true; 
+				return cur_obj->bDie; }),
 
 			std::end(obj_list));
 	};

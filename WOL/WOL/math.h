@@ -146,6 +146,9 @@ public:
 
 	template<typename Ty>
 	static Ty Rand(std::pair<Ty, Ty> range);
+
+	static vec RandVecNormal();
+	static vec RandVec();
 };
 
 static  bool EQUAL(const float lhs, const float rhs)

@@ -13,6 +13,7 @@ enum collision_tag
 	EMonster,
 	EMouse,
 	EShield,
+	EFireDragon,
 	EPlayerAttack,
 	EMonsterAttack,
 };

@@ -2,19 +2,56 @@
 #include "actor.h"
 #include "collision_component.h"
 #include "EnemyInfo.h"
+#include "Effect.h"
 
 class Monster :
     public actor
 {
 public:
+	enum class EMonsterState :uint8_t
+	{
+		Idle,
+		Walk,
+		Attack,
+		Hit,
+		Dead,
+		Skill1,
+		Skill2,
+		Skill3,
+		Skill4,
+	};
+
+	void CheckDirChangeImgFile();
 	void initialize()override;
 	Event update(float dt)override;
 	void Hit(std::weak_ptr<object> _target)override;
-	virtual void Attack();
-	void late_initialize(std::weak_ptr<class object> SetTarget);
+	void late_initialize(std::weak_ptr<class object> SetTarget,
+	vec SetLocation);
 public:
-	std::weak_ptr<collision_component>  _collision_component{};
+	std::weak_ptr<collision_component>  _collision_component_lower{};
+
+	vec collision_lower_correction{};
+
+	bool bDying = false;
+	float DefaultHitDuration = 0.25f;
+	bool bInvincible = false;
+	float InvincibleTime = 0.1f;
+	float StateDuration{};
+	EMonsterState CurrentState{ EMonsterState::Idle };
 	std::weak_ptr<class object> _AttackTarget;
-	std::shared_ptr<EnemyInfo> _EnemyInfo{};
+	EnemyInfo _EnemyInfo{};
+public:
+	void CardEffect(std::wstring ImageKey);
+protected:
+	// 페인트 사이즈 랑 페인트 스케일도 초기화
+	// 에너미 인포 값들도 초기화
+	std::wstring LeftAnimKey;
+	std::wstring RightAnimKey;
+	vec  lower_size,  lower_correction;
+	std::pair<int,int>shadow_correction;
+	std::vector<int> MyAnimInfo{};
+	float MyAnimDuration;
+	std::wstring SummonCardImgKey;
+	std::pair<int,int> ShadowWorldSizeCorrection;
 };
 

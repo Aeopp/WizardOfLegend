@@ -15,8 +15,8 @@ void WIZARD::initialize()
 	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"WIZARD_LEFT.bmp", L"WIZARD_LEFT");
 	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"WIZARD_RIGHT.bmp", L"WIZARD_RIGHT");
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision = _collision_component.lock();
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
+	auto sp_collision = _collision_component_lower.lock();
 
 	if (!sp_collision)return;
 
@@ -58,13 +58,11 @@ Event WIZARD::update(float dt)
 	_transform->_dir = to_dir;
 	_transform->Move(_transform->_dir,_speed * dt);
 
-	if (!_EnemyInfo)return Event::None;
 
-	float start_dis = _EnemyInfo->AttackStartDistance;
+	float start_dis = _EnemyInfo.AttackStartDistance;
 
 	if (cur_distance < start_dis)
 	{
-		Attack();
 	}
 
 	vec dir = _transform->_dir;
@@ -87,9 +85,8 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 
 	Anim& MyAnim = _render_component->_Anim;
 
-	if (!_EnemyInfo) return;
 
-	if (_EnemyInfo->HP > 0)
+	if (_EnemyInfo.HP > 0)
 	{
 		_render_component->ChangeAnim(AnimTable::hit, 0.2f, AnimTable::idle);
 	}
@@ -106,7 +103,3 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 	};
 };
 
-void WIZARD::Attack()
-{
-	_render_component->ChangeAnim(AnimTable::attack, 0.3f, AnimTable::idle);
-};

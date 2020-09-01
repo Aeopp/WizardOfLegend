@@ -24,9 +24,13 @@ void Scene_Boss::render(HDC hdc, std::pair<float, float> size_factor)
 	{
 		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
 
-		
-		Tile_mgr::instance().render(hdc, size_factor);
-		object_mgr::instance().render(hdc, size_factor);
+		object_mgr& obj_mgr = object_mgr::instance();
+		vec cp = obj_mgr.camera_pos;
+
+		Tile_mgr::instance().render(hdc, cp ,size_factor);
+		obj_mgr.render(hdc, size_factor);
+		Tile_mgr::instance().DecoRender(hdc, cp);
+		obj_mgr.UIEffectRender(hdc, cp, size_factor);
 		collision_mgr::instance().render(hdc, size_factor);
 		Timer::instance().render(hdc);
 	}

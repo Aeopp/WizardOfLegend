@@ -11,6 +11,6 @@ public:
 
 	uint32_t get_layer_id()const& override;
 
-	std::weak_ptr<class collision_component> _collision_component{};
+	std::weak_ptr<class collision_component> _collision_component_lower{};
 };
 

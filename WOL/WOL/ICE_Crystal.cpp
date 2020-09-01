@@ -12,9 +12,9 @@ void ICE_Crystal::initialize()
 {
 	actor::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
-	auto sp_collision = _collision_component.lock();
+	auto sp_collision = _collision_component_lower.lock();
 
 	if (!sp_collision)return;
 
@@ -41,10 +41,13 @@ void ICE_Crystal::initialize()
 
 	TickScale = 1.f;
 	sp_collision->bSlide = false;
+	id = object::ID::player_attack;
+	bAttacking = true;
+	sp_collision->bPush= false;
+	sp_collision->PushForce = 10.f;
 
 	//_Shadow.bShadow = true;
 	//_Shadow.correction = { 0,120 };
-
 }
 
 Event ICE_Crystal::update(float dt)

@@ -14,11 +14,15 @@ void shield::initialize()
 
 	// Shadow SetUp
 	{
-		_Shadow.bShadow = true;
+		_Shadow.bShadow = false;
 		_Shadow.correction = { 0,60 };
 		_Shadow.world_size_correction = { -20,0 };
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	}
+
+	id = object::ID::player_attack;
+
+	bAttacking = true;
 }
 
 Event shield::update(float dt)
@@ -70,7 +74,7 @@ void shield::CalcIdx()
 
 uint32_t shield::get_layer_id() const&
 {
-	return layer_type::EEffect;
+	return layer_type::EObject;
 }
 void shield::late_initialize(Transform _Transform)
 {
@@ -90,13 +94,13 @@ void shield::late_initialize(Transform _Transform)
 			L"BOTTOM_HOLE", layer_type::EMapDeco, 1, 0, 5.f, FLT_MAX, 200, 150,
 			0.8f, 0.8f);
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
 
-	auto sp_collision = _collision_component.lock();
+	auto sp_collision = _collision_component_lower.lock();
 	if (!sp_collision)return;
 
 	sp_collision->bSlide = false;
-	sp_collision->PushForce = 10.f;
+	sp_collision->PushForce = 1.f;
 	sp_collision->bPush = true;
 	sp_collision->_size = { 50.f,50.0f };
 
@@ -114,4 +118,6 @@ void shield::late_initialize(Transform _Transform)
 	_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 	_render_component->_Anim.SetAnimationClip(
 		{ 12 }, 360.f / _speed);
+
+
 };

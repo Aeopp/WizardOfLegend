@@ -42,13 +42,13 @@ void UI_PlayerBar::render(HDC hdc, vec camera_pos, vec size_factor)
 	
 	{
 		std::wstringstream wss;
-		wss << (int)sp_info->hp << L"/" << (int)sp_info->max_hp << std::endl;
+		wss << (int)sp_info->GetHP()<< L"/" << (int)sp_info->max_hp << std::endl;
 		Font(hdc, wss.str(), 20, RGB(150, 0, 0), (int)loc.x + 100, (int)loc.y - 35);
 	}
 	
 		{
 			std::wstringstream wss;
-			wss << (int)sp_info->mp << L"/" << (int)sp_info->max_mp << std::endl;
+			wss << (int)sp_info->GetMP()<< L"/" << (int)sp_info->max_mp << std::endl;
 			Font(hdc, wss.str(), 20, RGB(0, 0, 150), (int)loc.x + 100, (int)loc.y - 13);
 			Font(hdc, L"", 20, RGB(255, 0, 0));
 		}

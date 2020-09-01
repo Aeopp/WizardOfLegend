@@ -20,8 +20,9 @@ void Scene_End::render(HDC hdc, std::pair<float, float> size_factor)
 		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
 
 		Timer::instance().render(hdc);
-
-		object_mgr::instance().render(hdc, size_factor);
+		object_mgr& obj_mgr = object_mgr::instance();
+		obj_mgr.render(hdc, size_factor);
+		obj_mgr.UIEffectRender(hdc, obj_mgr.camera_pos, size_factor);
 		collision_mgr::instance().render(hdc, size_factor);
 	}
 };

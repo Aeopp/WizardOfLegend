@@ -26,8 +26,9 @@
 #include "Bmp.h"
 #include "Effect.h"
 #include "FireDragon.h"
-
-
+#include "EffectPlayerAttack.h"
+#include "sound_mgr.h"
+#include "Boomerang.h"
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
@@ -61,12 +62,13 @@ void Player::initialize()
 	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"LEFT_COMPLETE.bmp", L"LEFT_COMPLETE");
 	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"RIGHT_COMPLETE.bmp", L"RIGHT_COMPLETE");
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ERect);
-	auto sp_collision = _collision_component.lock();
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ERect);
+	auto sp_collision = _collision_component_lower.lock();
 
 	if (!sp_collision)return;
-
+	sp_collision->bSlide = true;
 	sp_collision->_size = { 30.f,30.0f };
+	sp_collision->bHitEffect = false;
 
 	_Camera = object_mgr::instance()._Camera;
 
@@ -104,7 +106,8 @@ void Player::initialize()
 
 	_speed = 400.f;
 
-	_Shadow.correction = { 0,(PaintSizeY * 0.47) /2.f };
+	_Shadow.correction = { +3,(PaintSizeY * 0.47) /2.f };
+	_Shadow.world_size_correction = { 10,0 };
 
 
 	Timer::instance().event_regist(time_event::ERemaingWhile, FLT_MAX,
@@ -116,6 +119,23 @@ void Player::initialize()
 		return true;
 	});
 
+
+	/*void late_initialize(int ImgLocationX, int ImgLocationY,
+	std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
+	int AnimRowIndex, float Duration, float AnimDuration,
+	int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
+	auto sp_nAttack = object_mgr::instance().insert_object<EffectPlayerAttack>(
+		0, 0, L"WOL_NORMAL_ATTACK", layer_type::EEffect, 4,
+		0, _player_info->DefaultAttackDuration, _player_info->DefaultAttackDuration,
+		200, 200, 0.8f, 0.8f);
+
+	if (!sp_nAttack) return;
+
+	NormalAttack = sp_nAttack;
+
+	sp_nAttack->_owner = _ptr;
+
+	id = object::ID::player;
 };
 
 Event Player::update(float dt)
@@ -125,29 +145,36 @@ Event Player::update(float dt)
 	player_check(dt);
 
 	if (!_player_info) return Event::Die;
-	_player_info->hp -= dt * 1;
-	_player_info->mp -= dt * 10;
-
+	_player_info->AddHp(-dt * 1);
+	_player_info->AddMp(-dt * 10);
 
 	return _E;
 }
 void Player::Hit(std::weak_ptr<object> _target)
 {
-	Anim& MyAnim = _render_component->_Anim;
-
-	if(_player_info->hp>0)
+	auto sp_target = _target.lock();
+	if (!sp_target)return;
+	if (sp_target->id != object::ID::monster_attack)return;
+	
+	if(_player_info->GetHP()>0)
 	{
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		MyAnim.AnimPlay((int)AnimTable::hit,0.3f);
-		MyAnim.SetDefaultClip((int)AnimTable::idle);
+		_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.2f, AnimTable::idle);
 	}
 	else
 	{
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
-		MyAnim.AnimPlay((int)AnimTable::dead, 0.3f);
-		MyAnim.SetDefaultClip((int)AnimTable::idle);
+		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f,	AnimTable::dead);
 	}
+	
+	float Atk = sp_target->Attack;
+
+	Camera_Shake(Atk*0.1, 
+		(_transform->_location - sp_target->_transform->_location).get_normalize(),
+		Atk * 0.1f);
+
+	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
 };
 
 void Player::StateCheck()
@@ -217,8 +244,8 @@ void Player::ICE_BLAST(int Num)
 
 	float BlastDistanceBetween = 45.f;
 	float BlastSpawnCycle = 0.07f;
-	int  IcePilarNum = 7;
-	float IcePilarDuration = 6.f;
+	int  IcePilarNum = 5;
+	float IcePilarDuration = 5.f;
 	int IcePilarDistribution = 300;
 
 	// 블라스트 생성 이펙트 한번 뿌려주기
@@ -304,7 +331,7 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('Q'))
 	{
 
-		ICE_BLAST(15);
+		ICE_BLAST(10);
 	}
 
 	if (_Input.Key_Down(VK_LBUTTON))
@@ -330,6 +357,10 @@ void Player::player_check(float dt)
 	}
 
 
+	if (_Input.Key_Down('Z')) {
+		SkillBoomerang(8);
+	}
+
 
 	if (_Input.Key_Down(VK_SPACE))
 	{
@@ -343,6 +374,40 @@ void Player::player_check(float dt)
 		_render_component->ChangeAnim(AnimTable::idle, 0.1f, AnimTable::idle);
 	}
 };
+
+void Player::SkillBoomerang(uint32_t Num)
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	float degree = 360.0f / Num;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		auto _Ice = _object_mgr.insert_object<Boomerang>();
+
+		if (!_Ice)return;
+		_Ice->_owner = _ptr;
+		_Ice->_transform->_dir = math::dir_from_angle(degree * i);
+		;
+		_Ice->_render_component->_Anim.RowIndex = math::Rand<int>({ 0,5 });
+	}
+
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillICECrystalMotionDuration;
+
+	_render_component->ChangeAnim(AnimTable::attack2, _player_info->SkillICECrystalMotionDuration);
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+
+	Camera_Shake(10, dir, 0.5f);
+}
 
 void Player::SkillIceCrystal(uint32_t Num)
 {
@@ -383,7 +448,7 @@ void Player::SkillFireDragon()
 	 if (!mp)return;
 
 	 vec FireDir = (*mp - _transform->_location).get_normalize();
-	float FireInitDistance = 30.f;
+	float FireInitDistance = 10.f;
 	auto _Fire = object_mgr::instance().insert_object<FireDragon>();
 
 	if (!_Fire)return;
@@ -392,6 +457,7 @@ void Player::SkillFireDragon()
 	_Fire->rotation_center = _transform->_location + (FireDir * FireInitDistance);
 	_Fire->_transform->_dir = FireDir;
 	_Fire->rotation_center_dir = FireDir;
+	_Fire->Cross = math::rotation_dir_to_add_angle(FireDir, 90.f);
 	_Fire->Updown = UpDown;
 	_player_info->bIdle = false;
 
@@ -516,14 +582,14 @@ void Player::make_player_bar()
 
 	auto HBar = object_mgr::instance().insert_object<UIHPBar>();
 
-	HBar->current = _player_info->hp;
+	HBar->current = _player_info->GetHP();
 	HBar->goal_time = 0.5f;
-	HBar->max = _player_info->hp;
+	HBar->max = _player_info->max_hp;
 	HBar->wp_info = _player_info;
 
 	auto MBar = object_mgr::instance().insert_object<UIMPBar>();
 
-	MBar->current = _player_info->mp;
+	MBar->current = _player_info->GetMP();
 	MBar->goal_time = 0.5f;
 	MBar->max = _player_info->max_mp;
 	MBar->wp_info = _player_info;
@@ -583,21 +649,42 @@ void Player::Dash(float speed)
 	_render_component->ChangeUnstoppableAnim(AnimTable::dash, _player_info->DashDuration, AnimTable::idle);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(5, dir, 0.1f);
+	Camera_Shake(3, dir, 0.05f);
+
+	
+	sound_mgr::instance().RandSoundKeyPlay("DASH", { 1,4 },1.f);
 }
 
 void Player::Attack()
 {
 	if (_player_info->bDash)return;
 	if (!_transform)return;
+	auto sp_Attack = NormalAttack.lock();
+	if (!sp_Attack) return;
+
 	Anim& MyAnim = _render_component->_Anim;
 	// 어택 듀레이션이 지난 다음에 어택을 풀어주기
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
+	float DefaultAttackDuration = _player_info->DefaultAttackDuration;
+	_player_info->CurrentAttackDuration = DefaultAttackDuration;
+	
 
-	vec dis = 	*Input_mgr::instance().GetWorldMousePos() - _transform->_location;
+	if (!_transform) return;
+	vec dis = *Input_mgr::instance().GetWorldMousePos() - _transform->_location;
+	vec attack_dir = dis.get_normalize();
 
-	math::EDir _Dir = math::checkDir(dis.get_normalize());
+	// 어중간한 각도는 버린다. (애니메이션이 이상해보임)
+	float fDegree = math::AngleFromVec(attack_dir);
+	int iDegree = std::round(fDegree / 45.f);
+	fDegree = iDegree * 45.f;
+
+	vec Dir = math::dir_from_angle(fDegree);
+	Dir.y *= -1;
+
+	_transform->_dir = Dir;
+	_transform->Move(_transform->_dir, 20.f);
+
+	math::EDir _Dir = math::checkDir(attack_dir);
 
 	switch (_Dir)
 	{
@@ -619,21 +706,34 @@ void Player::Attack()
 
 	_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 
+	AttackNumber  _ANum = AttackNumber::_1;
+
 	if ((int)AnimTable::attack1 == MyAnim.CurClipRowIndex())
 	{
+		AttackNumber  _ANum = AttackNumber::_1;
 		_render_component->ChangeAnim(AnimTable::attack2, _player_info->DefaultAttackDuration);
 	}
 	else
 	{
+		AttackNumber  _ANum = AttackNumber::_2;
 		_render_component->ChangeAnim(AnimTable::attack1, _player_info->DefaultAttackDuration);
 	};
 
+	
+	sp_Attack->AttackStart(DefaultAttackDuration,
+		DefaultAttackDuration, _player_info->NormalAttackPushForce,
+		_transform->_location + _transform->_dir * _player_info->NormalAttackRich, _ANum,
+		fDegree);
+
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(5, dir, 0.1f);
+	Camera_Shake(2, dir, 0.03f);
+	sound_mgr::instance().RandSoundKeyPlay("NORMAL_ATTACK_", { 1,3 }, 1);
+
 };
 
 void Player::Player_Move(float dt)
 {
+
 	if (!_player_info)return;
 	if (_player_info->bAttack)return;
 	_player_info->bMove = false;
@@ -725,5 +825,19 @@ void Player::Player_Move(float dt)
 			_transform->Move(_transform->_dir, _speed * dt);
 		}
 	}
+
+	
+
+	if (_player_info->bMove = true)
+	{
+		sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
+	//	sound_mgr::instance().Play("RUN_1", false, 1);
+
+	}
+}
+
+void Player::Die()
+{
+	sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
 }
 

@@ -50,7 +50,22 @@ void Bmp_mgr::initialize()
 	 Insert_Bmp(DefaultPath + L"MONEY.bmp", L"MONEY");
 	 Insert_Bmp(DefaultPath + L"SKILL_FIREDRAGON_COM.bmp", L"SKILL_FIREDRAGON_COM");
 	 Insert_Bmp(DefaultPath + L"FIRE_PARTICLE.bmp", L"FIRE_PARTICLE");
-};
+	 Insert_Bmp(DefaultPath + L"WOL_NORMAL_ATTACK.bmp", L"WOL_NORMAL_ATTACK");
+
+	 Insert_Bmp(DefaultPath + L"SWORDMAN_RIGHT.bmp", L"SWORDMAN_RIGHT");
+	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK.bmp", L"SWORDMAN_ATTACK");
+	 Insert_Bmp(DefaultPath + L"HITEFFECT.bmp", L"HITEFFECT");
+
+	 Insert_Bmp(DefaultPath + L"ARCHER_BOW_LEFT.bmp", L"ARCHER_BOW_LEFT");
+	 Insert_Bmp(DefaultPath + L"ARCHER_BOW_RIGHT.bmp", L"ARCHER_BOW_RIGHT");
+
+	 Insert_Bmp(DefaultPath + L"ARCHER_RIGHT.bmp", L"ARCHER_RIGHT");
+	 Insert_Bmp(DefaultPath + L"ARCHER_LEFT.bmp", L"ARCHER_LEFT");
+
+
+};	 	
+
+
 
 void Bmp_mgr::release()
 {

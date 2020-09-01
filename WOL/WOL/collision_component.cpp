@@ -35,8 +35,18 @@ circle collision_component::make_circle()
 {
 	auto _ptr = _owner.lock();
 	if (!_ptr)return circle{};
+	if (!_ptr->_transform)return circle{};
 
 	return { _ptr->_transform->_location+correction ,_size.x };
+}
+
+vec collision_component::make_center()
+{
+	auto _ptr = _owner.lock();
+	if (!_ptr)return vec{};;
+	if (!_ptr->_transform)return vec{};
+
+	return _ptr->_transform->_location - correction;;
 }
 
 

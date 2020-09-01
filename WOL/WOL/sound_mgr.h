@@ -20,6 +20,9 @@ public:
 	bool Frame(const float DeltaTime);
 	bool Release();
 	bool IsPlay(const std::string& SoundKey);
+
+	void RandSoundKeyPlay(const std::string& SoundKey,
+		std::pair<uint8_t, uint8_t> Range, float Volume);
 private:
 	std::string CurrentBgmKey;
 };

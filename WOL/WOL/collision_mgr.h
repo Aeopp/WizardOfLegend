@@ -21,7 +21,11 @@ public:
 	std::weak_ptr< collision_component> insert(std::weak_ptr<class object> _owner,collision_tag _tag,
 		figure_type _type = ERect);
 
-	bool bRender = true;
+	std::shared_ptr<class Bmp> HitEffectImg{};
+	//            이펙트 위치 이펙트 현재 컬럼 로우  이펙트의 현재 컬럼 델타
+	float CollisionHitEffectDelta = 0.05f;
+	std::list<std::tuple<vec, int,int,float>> CollisionHitEffectList{};
+
 
 	void collision(collision_tag lhs, collision_tag rhs);
 	void render(HDC hdc, std::pair<float, float>  size_factor) ;

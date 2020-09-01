@@ -229,6 +229,11 @@
     <ClInclude Include="FireDragon.h">
       <Filter>source\object\Actor</Filter>
     </ClInclude>
+    <ClInclude Include="EffectPlayerAttack.h" />
+    <ClInclude Include="SwordManAttack.h" />
+    <ClInclude Include="Boomerang.h" />
+    <ClInclude Include="ArcherBow.h" />
+    <ClInclude Include="ArcherArrow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -412,6 +417,24 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="FireDragon.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectPlayerAttack.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="player_info.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="SwordManAttack.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Boomerang.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="ArcherBow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="ArcherArrow.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

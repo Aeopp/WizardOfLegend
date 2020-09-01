@@ -14,9 +14,9 @@ void FireDragon::initialize()
 {
 	actor::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EFireDragon, ECircle);
 
-	auto sp_collision = _collision_component.lock();
+	auto sp_collision = _collision_component_lower.lock();
 
 	if (!sp_collision)return;
 
@@ -26,11 +26,16 @@ void FireDragon::initialize()
 
 	PaintSizeX = 180;
 	PaintSizeY = 180;
-	Scale = 0.8f;
+	Scale = 0.7f;
 	// 자기자신의 회전속도임
-	_speed = 600.f;
+	_speed = 200.f;
 	Updown = 1;
-	Angle = 45.f;
+	amplitudeSpeed = 1.f; 
+	UpdownDistance = 70.f;
+
+	particlePaintSize = { 70,70 };
+	ParticleBetWeen = 70.f;
+	ParticlePaintScale = 0.7f;
 
 	_render_component = std::make_shared<render_component>();
 	_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"SKILL_FIREDRAGON_COM");
@@ -49,19 +54,21 @@ void FireDragon::initialize()
 	int RowNum = 0;
 	for (int i = 0; i < ParticleNum; ++i)
 	{
-		ParticleRender.push_back(Fire{ vec{_transform->_location},RowNum,0 });
-
+		ParticleRender.push_back(Fire{ RowNum,0 });
 		
 		++RowNum;
 		if (RowNum >= 3)
 			RowNum = 0;
-	}
+	}	
+	
+	id = object::ID::player_attack;
+	bAttacking = true;
 }
 
 void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	if (!_render_component) return;
-	_render_component->Dest_Loc = _transform->_location - camera_pos - (_render_component->Dest_Paint_Size * 0.5);
+	_render_component->Dest_Loc = _transform->_location - camera_pos - (_render_component->Dest_Paint_Size * 0.5 * Scale);
 
 	_Shadow.render(hdc, camera_pos);
 
@@ -81,11 +88,11 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 
 
 	uint32_t AnimColIndex{}, AnimRowIndex{};
-	float Degree = math::AngleFromVec(rot_dir);
+	float Degree = CurrentAngle;
 	uint32_t SpriteMapKey = (uint32_t)Degree / 15;
 	{
 		// 오른쪽
-		if (rot_dir.x > 0)
+		if (Degree <  90.f  || Degree > 270.f)
 		{
 			AnimRowIndex = 0;
 			AnimColIndex = RightDirSpriteTable[SpriteMapKey];
@@ -104,7 +111,7 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 	case Transparent:
 		GdiTransparentBlt(hdc
 			, dl.x, dl.y
-			, ps.x, ps.y
+			, ps.x * Scale, ps.y*Scale
 			, _BDC
 			, s.left + AnimColIndex * ds.x, s.top + AnimRowIndex * ds.y
 			, s.right, s.bottom
@@ -117,20 +124,28 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 	auto sp_FireParticle = FireParticle.lock();
 	if (!sp_FireParticle)return;
 
-	for (auto& Particle : ParticleRender)
+	for(int i=1;i<=ParticleNum;++i)
 	{
-		vec v = Particle.v;
+		vec v = rotation_center;
+		vec w = particlePaintSize;
+
+		v -=( _transform->_dir * ParticleBetWeen*i);
+		v += Cross * amplitude * (Tick - (1.f/(float)ParticleNum)*i);
 		v -= camera_pos;
-		// ㅠ렌더하기
+		v -= (particlePaintSize * 0.5 * ParticlePaintScale);
+
+		Fire& Particle = ParticleRender[i - 1]; 
+
 		GdiTransparentBlt(hdc
 			, v.x, v.y
-			, 70, 70
+			, w.x * ParticlePaintScale , w.x * ParticlePaintScale 
 			, sp_FireParticle->Get_MemDC()
-			, Particle.col * 70       ,Particle.row * 70
-			, 70, 70
+			, Particle.col * w.x       ,Particle.row * w.y
+			, w.x, w.y
 			, _render_component->_ColorKey);
 
 		ParticleDelta -= DeltaTime;
+
 		if (ParticleDelta < 0)
 		{
 			ParticleDelta = DefaultParticleDelta;
@@ -142,8 +157,11 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 		}
 	};
 
-	helper::TEXTOUT(hdc, 300, 300, L"Current Angle : ", math::AngleFromVec(rot_dir));
-	helper::TEXTOUT(hdc, 300, 500, L" Init Angle : ", math::AngleFromVec(_transform->_dir));
+	if (bDebug)
+	{
+		helper::TEXTOUT(hdc, 300, 300, L"Current Angle : ", CurrentAngle);
+		helper::TEXTOUT(hdc, 300, 500, L" Init Angle : ", math::AngleFromVec(_transform->_dir));
+	}
 }
 
 Event FireDragon::update(float dt)
@@ -151,28 +169,16 @@ Event FireDragon::update(float dt)
 	Event _Event = actor::update(dt);
 	if (!_transform)return Event::Die;
 
-	CurrentAngle += (dt * 90.f) * Updown;
-	if (CurrentAngle > 45.f)Updown = -1;
-	if (CurrentAngle < -45.f)Updown = 1;
+	Tick += (dt*amplitudeSpeed)*Updown;
+	if (Tick >= 1.f)Updown = -1.f;
+	if (Tick <= -1.f)Updown = +1.f;
 
-	// CurrentAngle = math::LOOP({-45.f,+45.f}, CurrentAngle);
-	rot_dir = math::rotation_dir_to_add_angle(rotation_center_dir, CurrentAngle);
-
-
+    // 직선의 중심점은 일단 이동
 	rotation_center += _transform->_dir * _speed * dt;
-	_transform->_location = rotation_center + (rot_dir * 100.f);
-
-
-	{
-		ParticleRender[CurrentParticleIndex].v = _transform->_location;
-
-		++CurrentParticleIndex;
-		if (CurrentParticleIndex >= ParticleNum)
-		{
-			CurrentParticleIndex = 0;
-		}
-	}
+	 // 직선의 중심점에서 진폭만큼 더해주기
+	_transform->_location = rotation_center + (Cross * amplitude * Tick);
 	
+	CurrentAngle = math::AngleFromVec(_transform->_dir) + (45.f* Tick);
 
 	return _Event;
 }

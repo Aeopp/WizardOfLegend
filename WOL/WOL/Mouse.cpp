@@ -17,8 +17,6 @@ void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 	s.x *= size_factor.x;
 	s.y *= size_factor.y;
 
-	Debuger(hdc, [&] {Rectangle(hdc, loc.x - s.x, loc.y - s.y, loc.x + s.x, loc.y + s.y); });
-
 	if (!_render_component)return;
 
 	loc -= _render_component->Dest_Paint_Size * 0.5f;
@@ -29,6 +27,8 @@ void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	if (bDebug)
 	{
+		Rectangle(hdc, loc.x - s.x, loc.y - s.y, loc.x + s.x, loc.y + s.y);
+
 		std::wstringstream wss;
 		wss << loc;
 		RECT _rt{ loc.x,loc.y,loc.x + 200,loc.y + 100 };
@@ -44,8 +44,8 @@ void Mouse::initialize()
 
 	_transform->_size = { 10,10 };
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMouse, ECircle);
-	auto sp_collision = _collision_component.lock();
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMouse, ECircle);
+	auto sp_collision = _collision_component_lower.lock();
 
 	if (!sp_collision)return;
 
@@ -64,6 +64,15 @@ void Mouse::initialize()
 
 Event Mouse::update(float dt)
 {
+	if (bDebug)
+	{
+		ShowCursor(true);
+	}
+	else
+	{
+		ShowCursor(false);
+	}
+
 	Event _E = UI::update(dt);
 
 	POINT		pt = {};

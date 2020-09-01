@@ -118,6 +118,13 @@ bool sound_mgr::IsPlay(const std::string& SoundKey)
 
 	return bPlay;
 }
+void sound_mgr::RandSoundKeyPlay(const std::string& SoundKey, std::pair<uint8_t, uint8_t> Range,
+	float Volume)
+{
+	int n  = math::Rand<uint8_t>(std::move(Range));
+
+	Play(SoundKey + "_" +std::to_string(n), false ,Volume);
+}
 bool sound_mgr::Init()
 {
 	FMOD_RESULT F_Result;

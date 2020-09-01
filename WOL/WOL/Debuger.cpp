@@ -9,7 +9,7 @@ Debuger::Debuger(HDC hdc,std::function<void()> Work)
 
 		Brush = CreateSolidBrush(RGB(50, 50, 50));
 		oBrush = (HBRUSH)SelectObject(hdc, Brush);
-		Pen = (HPEN)CreateSolidBrush(RGB(255, 0, 0));
+		Pen = (HPEN)CreateSolidBrush(RGB(255, 127, 182));
 		oPen = (HPEN)SelectObject(hdc, Pen);
 
 		Work();

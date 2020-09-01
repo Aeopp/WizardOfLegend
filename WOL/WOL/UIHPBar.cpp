@@ -29,7 +29,7 @@ Event UIHPBar::update(float dt)
 	auto sp_info = wp_info.lock();
 	if (sp_info)
 	{
-		target = sp_info->hp;
+		target = sp_info->GetHP();
 	}
 
 	return UIBar::update(dt);;

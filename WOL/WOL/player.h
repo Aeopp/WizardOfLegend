@@ -15,8 +15,9 @@ class Player :
     public actor
 {
 public:
-    std::weak_ptr<collision_component> _collision_component;
+    std::weak_ptr<collision_component> _collision_component_lower;
     std::weak_ptr<class Camera> _Camera;
+    std::weak_ptr<class EffectPlayerAttack> NormalAttack{};
 
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
     void initialize()override;
@@ -59,6 +60,7 @@ private:
     void Camera_Shake(float force, vec dir, float duration);
     void player_check(float dt);
 
+    void SkillBoomerang(uint32_t Num);
     void SkillIceCrystal(uint32_t Num);
     void SkillFireDragon();
 
@@ -70,5 +72,6 @@ private:
     void Dash(float speed);
     void Attack();
     void Player_Move(float dt);
+    void Die();
 };
 

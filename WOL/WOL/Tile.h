@@ -23,7 +23,7 @@ enum class EDecoTileInfo : uint32_t
     end,
 };
 
-class Tile
+class Tile 
 {
 public:
     void render(HDC hdc, vec camera_pos, vec size_factor);
@@ -47,7 +47,7 @@ public:
     int ColIndex;
 
     bool bRender = false;
-
+    bool bDeco = false;
     friend std::ostream& operator<<(std::ostream& os, const Tile& _Tile);
     friend std::istream& operator>>(std::istream& fs,Tile& _Tile);
 };

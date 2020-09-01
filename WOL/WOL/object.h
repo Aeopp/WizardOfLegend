@@ -4,7 +4,7 @@
 #include "transform.h"
 #include "event.h"
 
-class object abstract
+class  object abstract 
 {
 public:
 	virtual Event update(float dt);
@@ -13,6 +13,17 @@ public:
 	virtual void release();
 	void late_initialize() {};
 public:
+	enum class ID
+	{
+		object,
+		map, 
+		monster,
+		player,
+		monster_attack,
+		player_attack,
+	};
+	ID id{ ID::object };
+
 	virtual uint32_t get_layer_id()const&;
 	void set_ptr(std::weak_ptr<object> _ptr)&;
 	std::weak_ptr<object> get_ptr()const{return _ptr;}
@@ -25,5 +36,7 @@ public:
 	virtual void HitTile(RECT TileRt);
 
 	bool bDie{ false };
+	bool bAttacking{ false };
+	int Attack{ 0 };
 };
 

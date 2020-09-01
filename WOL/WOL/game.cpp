@@ -28,12 +28,7 @@ void game::render()
 	BitBlt(HBackBuffer, 0, 0, client_rect.right, client_rect.bottom, HMemDC, 0, 0, SRCCOPY);
 
 	CurrentHdc = HBackBuffer;
-	if (bDebug)
-	{
-		std::wstringstream wss;
-		wss << L"컬링 오브젝트 : " << print_cul_obj << L" 렌더링 오브젝트 " << print_render_obj << std::endl;
-		TextOut(CurrentHdc, 1400, 0, wss.str().c_str(), wss.str().size());
-	}
+
 
 	Scene_mgr::instance().render(HBackBuffer, size_factor());
 

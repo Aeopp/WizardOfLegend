@@ -3,7 +3,6 @@
 #include "Bmp_mgr.h"
 #include "Bmp.h"
 #include "Color.h"
-
 #include "actor.h"
 
 void Shadow::ShadowImgInit()

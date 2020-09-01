@@ -8,22 +8,26 @@ public:
     void initialize()override;
     Event update(float dt)override;
     void Hit(std::weak_ptr<object> _target)override;
-    void Attack()override;
+    void render(HDC hdc, vec camera_pos, vec size_factor)override;
+
+    std::shared_ptr<class SwordManAttack> NormalAttack{};
+
+    /*static const inline std::unordered_map<EMonsterState, uint32_t> AnimRowIdxTable
+    {
+        { EMonsterState::Attack, 2},
+        {EMonsterState::Dead,4},
+        {EMonsterState::Hit,3},
+        {EMonsterState::Idle,0},
+        {EMonsterState::Walk,1}
+    };*/
 private:
-    enum class AnimTable
+    enum class EAnimState : uint8_t
     {
-        idle,
-        walk,
-        attack,
-        hit,
-        dead,
+        Idle,
+        Walk,
+        Attack,
+        Hit,
+        Dead,
     };
-    enum class EAnimDir
-    {
-        right,
-        left,
-        max,
-    };
-    std::array<std::weak_ptr<class Bmp>, (int)EAnimDir::max> AnimDirFileTable;
 };
 

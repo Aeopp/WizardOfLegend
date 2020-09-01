@@ -15,8 +15,10 @@ void Scene_Start::render(HDC hdc, std::pair<float, float> size_factor)
 {
 	{
 		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
+		object_mgr& obj_mgr = object_mgr::instance();
 
-		object_mgr::instance().render(hdc, size_factor);
+		obj_mgr.render(hdc, size_factor);
+		obj_mgr.UIEffectRender(hdc, obj_mgr.camera_pos, size_factor);
 	}
 }
 
@@ -51,7 +53,9 @@ void Scene_Start::initialize()
 
 	// TOOD :: Scene Dependent Init 
 	{
-		sound_mgr::instance().Play( "MAIN_MENU_BGM", true, 1.f);
+		sound_mgr::instance().Play("MAIN_MENU_BGM", true, 1.f);
+
+
 
 		auto EMouse = object_mgr::instance().insert_object<Mouse>();
 

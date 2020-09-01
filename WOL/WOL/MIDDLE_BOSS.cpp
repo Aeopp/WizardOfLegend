@@ -15,8 +15,8 @@ void MIDDLE_BOSS::initialize()
 	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"MIDDLE_BOSS_LEFT.bmp", L"MIDDLE_BOSS_LEFT");
 	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"MIDDLE_BOSS_RIGHT.bmp", L"MIDDLE_BOSS_LEFT");
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision = _collision_component.lock();
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
+	auto sp_collision = _collision_component_lower.lock();
 
 	if (!sp_collision)return;
 
@@ -58,13 +58,11 @@ Event MIDDLE_BOSS::update(float dt)
 	_transform->_dir = to_dir;
 	_transform->Move(_transform->_dir,_speed * dt);
 
-	if (!_EnemyInfo)return Event::None;
 
-	float start_dis = _EnemyInfo->AttackStartDistance;
+	float start_dis = _EnemyInfo.AttackStartDistance;
 
 	if (cur_distance < start_dis)
 	{
-		Attack();
 	}
 
 	vec dir = _transform->_dir;
@@ -87,9 +85,8 @@ void MIDDLE_BOSS::Hit(std::weak_ptr<object> _target)
 
 	Anim& MyAnim = _render_component->_Anim;
 
-	if (!_EnemyInfo) return;
 
-	if (_EnemyInfo->HP > 0)
+	if (_EnemyInfo.HP > 0)
 	{
 		_render_component->ChangeAnim(AnimTable::hit, 0.2f, AnimTable::idle);
 	}
@@ -103,16 +100,5 @@ void MIDDLE_BOSS::Hit(std::weak_ptr<object> _target)
 				return true;
 			}));
 	};
-}
-
-void MIDDLE_BOSS::Attack()
-{
-	int temp = rand()%2;
-
-	if (temp==0)
-	_render_component->ChangeAnim(AnimTable::attack1, 0.3f, AnimTable::idle);
-
-	if (temp == 0)
-		_render_component->ChangeAnim(AnimTable::attack2, 0.3f, AnimTable::idle);
 }
 

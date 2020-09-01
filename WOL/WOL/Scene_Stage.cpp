@@ -17,21 +17,30 @@
 #include "MIDDLE_BOSS.h"
 #include "Tile_mgr.h"
 #include "GoldEffect.h"
-
+#include "Debuger.h"
+#include "ARCHER.h"
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 {
 	Scene::render(hdc,size_factor);
 
 	{
-		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
+		auto FontOn = Font(hdc, L"", 20, RGB(181, 182, 221));
+		TextOut(hdc, 100,100, L"33", 3);
+		 FontOn = Font(hdc, L"", 20, RGB(221, 221, 217));
+		TextOut(hdc, 500, 500, L"33", 3);
 
-		Tile_mgr::instance().render(hdc, size_factor);
-		object_mgr::instance().render(hdc, size_factor);
+		auto d = Debuger(hdc, RGB(0, 0, 0), RGB(0, 0, 0));
+
+		object_mgr& obj_mgr = object_mgr::instance();
+		vec cp = obj_mgr.camera_pos;
+
+		Tile_mgr::instance().render(hdc, cp,size_factor);
+		obj_mgr.render(hdc, size_factor);
+		Tile_mgr::instance().DecoRender(hdc, cp);
+		obj_mgr.UIEffectRender(hdc, cp, size_factor);
 		collision_mgr::instance().render(hdc, size_factor);
 		Timer::instance().render(hdc);
-		
-
 	}
 }
 
@@ -51,7 +60,14 @@ void Scene_Stage::update(float dt)
 
 	collision_mgr::instance().update();
 
-	Input_mgr::instance().update();
+
+	Input_mgr& _Input = Input_mgr::instance();
+
+	if (_Input.Key_Down('0'))
+	{
+		Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
+	}
+	_Input.update();
 }
 
 void Scene_Stage::initialize()
@@ -91,17 +107,28 @@ void Scene_Stage::initialize()
 
 		for (int i = 6; i < 20; ++i)
 		{
-			auto _gold = obj_mgr.insert_object<GoldEffect>(i * 100, i * 100,
+			auto _gold = GoldEffect::MakeGold(i * 100, i * 100,
 				L"MONEY", layer_type::EEffect, 2,
-				math::Rand<int>({ 1,3 }), FLT_MAX, 0.2f, 24, 24, 1.f, 1.f);
+				math::Rand<int>({ 1,3 }), FLT_MAX, 0.2f, 24, 24, 1.f, 1.f, _Player);
 
 			_gold->_transform->_location = { i * 100, i * 100};
 			_gold->_owner = _Player;
-
 		}
 
+		for (int i = 0; i < 3; ++i)
+		{
+			auto sword_man = obj_mgr.insert_object<SwordMan>(_Player, vec{ 800,350 * i });
+			manage_objs.push_back(sword_man);
+		}
 
+		for (int i = 0; i < 3; ++i)
+		{
+			auto archer = obj_mgr.insert_object<ARCHER>(_Player, vec{ 1200,350 * i });
+			manage_objs.push_back(archer);
+		}
+		
 		manage_objs.push_back(_camera);
+		manage_objs.push_back(_Player);
 	}
 }
 

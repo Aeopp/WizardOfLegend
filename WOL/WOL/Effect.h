@@ -13,7 +13,6 @@ public:
 public:
 	 uint32_t get_layer_id()const& override;
 public:
-	
 	// 파티클 재생이 끝나면 삭제
 	bool bDie{ false };
 	int CurrentCol;
@@ -22,7 +21,7 @@ public:
 	// 프로퍼티들 초기화 해주세요 ===========================================
 	COLORREF ColorKey = COLOR::MEGENTA();
 	// 이미지 그릴 위치 (센터기준)
-	int ImglocationX;
+	int ImgLocationX;
 	int ImgLocationY;
 	std::wstring ImgKey{};
 

@@ -5,7 +5,6 @@
 
 struct Fire
 {
-	vec v;
 		int col;
 		int row;
 };
@@ -26,26 +25,39 @@ public:
 	void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	Event update(float dt)override;
 	uint32_t get_layer_id()const& override;
-	std::weak_ptr<class collision_component>  _collision_component;
+	std::weak_ptr<class collision_component>  _collision_component_lower;
 	void Hit(std::weak_ptr<class object> _target)override;
 	void HitTile(RECT rt)override;
 public:
+	// 직선의 중심점
 	vec rotation_center{};
+	// 직선 방향
 	vec rotation_center_dir{};
+	// 현재 바라보는 방향
 	vec rot_dir;
 
-	int CurrentParticleIndex = 0;
+	// 직선에서 90도 회전된 직선
+	vec Cross;
 
+	float UpdownDistance{};
+
+	// 각이 회전하는 속도 /s
+	float amplitudeSpeed = 45.f;
+	float amplitude = 70.f;
+	float ParticleBetWeen;
+	float ParticlePaintScale{};
+
+	vec particlePaintSize{};
+	int CurrentParticleIndex = 0;
 	float DefaultParticleDelta = 0.1f;
 	float ParticleDelta = DefaultParticleDelta;
 	int ParticleNum = 8;
 	std::deque<Fire> ParticleRender{};
 
-
 	std::weak_ptr<class Bmp> FireParticle{};
 
-	float CurrentAngle = 0.0f; 
-	float Angle = 45.f;
+	float CurrentAngle = 0.f;
+	
 	int Updown = 1;
 	float factor = 1.f;
 	float Tick{};

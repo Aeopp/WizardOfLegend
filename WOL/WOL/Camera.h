@@ -15,8 +15,8 @@ public:
 private:
 	bool bShake{ false };
 
-	float _force; 
-	vec _dir;
+	float _force{};
+	vec _dir{};
 	bool Shaking( );
 	bool Shaking_End( );
 };

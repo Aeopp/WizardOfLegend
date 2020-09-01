@@ -10,7 +10,6 @@ public:
     void initialize()override;
     Event update(float dt)override;
     void Hit(std::weak_ptr<object> _target)override;
-    void Attack()override;
 private:
     enum class AnimTable
     {

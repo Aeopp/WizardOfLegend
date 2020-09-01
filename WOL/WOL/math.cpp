@@ -7,6 +7,7 @@
 
 
 
+// 화면 좌표로 그대로 쓸것이라면 뒤집어야함에 유의할것.
 math::EDir math::checkDir(vec dir)
 {
 	dir = dir.get_normalize();
@@ -28,6 +29,7 @@ math::EDir math::checkDir(vec dir)
 	else if (dir.dot(vec{ 0,-1 }) > cos45)
 	{
 		return EDir::down;
+		
 	}
 	return EDir();
 }
@@ -153,6 +155,16 @@ float math::my_lerp(float start, float goal, float goal_time,float dt)
 {
 	float f = goal - start;
 	return start + ((f * dt) / goal_time);
+}
+vec math::RandVecNormal()
+{
+	return vec{ Rand_Normal<float>({ -1,1 }),
+	Rand_Normal<float>({ -1,1 }) };
+}
+vec math::RandVec()
+{
+	return vec{ Rand<float>({ -1,1 }),
+	Rand<float>({ -1,1 }) };
 };
 
 

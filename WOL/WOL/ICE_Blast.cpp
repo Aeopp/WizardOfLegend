@@ -10,14 +10,14 @@ void ICE_Blast::initialize()
 {
 	actor::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
+	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
 	//RenderComponent Setup
 	{
 		PaintSizeX = 200;
 		PaintSizeY = 250;
-		ScaleY = ScaleX = 0.7f;
-		COLORREF _ColorRef = COLOR::MEGENTA();
+		ScaleY = ScaleX = 0.6f;
+		constexpr COLORREF _ColorRef = COLOR::MEGENTA();
 		float AnimDuration = 0.7f;
 
 		_render_component = std::make_shared<render_component>();
@@ -32,7 +32,7 @@ void ICE_Blast::initialize()
 	};
 	// 콜리전 셋업
 	{
-		auto sp_collision = _collision_component.lock();
+		auto sp_collision = _collision_component_lower.lock();
 
 		if (!sp_collision)return;
 		sp_collision->bPush = true;
@@ -40,13 +40,15 @@ void ICE_Blast::initialize()
 
 		sp_collision->_size = { 30.f,30.0f };
 		sp_collision->bRender = true;
-		sp_collision->bSlide = true;
+		sp_collision->bSlide = false;
 		sp_collision->bCollision = true;
 	};
 
 	_Shadow.bShadow = false;
 	_Shadow.correction = { 0,60 };
 
+	id = object::ID::player_attack;
+	bAttacking = true;
 
 	Duration = 0.8f;
 }
@@ -73,6 +75,6 @@ void ICE_Blast::IceEffectPlay()
 
 uint32_t ICE_Blast::get_layer_id() const&
 {
-	return layer_type::EEffect;
+	return layer_type::EObject;
 };
 

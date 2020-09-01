@@ -28,15 +28,36 @@ void Tile_mgr::late_update()
 
 }
 
-void Tile_mgr::render(HDC hdc, std::pair<float,float> size_factor)
+void Tile_mgr::render(HDC hdc, vec camera_pos , std::pair<float,float> size_factor)
 {
-	vec cp = object_mgr::instance().camera_pos;
+	/*vec cp = object_mgr::instance().camera_pos;*/
 
-	for (auto& Tile : _Tile_list)
+	for (auto& _Tile : _Tile_list)
 	{
-		if (!Tile.bRender)continue;
-		Tile.render(hdc, cp, vec{ size_factor.first,size_factor.second });
+		if (!_Tile.bRender)continue;
+		RECT CameraRange = game::client_rect;
+		CameraRange.left -= _Tile._size.x;
+		CameraRange.top -= _Tile._size.y;
+		
+		if (!math::RectInPoint(CameraRange, _Tile._location - camera_pos))continue;
+
+		if (_Tile.bDeco)
+		{
+			DecoVec.push_back(_Tile);
+			continue; 
+		}
+
+		_Tile.render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
 	};
+}
+
+void Tile_mgr::DecoRender(HDC hdc,vec camera_pos)
+{
+	for (auto& _Tile : DecoVec)
+	{
+		_Tile.get().render(hdc, camera_pos, vec{});
+	}
+	DecoVec.clear();
 }
 
 void Tile_mgr::release()
@@ -60,6 +81,7 @@ std::pair<int, int> Tile_mgr::CalcTileImageSrcIndex(vec mouse_window_pos, vec Im
 
 std::pair<int, int> Tile_mgr::CalcTileWorldIndex(vec mouse_world_pos, int TileWorldX, int TileWorldY)
 {
+	if(bDebug)
 	helper::TEXTOUT(game::CurrentHdc, 150, 350, L" World Index X : ", (mouse_world_pos.x / TileWorldX) , L" World Index Y : ", (mouse_world_pos.y / TileWorldY) );
 
 	return { (mouse_world_pos.x / TileWorldX)  , (mouse_world_pos.y / TileWorldY) };
@@ -76,16 +98,27 @@ bool Tile_mgr::IsContain(std::pair<int, int> WorldIndex) const
 void Tile_mgr::Save_Tile(std::wstring filename)
 {
 	size_t Tile_Num  = _Tile_list.size();
+	auto FileName = std::to_wstring(math::Rand<uint32_t>({ 2020,7070 }));
 
-	int I = math::Rand<int>({ 1, 100000000 });
+	std::ofstream ofs(Tile_mgr::DefaultTilePath + FileName);
 
-	std::ofstream ofs(Tile_mgr::DefaultTilePath + std::to_wstring(I));
+	if (!ofs.is_open())
+	{
+		MessageBox(game::hWnd, L"타일 데이터를 저장하지 못했습니다.", L"Tile Load Fail !!", MB_OK);
+		//throw std::exception("Tile Data Load Fail !!");
+	}
+	
 	ofs << Tile_Num;
 
 	for (auto& _Tile : _Tile_list)
 	{
 		ofs << _Tile;
 	}
+
+	std::wstringstream
+		wss;
+	wss << L"타일  데이터를 저장했습니다. \n " << L" 파일 이름 : " << FileName;
+	MessageBox(game::hWnd, wss.str().c_str(), L"Tile Data Load",  MB_OK);
 }
 
 
@@ -95,6 +128,12 @@ void Tile_mgr::Load_Tile(std::wstring filename)
 		_Tile_list.clear();
 
 	std::ifstream ifs(Tile_mgr::DefaultTilePath + filename);
+
+	if (!ifs.is_open())
+	{
+		MessageBox(game::hWnd, L"타일 데이터를 읽어오지 못했습니다.", L"Tile Load Fail !!", MB_OK);
+		throw std::exception("Tile Data Load Fail !!");
+	}
 
 	size_t Tile_Num;
 	ifs >> Tile_Num;
@@ -107,6 +146,11 @@ void Tile_mgr::Load_Tile(std::wstring filename)
 		ifs>> _Temp;
 		_Tile_list.push_back(std::move(_Temp));
 	}
+
+	std::wstringstream
+		wss;
+	wss <<  L"타일 데이터를 로딩했습니다. \n " << DefaultTilePath << filename;
+	MessageBox(game::hWnd, wss.str().c_str(), L"Tile Data Load",  MB_OK);
 }
 void Tile_mgr::Erase_Tile(std::pair<int, int> WorldIndex)
 {
@@ -142,7 +186,7 @@ void Tile_mgr::Insert_Tile(ETileSelect ImageKey, std::pair<int, int> WorldSize, 
 	_Tile._paint_size = vec{ ImgSize.first,ImgSize.second };
 	_Tile._size = vec{ WorldSize.first,WorldSize.second };
 	_Tile.bRender = true;
-
+	_Tile.bDeco = bDeco;
 	// y인덱스 곱하기 x 사이즈  + x인덱스
 	_Tile_list.push_back(_Tile);
 };

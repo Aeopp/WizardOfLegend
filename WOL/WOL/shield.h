@@ -6,7 +6,7 @@ class shield :
 public :
 	void initialize()override;
 	Event update(float dt)override;
-	std::weak_ptr<class collision_component>  _collision_component;
+	std::weak_ptr<class collision_component>  _collision_component_lower;
 	void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	void CalcIdx();
 	uint32_t get_layer_id()const& override;

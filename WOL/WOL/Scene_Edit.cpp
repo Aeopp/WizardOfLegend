@@ -14,6 +14,8 @@
 #include "Color.h"
 #include "Tile.h"
 #include "Debuger.h"
+#include "Scene_mgr.h"
+
 
 
 
@@ -26,9 +28,6 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 
 	{
 		auto FontOn = Font(hdc, L"", 20, RGB(117, 245, 255));
-
-		Timer::instance().render(hdc);
-
 
 		// 원활한 에디팅을 위해 타일 좌표만큼 사각형을 그린다.
 
@@ -57,10 +56,35 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 			}
 		}
 
-		Tile_mgr::instance().render(hdc, size_factor);
+		Tile_mgr::instance().render(hdc,cp, size_factor);
 
-		object_mgr::instance().render(hdc, size_factor);
 
+		if (bSelect)
+		{
+			auto SP_CurrentSelectImage = Bmp_mgr::ImageSelectMap[CurrentSelectImage].first.lock();
+			if (!SP_CurrentSelectImage)return;
+
+			HDC hMemDC = SP_CurrentSelectImage->Get_MemDC();
+
+			vec dl = select_image_start_pos;
+			vec ds, ss;
+			ss = ds = { 916,620 };
+			vec sl = { 0,0 };
+
+			if (CurrentSelectImage == ETileSelect::Info_4) { ds = ss = { 438,511 }; }
+
+			GdiTransparentBlt(hdc
+				, dl.x, dl.y
+				, ds.x, ds.y
+				, hMemDC
+				, sl.x, sl.y
+				, ss.x, ss.y
+				, COLOR::MEGENTA());
+		}
+
+		_object_mgr.render(hdc, size_factor);
+		Tile_mgr::instance().DecoRender(hdc, cp);
+		_object_mgr.UIEffectRender(hdc, cp, size_factor);
 		collision_mgr::instance().render(hdc, size_factor);
 
 		if (bDebug)
@@ -72,30 +96,10 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 			std::wstring wstr = wss.str();
 			TextOut(hdc, 150, 150, wstr.c_str(), wstr.size());
 		}
+		Timer::instance().render(hdc);
+
 	};
 
-	if(bSelect)
-	{
-		auto SP_CurrentSelectImage = Bmp_mgr::ImageSelectMap[CurrentSelectImage].first.lock();
-		if (!SP_CurrentSelectImage)return;
-
-		HDC hMemDC = SP_CurrentSelectImage->Get_MemDC();
-
-		vec dl = select_image_start_pos;
-		vec ds, ss;
-		ss =ds = { 916,620 };
-		vec sl = { 0,0 };
-
-		if (CurrentSelectImage == ETileSelect::Info_4) {ds = ss = { 438,511 };}
-
-		GdiTransparentBlt(hdc
-			, dl.x, dl.y
-			, ds.x, ds.y
-			, hMemDC
-			, sl.x, sl.y
-			, ss.x, ss.y
-			, COLOR::MEGENTA());
-	}
 };
 
 void Scene_Edit::update(float dt)
@@ -258,43 +262,40 @@ void Scene_Edit::Input_Check_Scroll()
 
 	if (_Input.Key_Down('Q'))
 	{
-		Tile_mgr::instance().Save_Tile(Tile_mgr::StageFileName);
+		Tile_mgr::instance().Load_Tile(Tile_mgr::StageFileName);
 	}
 
 	if (_Input.Key_Down('W'))
 	{
-		Tile_mgr::instance().Load_Tile(Tile_mgr::StageFileName);
+		Tile_mgr::instance().Load_Tile(Tile_mgr::BossStageFileName);
 	}
+	if (_Input.Key_Down('Q'))
+	{
+		collision_mgr::instance().load_collision(Tile_mgr::StageFileName);
+	}
+
+	if (_Input.Key_Down('W'))
+	{
+		collision_mgr::instance().load_collision(Tile_mgr::BossStageFileName);
+	}
+
 
 	if (_Input.Key_Down('Z'))
 	{
-		Tile_mgr::instance().Save_Tile(Tile_mgr::BossStageFileName);
+		Tile_mgr::instance().Save_Tile(Tile_mgr::StageFileName);
 	}
 
 	if (_Input.Key_Down('X'))
 	{
-		Tile_mgr::instance().Load_Tile(Tile_mgr::BossStageFileName);
-	}
-
-	if (_Input.Key_Down('R'))
-	{
 		collision_mgr::instance().save_collision(collision_mgr::StageFileName);
 	}
 
-	if (_Input.Key_Down('T'))
+	if (_Input.Key_Down(VK_ESCAPE))
 	{
-		collision_mgr::instance().load_collision(collision_mgr::StageFileName);
+		MessageBox(game::hWnd, L"시작 화면으로 이동합니다.", L"Main", MB_OK);
+		Scene_mgr::instance().Scene_Change(ESceneID::EStart);
 	}
 
-	if (_Input.Key_Down('V'))
-	{
-		collision_mgr::instance().save_collision(collision_mgr::BossStageFileName);
-	}
-
-	if (_Input.Key_Down('B'))
-	{
-		collision_mgr::instance().load_collision(collision_mgr::BossStageFileName);
-	}
 
 	if (_Input.Key_Down('1'))
 	{

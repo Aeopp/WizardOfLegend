@@ -12,14 +12,14 @@ public :
     void initialize();
     void update(float dt);
     void late_update();
-    void render(HDC hdc, std::pair<float, float> size_factor);
+    void render(HDC hdc, vec camera_pos , std::pair<float, float> size_factor);
+    void DecoRender(HDC hdc, vec camera_pos);
     void release();
 public:
     void Save_Tile(std::wstring filename= StageFileName);
     void Load_Tile(std::wstring filename= StageFileName);
 
     void Erase_Tile(std::pair<int, int> WorldIndex);
-
     void Insert_Tile(ETileSelect ImageKey, std::pair<int, int> WorldSize, std::pair<int, int> ImgSize, std::pair<int, int> Paint_Loc, COLORREF ColorKey,
         std::pair<int, int> WorldIndex, bool bDeco = false);
     // 마우스 좌표를 이미지의 행 열 인덱스로 변환해줍니다.
@@ -35,6 +35,7 @@ public:
     static inline const std::wstring BossStageFileName = L"BossTileInfo.txt";
     static inline const std::wstring StageFileName = L"StageTileInfo.txt";
 private:
+    std::vector<std::reference_wrapper<Tile>> DecoVec;
     std::vector<Tile> _Tile_list;
     // 데코레이션 타일들 중복삽입 방지
     std::set<std::pair<int, int>> _Deco_Tile_Indexs;

@@ -11,7 +11,7 @@ public:
 	void release() override;
 
 	vec controll_pos{ 0,0 };
-	float scrool_speed{ 100.f };
+	float scrool_speed{ 50.f };
 	vec select_image_start_pos{ 300,300 };
 
 	std::pair<vec, vec> Tile_image_start_pos{ {73,82},{515,82} };

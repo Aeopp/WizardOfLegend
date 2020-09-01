@@ -56,10 +56,6 @@ void UIStart::render(HDC hdc, vec camera_pos, vec size_factor)
 	POINT pt = make_pt(omv->x, omv->y);
 	
 	std::wstringstream wss;
-	wss << L"X : " << pt.x << L" Y : " << pt.y << std::endl;
-
-	TextOut(hdc, pt.x, pt.y, wss.str().c_str(), wss.str().size());
-
 }
 
 void UIStart::OnMouse(const vec hit_pos)

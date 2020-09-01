@@ -30,7 +30,7 @@ Event UIMPBar::update(float dt)
 	auto sp_info = wp_info.lock();
 	if (sp_info)
 	{
-		target = sp_info->mp;
+		target = sp_info->GetMP();
 	}
 
 	return UIBar::update(dt);;

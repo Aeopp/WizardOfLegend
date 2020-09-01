@@ -37,7 +37,7 @@ void Effect::render(HDC hdc, vec camera_pos, vec size_factor)
 	int wsx = (PaintSizeX * ScaleX);
 	int wsy = (PaintSizeY * ScaleY);
 
-	vec  v = { ImglocationX,ImgLocationY };
+	vec  v = { ImgLocationX,ImgLocationY };
 	v -= camera_pos;
 
 	GdiTransparentBlt(hdc, v.x - wsx / 2, v.y - wsy / 2,
@@ -62,7 +62,10 @@ void Effect::late_initialize(
 	float AnimDuration, int PaintSizeX, int PaintSizeY,
 	float ScaleX, float ScaleY)
 {
-	this->ImglocationX = ImgLocationX;
+	_transform->_location.x = ImgLocationX;
+	_transform->_location.y = ImgLocationY;
+	
+	this->ImgLocationX = ImgLocationX;
 	this->ImgLocationY = ImgLocationY;
 	this->ImgKey = ImgKey;
 	this->layer_ID = layer_ID;

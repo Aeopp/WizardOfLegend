@@ -13,17 +13,28 @@ public:
 
 	void set_owner(std::weak_ptr<object> _owner)&;
 	std::weak_ptr<object> get_owner()const { return _owner; }
-	bool bSlide{ true };
+	// 벽밀림
+	bool bSlide{ false };
+	// 오브젝트 밀림
+	bool bObjectSlide{ false };
+
+	// 상호작용시에 출력할 폰트 컬러
+	COLORREF HitColor;
+
 	void Hit(std::weak_ptr<class object> _target);
 	figure_type _figure_type{ figure_type::ERect };
 
 	bool bPush{ false };
+	// 해당 컴포넌트가 Src 일경우 히트 이펙트 재생시킬지 여부
+	bool bHitEffect{ true };
 
 	float PushForce{};
 	vec _size;
 	vec correction{};
 	RECT make_rect();
 	circle make_circle();
+	vec make_center();
+
 
 	bool bDie{ false };
 };
