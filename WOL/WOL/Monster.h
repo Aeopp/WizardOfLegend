@@ -28,7 +28,7 @@ public:
 	void late_initialize(std::weak_ptr<class object> SetTarget,
 	vec SetLocation);
 public:
-	std::weak_ptr<collision_component>  _collision_component_lower{};
+	std::weak_ptr<collision_component>  _collision_component{};
 
 	vec collision_lower_correction{};
 

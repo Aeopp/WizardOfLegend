@@ -123,8 +123,8 @@ void SwordManAttack::initialize()
 	auto sp_comp = _collision_component.lock();
 	if (!sp_comp)return;
 	sp_comp->bCollision = false;
-	sp_comp->bObjectSlide= false;
-	sp_comp->bPush = false;
+	sp_comp->bCollisionSlideAnObject= false;
+	sp_comp->bCollisionTargetPushFromForce = false;
 	sp_comp->bSlide = false;
 	sp_comp->HitColor = RGB(123, 123, 123);
 	sp_comp->PushForce = 0.01f;

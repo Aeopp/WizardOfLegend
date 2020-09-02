@@ -96,8 +96,8 @@ void Timer::initialize()
 
 float Timer::delta()
 {
-    return (1000.f / fps) * 0.001 * time_scale;
+    //return (1000.f / fps) * 0.001 * time_scale;
 	//return 0.016f;
 
-	//return dt /1000.f * time_scale;
+	return dt /1000.f * time_scale;
 }

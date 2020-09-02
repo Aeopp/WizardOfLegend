@@ -17,8 +17,8 @@ void BOSS::initialize()
 	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"BOSS_RIGHT.bmp", L"BOSS_RIGHT");
 	AnimDirFileTable[(int)EAnimDir::attack] = BMgr.Insert_Bmp(L"BOSS_ATTACK.bmp", L"BOSS_ATTACK");
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision = _collision_component_lower.lock();
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
+	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 

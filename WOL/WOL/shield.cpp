@@ -76,13 +76,13 @@ void shield::render(HDC hdc, vec camera_pos, vec size_factor)
 void shield::Hit(std::weak_ptr<object> _target)
 {
 	object::Hit(_target);
-	auto sp_target = _target.lock();
-	// 공격 무효화
-	bool bNullAttack = sp_target->bInvalidatedefense;
-	if (bNullAttack)
-	{
+	//auto sp_target = _target.lock();
+	//// 공격 무효화
+	//bool bNullAttack = sp_target->bInvalidatedefense;
+	//if (bNullAttack)
+	//{
 
-	}
+	//}
 }
 
 void shield::CalcIdx()
@@ -117,14 +117,14 @@ void shield::late_initialize(Transform _Transform)
 			L"BOTTOM_HOLE", layer_type::EMapDeco, 1, 0, 5.f, FLT_MAX, 200, 150,
 			0.8f, 0.8f);
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EShield, ECircle);
 
-	auto sp_collision = _collision_component_lower.lock();
+	auto sp_collision = _collision_component.lock();
 	if (!sp_collision)return;
 
-	sp_collision->bSlide = false;
+	sp_collision->bSlide = true;
 	sp_collision->PushForce = 1.f;
-	sp_collision->bPush = true;
+	sp_collision->bCollisionTargetPushFromForce = true;
 	sp_collision->_size = { 50.f,50.0f };
 
 	duration = 15.f;

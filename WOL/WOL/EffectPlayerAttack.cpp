@@ -21,9 +21,9 @@ void EffectPlayerAttack::AttackStart(float Duration, float AnimDuration
 	id = object::ID::player_attack;
 	bAttacking = true;
 	
-	auto sp_comp = _collision_component_lower.lock();
+	auto sp_comp = _collision_component.lock();
 	if (!sp_comp)return;
-	sp_comp->bPush = true;
+	sp_comp->bCollisionTargetPushFromForce = true;
 	sp_comp->PushForce = PushForce;
 	sp_comp->bCollision = true;
 	sp_comp->bSlide = false;
@@ -32,11 +32,11 @@ void EffectPlayerAttack::AttackStart(float Duration, float AnimDuration
 void EffectPlayerAttack::AttackEnd()
 {
 	bAttacking = false;
-	auto sp_comp = _collision_component_lower.lock();
+	auto sp_comp = _collision_component.lock();
 	if (!sp_comp)return;
 	sp_comp->bSlide = false;
 	sp_comp->bCollision = false;
-	sp_comp->bPush = false;
+	sp_comp->bCollisionTargetPushFromForce = false;
 	sp_comp->PushForce = 0.f;
 }
 
@@ -109,17 +109,17 @@ void EffectPlayerAttack::initialize()
 {
 	Effect::initialize();
 
-	_collision_component_lower = 
+	_collision_component = 
 	collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
 	Attack = { 8,13 };
 
 		// 콜리전 셋업
 	{
-		auto sp_collision = _collision_component_lower.lock();
+		auto sp_collision = _collision_component.lock();
 
 		if (!sp_collision)return;
-		sp_collision->bPush = true;
+		sp_collision->bCollisionTargetPushFromForce = true;
 		sp_collision->PushForce = 30.f;
 
 		sp_collision->_size = { 45.f,45.0f };

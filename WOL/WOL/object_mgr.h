@@ -12,7 +12,6 @@ struct TextEffect
 
 class object_mgr : public singleton_interface<object_mgr>
 {
-
 public:
 	void render(HDC hdc,std::pair<float,float> size_factor);
 	void update();
@@ -31,6 +30,9 @@ public:
 	[[nodiscard]] auto insert_object(param_Ty&&... _params);
 private:
 	void check_erase();
+	// 업데이트 함수 호출 일정 범위로 통제
+	int ObjectUpdateRangeX;
+	int ObjectUpdateRangeY;
 };
 
 template<typename object_type, typename ...param_Ty>

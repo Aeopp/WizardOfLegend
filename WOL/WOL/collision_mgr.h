@@ -22,8 +22,9 @@ public:
 		figure_type _type = ERect);
 
 	std::shared_ptr<class Bmp> HitEffectImg{};
-	//            이펙트 위치 이펙트 현재 컬럼 로우  이펙트의 현재 컬럼 델타
+	
 	float CollisionHitEffectDelta = 0.15f;
+	// 이펙트 위치 컬럼 로우 델타
 	std::list<std::tuple<vec, int,int,float>> CollisionHitEffectList{};
 
 	void collision(collision_tag lhs, collision_tag rhs);
@@ -40,6 +41,8 @@ public:
 
 	bool IsHitEffectMappingTag(collision_tag lhs,collision_tag rhs);
 	bool IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs);
+
+	void HitEffectPush(vec location, float Duration);
 private:
 	void check_erase()&;
 	int CollisionRangeX;
@@ -47,5 +50,7 @@ private:
 	int CollisionTileNum{};
 
 	int CollisionObjNum{};
+
+	float TileHitEffectDuration = 0.2f;
 };
 

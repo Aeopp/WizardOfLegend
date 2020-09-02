@@ -7,7 +7,7 @@ public :
 	static void DefenseMsg(vec loc);
 	void initialize()override;
 	Event update(float dt)override;
-	std::weak_ptr<class collision_component>  _collision_component_lower;
+	std::weak_ptr<class collision_component>  _collision_component;
 	void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	void Hit(std::weak_ptr<object> _target)override;
 	void CalcIdx();

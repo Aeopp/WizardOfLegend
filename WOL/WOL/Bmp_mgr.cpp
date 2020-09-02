@@ -61,6 +61,8 @@ void Bmp_mgr::initialize()
 
 	 Insert_Bmp(DefaultPath + L"ARCHER_RIGHT.bmp", L"ARCHER_RIGHT");
 	 Insert_Bmp(DefaultPath + L"ARCHER_LEFT.bmp", L"ARCHER_LEFT");
+	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK_RESET.bmp", L"SWORDMAN_ATTACK_RESET");
+	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK_ROTATION.bmp", L"SWORDMAN_ATTACK_ROTATION");
 
 
 };	 	
@@ -69,7 +71,7 @@ void Bmp_mgr::initialize()
 
 void Bmp_mgr::release()
 {
-
+	
 };
 
 std::weak_ptr<Bmp> Bmp_mgr::Insert_Bmp(std::wstring FileName, std::wstring ImageKey)

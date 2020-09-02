@@ -44,8 +44,8 @@ void Mouse::initialize()
 
 	_transform->_size = { 10,10 };
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMouse, ECircle);
-	auto sp_collision = _collision_component_lower.lock();
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMouse, ECircle);
+	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 

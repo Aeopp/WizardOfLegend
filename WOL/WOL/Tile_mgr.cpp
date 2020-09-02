@@ -35,8 +35,8 @@ void Tile_mgr::render(HDC hdc, vec camera_pos , std::pair<float,float> size_fact
 	size_t RenderObjCount = 0;
 
 	RECT CameraRange = game::client_rect;
-	CameraRange.left -= game::TileWorldX;
-	CameraRange.top -= game::TileWorldY;
+	CameraRange.left -= game::TileWorldX * 6;
+	CameraRange.top -= game::TileWorldY * 6;
 
 	for (auto& _Tile : _Tile_list)
 	{

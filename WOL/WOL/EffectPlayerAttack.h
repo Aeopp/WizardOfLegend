@@ -11,7 +11,7 @@ class EffectPlayerAttack :
     public Effect
 {
 public:
-	std::weak_ptr<class collision_component> _collision_component_lower;
+	std::weak_ptr<class collision_component> _collision_component;
 
 	void AttackStart(float Duration,
 		float AnimDuration, float PushForce,vec InitLocation,

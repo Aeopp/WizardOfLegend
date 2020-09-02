@@ -14,9 +14,9 @@ void FireDragon::initialize()
 {
 	actor::initialize();
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EFireDragon, ECircle);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EFireDragon, ECircle);
 
-	auto sp_collision = _collision_component_lower.lock();
+	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 

@@ -202,6 +202,7 @@
     <ClInclude Include="player_info.h" />
     <ClInclude Include="render_component.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="RotationBoomerang.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene_Boss.h" />
     <ClInclude Include="Scene_Edit.h" />
@@ -277,6 +278,7 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_info.cpp" />
     <ClCompile Include="render_component.cpp" />
+    <ClCompile Include="RotationBoomerang.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Scene_Boss.cpp" />
     <ClCompile Include="Scene_Edit.cpp" />

@@ -234,6 +234,7 @@
     <ClInclude Include="Boomerang.h" />
     <ClInclude Include="ArcherBow.h" />
     <ClInclude Include="ArcherArrow.h" />
+    <ClInclude Include="RotationBoomerang.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -435,6 +436,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="ArcherArrow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="RotationBoomerang.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

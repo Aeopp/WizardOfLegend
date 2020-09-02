@@ -6,7 +6,7 @@ class Scene_Boss : public Scene
 public:
 	~Scene_Boss()noexcept override;
 
-	vec PlayerSpawnLocation = { 0,0 };
+	vec PlayerSpawnLocation = { 3900,1500};
 
 	void render(HDC hdc, std::pair<float, float> size_factor)override;
 	void update(float dt) override;

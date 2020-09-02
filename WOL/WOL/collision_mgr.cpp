@@ -23,7 +23,6 @@ void collision_mgr::collision_tile_clear()
 
 void collision_mgr::collision_tile(collision_tag rhs)
 {
-
 	auto& rhs_list = _collision_map[rhs];
 
 	// 임의의 범위내에서만 충돌검사를 수행한다.
@@ -49,6 +48,8 @@ void collision_mgr::collision_tile(collision_tag rhs)
 		for (auto& rhs_obj : rhs_list)
 		{
 			if (!rhs_obj->bCollision)continue;
+			if (!rhs_obj->bSlide)continue;
+
 			vec collision_pos = rhs_obj->make_center();
 			if(!math::RectInPoint(CameraRange, collision_pos - cp))continue;
 
@@ -64,14 +65,17 @@ void collision_mgr::collision_tile(collision_tag rhs)
 			if (bCollision.has_value())
 			{
 				// 우항 오브젝트 밀어버리기
-				if (rhs_obj->bSlide)
-				{
 					auto _ptr = rhs_obj->get_owner().lock();
 					if (!_ptr)return;
 
+					if (rhs_obj->bTileHitEffect)
+					{
+						HitEffectPush(_ptr->_transform->_location, TileHitEffectDuration);
+					}
+
 					_ptr->_transform->_location += *bCollision;
 					_ptr->HitTile(lhs_rect);
-				}
+
 			}
 		}
 	}
@@ -311,6 +315,7 @@ void collision_mgr::update()
 	collision(EPlayerAttack, EMonster);
 	collision(EFireDragon, EMonster);
 	collision(EMonsterAttack, EPlayer);
+
 	collision(EShield, EMonster);
 	collision(EShield,EMonsterAttack);
 
@@ -350,6 +355,10 @@ bool collision_mgr::IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs
 	}
 
 	return false;
+}
+void collision_mgr::HitEffectPush(vec location, float Duration)
+{
+	CollisionHitEffectList.push_back({ location,0,math::Rand<int>({ 0,3 }),Duration });
 }
 void collision_mgr::check_erase()&
 {
@@ -432,12 +441,12 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				}
 				
 				// 우항 오브젝트 밀어버리기
-				if (lhs_obj->bPush    )
+				if (lhs_obj->bCollisionTargetPushFromForce)
 				{
 					_ptr->_transform->_location += (*bCollision).get_normalize()
 						* lhs_obj->PushForce;
 				}
-				if (lhs_obj->bObjectSlide || IsObjectSlideMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))
+				if (lhs_obj->bCollisionSlideAnObject || IsObjectSlideMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))
 				{
 					_ptr->_transform->_location += *bCollision;
 				}

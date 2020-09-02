@@ -15,8 +15,8 @@ void WIZARD::initialize()
 	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"WIZARD_LEFT.bmp", L"WIZARD_LEFT");
 	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"WIZARD_RIGHT.bmp", L"WIZARD_RIGHT");
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision = _collision_component_lower.lock();
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
+	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 

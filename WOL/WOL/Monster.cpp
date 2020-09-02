@@ -32,8 +32,8 @@ void Monster::initialize()
 {
 	actor::initialize();
 	
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision_lower = _collision_component_lower.lock();
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
+	auto sp_collision_lower = _collision_component.lock();
 
 	if (!sp_collision_lower)return;
 

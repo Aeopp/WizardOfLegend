@@ -32,7 +32,6 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 
 	for (auto& obj : RenderSortY)
 	{
-		
 		vec culling_obj_pos = obj->_transform->_location - camera_pos;
 		if (math::RectInPoint(game::client_rect, culling_obj_pos))
 		{
@@ -92,10 +91,23 @@ void object_mgr::update()
 
 	float dt = Timer::instance().delta();
 
+	RECT ObjUpdateCullingRange = game::client_rect;
+
+	ObjUpdateCullingRange.left -= ObjectUpdateRangeX;
+	ObjUpdateCullingRange.top -= ObjectUpdateRangeY;
+	ObjUpdateCullingRange.right += ObjectUpdateRangeX; 
+	ObjUpdateCullingRange.bottom += ObjectUpdateRangeY;
+
 	for (auto& [f, obj_list] : object_map)
 	{
 		for (auto obj = begin(obj_list); obj != end(obj_list);)
 		{
+			auto sp_Transform = (*obj)->_transform;
+			if (!sp_Transform)continue;
+			vec obj_location = sp_Transform->_location;
+
+			//if (!math::RectInPoint(ObjUpdateCullingRange, obj_location ))continue;
+
 			Event _event = (*obj)->update(dt);
 
 			switch (_event)
@@ -117,7 +129,10 @@ void object_mgr::update()
 
 void object_mgr::initialize()
 {
-	
+	RECT rt = game::client_rect;
+
+	ObjectUpdateRangeX = rt.right - rt.left;
+	ObjectUpdateRangeY = rt.bottom - rt.top;
 }
 
 void object_mgr::release()

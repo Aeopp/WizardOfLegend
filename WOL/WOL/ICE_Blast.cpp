@@ -10,7 +10,7 @@ void ICE_Blast::initialize()
 {
 	actor::initialize();
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
 	//RenderComponent Setup
 	{
@@ -27,15 +27,15 @@ void ICE_Blast::initialize()
 		_render_component->_ColorKey = _ColorRef;
 		_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 		_render_component->_Anim.SetAnimationClip(
-			{ 3}, AnimDuration);
+			{ 3 }, AnimDuration);
 		_render_component->_Anim.EndMotionColIndex = 2;
 	};
 	// 콜리전 셋업
 	{
-		auto sp_collision = _collision_component_lower.lock();
+		auto sp_collision = _collision_component.lock();
 
 		if (!sp_collision)return;
-		sp_collision->bPush = true;
+		sp_collision->bCollisionTargetPushFromForce = true;
 		sp_collision->PushForce = 20.f;
 
 		sp_collision->_size = { 30.f,30.0f };
@@ -55,8 +55,7 @@ void ICE_Blast::initialize()
 	bAttacking = true;
 
 	Attack = { 15,25 };
-}
-
+};
 
 Event ICE_Blast::update(float dt)
 {

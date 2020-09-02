@@ -28,7 +28,8 @@
 #include "FireDragon.h"
 #include "EffectPlayerAttack.h"
 #include "sound_mgr.h"
-#include "Boomerang.h"
+#include "RotationBoomerang.h"
+
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
@@ -62,8 +63,8 @@ void Player::initialize()
 	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"LEFT_COMPLETE.bmp", L"LEFT_COMPLETE");
 	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"RIGHT_COMPLETE.bmp", L"RIGHT_COMPLETE");
 
-	_collision_component_lower = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ERect);
-	auto sp_collision = _collision_component_lower.lock();
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayer, ERect);
+	auto sp_collision = _collision_component.lock();
 
 	if (!sp_collision)return;
 	sp_collision->bSlide = true;
@@ -163,19 +164,20 @@ void Player::Hit(std::weak_ptr<object> _target)
 	if(_player_info->GetHP()>0)
 	{
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.2f, AnimTable::idle);
+		_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.4f, AnimTable::idle);
 	}
 	else
 	{
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
 		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f,	AnimTable::dead);
-
-		Timer::instance().time_scale = 0.0f;
-		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!", 
-		MB_OK);
+	
+		Timer::instance().time_scale = 0.1f;
+		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
+			MB_OK);
 		Timer::instance().time_scale = 1.0f;
 		DeltaTime = 0.0f;
+
 		_player_info->SetHp(_player_info->max_hp);
 		_player_info->SetMp(_player_info->max_mp);
 	}
@@ -254,6 +256,8 @@ void Player::MakeShield()
 	vec dir{ math::Rand<float>({ -10,+10 }), math::Rand<float>({ -0,+0 }) };
 	Camera_Shake(15, dir, 0.3f);
 	_player_info->AddMp(-200);
+
+
 }
 
 void Player::ICE_BLAST(int Num)
@@ -274,7 +278,7 @@ void Player::ICE_BLAST(int Num)
 	int    IcePilarNum = 3;
 	float IcePilarDuration = 5.f;
 	int IcePilarDistribution = 300;
-	float IcePilarBeetWeen = 115.f;
+	float IcePilarBeetWeen = 90.f;
 
 	// 블라스트 생성 이펙트 한번 뿌려주기
 	object_mgr& obj_mgr = object_mgr::instance();
@@ -354,6 +358,7 @@ void Player::ICE_BLAST(int Num)
 	Camera_Shake(10, Dir, 0.5f);
 
 	_player_info->AddMp(-150);
+
 }
 void Player::Camera_Shake(float force,vec dir,float duration)
 {
@@ -406,11 +411,19 @@ void Player::player_check(float dt)
 		SkillIceCrystal(math::Rand<int>({ 1,12 }));
 	}
 
-
 	if (_Input.Key_Down('Z')) {
-		SkillBoomerang(8);
+		SkillBoomerang();
+	}
+	if (_Input.Key_Down('X')) {
+		MultiBoomerang(8);
 	}
 
+	if (_Input.Key_Down('C')) {
+		SkillBoomerang();
+	}
+	if (_Input.Key_Down('V')) {
+		MultiBoomerang(8);
+	}
 
 	if (_Input.Key_Down(VK_SPACE))
 	{
@@ -425,25 +438,26 @@ void Player::player_check(float dt)
 	}
 };
 
-void Player::SkillBoomerang(uint32_t Num)
+void Player::SkillBoomerang()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
 
 	object_mgr& _object_mgr = object_mgr::instance();
 
-	float degree = 360.0f / Num;
+	auto _Boom= _object_mgr.insert_object<Boomerang>();
+	if (!_Boom)return;
+	if (!_Boom->_transform)return;
 
-	for (int i = 0; i < 8; ++i)
-	{
-		auto _Ice = _object_mgr.insert_object<Boomerang>();
+	float InitSpeed = 100.f;
 
-		if (!_Ice)return;
-		_Ice->_owner = _ptr;
-		_Ice->_transform->_dir = math::dir_from_angle(degree*i);
-		;
-		_Ice->_render_component->_Anim.RowIndex = math::Rand<int>({ 0,5 });
-	}
+	vec MyLocation = _transform->_location;
+	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
+	vec Dir = Dis.get_normalize(); 
+
+	_Boom->_transform->_dir = Dir;
+	_Boom->_transform->_location  = MyLocation  +  Dir * InitSpeed;
+	_Boom->CalcImgAngle(math::radian_to_degree(atan2f(Dir.y, Dir.x)));
 
 	_player_info->bIdle = false;
 	_Shadow.CurrentShadowState = EShadowState::BIG;
@@ -452,14 +466,25 @@ void Player::SkillBoomerang(uint32_t Num)
 	_player_info->bAttack = true;
 	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
 
-	_render_component->ChangeAnim(AnimTable::attack2,
-	_player_info->SkillBoomerangMotionDuration);
+	int AttackAnimNum =math::Rand<int>({ 1,2 });
+
+	if (AttackAnimNum == 1)
+	{
+		_render_component->ChangeAnim(AnimTable::attack1,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+	else 
+	{
+		_render_component->ChangeAnim(AnimTable::attack2,
+			_player_info->SkillBoomerangMotionDuration);
+	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 
-	Camera_Shake(10, dir, 0.5f);
+	Camera_Shake(1, dir, 0.2f);
 
 	_player_info->AddMp(-50);
+
 }
 
 void Player::SkillIceCrystal(uint32_t Num)
@@ -492,6 +517,7 @@ void Player::SkillIceCrystal(uint32_t Num)
 	Camera_Shake(10, dir, 0.5f);
 
 	_player_info->AddMp(-100);
+
 }
 void Player::SkillFireDragon()
 {
@@ -556,7 +582,169 @@ void Player::SkillFireDragon()
 	UpDown *= -1;
 
 	//_player_info->AddMp(-25);
-};
+}
+
+void Player::MultiBoomerang(int Num)
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+
+	float InitSpeed = 10.f;
+
+	vec MyLocation = _transform->_location;
+	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
+	vec Dir = Dis.get_normalize();
+
+	for (int i = 0; i < Num; ++i)
+	{
+		auto _Boom = _object_mgr.insert_object<Boomerang>();
+		if (!_Boom)return;
+		if (!_Boom->_transform)return;
+		vec InitDir = math::rotation_dir_to_add_angle(Dir, (360.f / Num) * i); 
+		_Boom->_transform->_dir = InitDir; 
+		_Boom->_transform->_location = MyLocation + InitDir * InitSpeed;
+		_Boom->CalcImgAngle(math::radian_to_degree(atan2f(InitDir.y, InitDir.x)));
+	}
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+
+	int AttackAnimNum = math::Rand<int>({ 1,2 });
+
+	if (AttackAnimNum == 1)
+	{
+		_render_component->ChangeAnim(AnimTable::attack1,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+	else
+	{
+		_render_component->ChangeAnim(AnimTable::attack2,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+
+	Camera_Shake(8, dir, 0.4f);
+
+	_player_info->AddMp(-50);
+}
+void Player::SkillRotBoomerang()
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	auto _Boom = _object_mgr.insert_object<RotationBoomerang>();
+	if (!_Boom)return;
+	if (!_Boom->_transform)return;
+
+	float InitSpeed = 100.f;
+
+	vec MyLocation = _transform->_location;
+	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
+	vec Dir = Dis.get_normalize();
+
+	_Boom->_transform->_dir = Dir;
+	_Boom->_transform->_location = MyLocation + Dir * InitSpeed;
+	_Boom->CalcImgAngle(math::radian_to_degree(atan2f(Dir.y, Dir.x)));
+
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+
+	int AttackAnimNum = math::Rand<int>({ 1,2 });
+
+	if (AttackAnimNum == 1)
+	{
+		_render_component->ChangeAnim(AnimTable::attack1,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+	else
+	{
+		_render_component->ChangeAnim(AnimTable::attack2,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+
+	Camera_Shake(1, dir, 0.2f);
+
+	_player_info->AddMp(-50);
+}
+void Player::MultiRotBoomerang(int Num)
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+
+	float InitSpeed = 10.f;
+
+	vec MyLocation = _transform->_location;
+	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
+	vec Dir = Dis.get_normalize();
+
+	for (int i = 0; i < Num; ++i)
+	{
+		auto _Boom = _object_mgr.insert_object<RotationBoomerang>();
+		if (!_Boom)return;
+		if (!_Boom->_transform)return;
+		vec InitDir = math::rotation_dir_to_add_angle(Dir, (360.f / Num) * i);
+		_Boom->_transform->_dir = InitDir;
+		_Boom->_transform->_location = MyLocation + InitDir * InitSpeed;
+		_Boom->CalcImgAngle(math::radian_to_degree(atan2f(InitDir.y, InitDir.x)));
+	}
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+
+	int AttackAnimNum = math::Rand<int>({ 1,2 });
+
+	if (AttackAnimNum == 1)
+	{
+		_render_component->ChangeAnim(AnimTable::attack1,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+	else
+	{
+		_render_component->ChangeAnim(AnimTable::attack2,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+
+	Camera_Shake(8, dir, 0.4f);
+
+	_player_info->AddMp(-50);
+
+}
+;
+
+void Player::SkillInCastSlowTime(float Duration,float SlowTimeScale)
+{
+	Timer& _Timer = Timer::instance();
+	_Timer.time_scale = SlowTimeScale;
+	Timer::instance().event_regist(time_event::EOnce,
+		Duration / SlowTimeScale, []()->bool
+		{
+			Timer::instance().time_scale = 1.f;
+			return true;
+		});
+}
 
 void Player::CheckDirInput()
 {

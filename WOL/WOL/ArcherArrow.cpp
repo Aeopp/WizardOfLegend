@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "object_mgr.h"
+
 #include "ArcherArrow.h"
 #include "collision_component.h"
 #include "collision_mgr.h"
@@ -17,10 +19,13 @@ void ArcherArrow::launch(vec init,vec dir, int Row, std::shared_ptr<class Bmp> S
 
 	auto sp_comp = wp_collision.lock();
 	if (!sp_comp)return;
-	sp_comp->bPush = false;
-	sp_comp->bObjectSlide = false;
+	sp_comp->bCollisionTargetPushFromForce = false;
+	sp_comp->bCollisionSlideAnObject = false;
 	sp_comp->bHitEffect = true;
 	sp_comp->bCollision= true;
+	sp_comp->bSlide = true;
+	sp_comp->bTileHitEffect = true;
+
 }
 
 void ArcherArrow::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -50,6 +55,8 @@ void ArcherArrow::HitTile(RECT rt)
 {
 	object::HitTile(rt);
 
+// È÷Æ® ÀÌÆåÆ®
+	
 	bDie = true;
 }
 
@@ -66,8 +73,8 @@ void ArcherArrow::initialize()
 
 	sp_comp->bHitEffect = false;
 	sp_comp->bCollision = false;
-	sp_comp->bPush = false;
-	sp_comp->bObjectSlide = false;
+	sp_comp->bCollisionTargetPushFromForce = false;
+	sp_comp->bCollisionSlideAnObject = false;
 	sp_comp->HitColor = RGB(123, 200, 50);
 	sp_comp->PushForce = 1.f;
 	sp_comp->_size = { 13.f,13.f };

@@ -15,7 +15,7 @@ class Player :
     public actor
 {
 public:
-    std::weak_ptr<collision_component> _collision_component_lower;
+    std::weak_ptr<collision_component> _collision_component;
     std::weak_ptr<class Camera> _Camera;
     std::weak_ptr<class EffectPlayerAttack> NormalAttack{};
 
@@ -59,15 +59,20 @@ private:
     std::array<std::weak_ptr<class Bmp>,(int)EAnimDir::max> AnimDirFileTable;
 
     void temp(float temp);
-    void MakeShield();
-    void ICE_BLAST(int Num);
+ 
     void Camera_Shake(float force, vec dir, float duration);
     void player_check(float dt);
 
-    void SkillBoomerang(uint32_t Num);
+    void MakeShield();
+    void ICE_BLAST(int Num);
     void SkillIceCrystal(uint32_t Num);
     void SkillFireDragon();
+    void SkillBoomerang();
+    void MultiBoomerang(int Num);
+    void SkillRotBoomerang();
+    void MultiRotBoomerang(int Num);
 
+    void SkillInCastSlowTime(float Duration,float SlowTimeScale);
     void CheckDirInput();
     void make_gold_UI();
     void make_skill_bar();

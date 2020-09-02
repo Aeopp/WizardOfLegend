@@ -104,7 +104,7 @@ void Scene_Stage::initialize()
 		float s = 0.f;
 		float Distance = 400.f;
 
-		for (int i = 0; i < 16; ++i)
+		for (int i = 0; i < 3; ++i)
 		{
 			s += Angle;
 			vec v = PlayerSpawnLocation;

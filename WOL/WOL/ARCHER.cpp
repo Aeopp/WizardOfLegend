@@ -226,13 +226,13 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 			bDie = true;
 		    auto _gold = GoldEffect::MakeGold(v.x, v.y,
 			L"MONEY", layer_type::EEffect, 2,
-			math::Rand<int>({ 0,2 }), FLT_MAX, 0.5f, 24, 24, 1.5f, 1.5f, AttackTarget);
+			math::Rand<int>({ 0,2 }), FLT_MAX, 0.5f, 24, 24, 1.f, 1.f, AttackTarget);
 		    return true;
 		
 			}	
 		);
 
-		auto sp_col = _collision_component_lower.lock();
+		auto sp_col = _collision_component.lock();
 		if (!sp_col)return;
 		sp_col->bDie = true;
 	}
