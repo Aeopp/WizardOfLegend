@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "ARCHER.h"
 
+#include "sound_mgr.h"
+
 #include "Bmp_mgr.h"
 #include "collision_mgr.h"
 #include "render_component.h"
@@ -102,6 +104,9 @@ Event ARCHER::update(float dt)
 		NormalAttack->Preparation(true);
 
 		_render_component->ChangeAnim(EAnimState::Attack, 2.3f,EAnimState::Attack);
+
+		sound_mgr::instance().Play("ARCHER_AIM", false, 1.f);
+		
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 		// 여기서 공격
 		if (CoolTime < 0)
@@ -124,6 +129,7 @@ Event ARCHER::update(float dt)
 				bParticle->launch(loc+dir*10.f,dir );
 				_Shadow.CurrentShadowState = EShadowState::BIG;
 				_Info.bAttack = false;
+				sound_mgr::instance().Play("ARCHER_SHOOT", false, 1.f);
 				return true;
 			});				
 
@@ -171,17 +177,22 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
 	if (!sp_target->bAttacking)return;
-	if (sp_target->id == object::ID::player_shield)return;
-	if (sp_target->id == object::ID::monster)return;
-	if (sp_target->id == object::ID::monster_attack)return;
+//	if (sp_target->ObjectTag == object::Tag::player_shield)return;
+	if (sp_target->ObjectTag == object::Tag::monster)return;
+	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
+
+	if (sp_target->UniqueID == EobjUniqueID::NormalAttack)
+		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1.f);
+	
 
 	bInvincible = true;
 	NormalAttack->Preparation(false);
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
 
-	_render_component->ChangeAnim(EAnimState::Hit, 0.25f);
+	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
+	collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
 
 	StateDuration = 0.25f;
 	CurrentState = EMonsterState::Hit;
@@ -189,11 +200,11 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	float Atk = math::Rand<int>(sp_target->Attack);
 	_EnemyInfo.HP -= Atk;
 
-	Timer::instance().event_regist(time_event::EOnce, 0.25f,
+	Timer::instance().event_regist(time_event::EOnce, 0.3f,
 		[&bInvincible = bInvincible]()->bool
 		{  bInvincible = false; return true;  });
 
-	Timer::instance().event_regist(time_event::EOnce, 0.25f,
+	Timer::instance().event_regist(time_event::EOnce, 0.3f,
 		[&bHit = _EnemyInfo.bHit](){
 		bHit = false;
 		return true;});

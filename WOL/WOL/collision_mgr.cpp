@@ -47,6 +47,7 @@ void collision_mgr::collision_tile(collision_tag rhs)
 
 		for (auto& rhs_obj : rhs_list)
 		{
+
 			if (!rhs_obj->bCollision)continue;
 			if (!rhs_obj->bSlide)continue;
 
@@ -199,12 +200,12 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 		for (auto iter = std::begin(CollisionHitEffectList);
 			iter != std::end(CollisionHitEffectList);)
 		{
-			auto& [v, col, row, delta] = *iter;
+			auto& [v, col, row,delta, currentDelta] = *iter;
 
-			delta -= DeltaTime;
-			if (delta < 0)
+			currentDelta -= DeltaTime;
+			if (currentDelta < 0)
 			{
-				delta = CollisionHitEffectDelta;
+				currentDelta = delta;
 				++col;
 			}
 			if (col >= 5)
@@ -358,7 +359,7 @@ bool collision_mgr::IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs
 }
 void collision_mgr::HitEffectPush(vec location, float Duration)
 {
-	CollisionHitEffectList.push_back({ location,0,math::Rand<int>({ 0,3 }),Duration });
+	CollisionHitEffectList.push_back({ location,0,math::Rand<int>({ 0,3 }),Duration/5 ,Duration / 5 });
 }
 void collision_mgr::check_erase()&
 {
@@ -396,12 +397,14 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 	{
 		if (!lhs_obj->bCollision)continue;
 		if (!math::RectInPoint(CameraRange, lhs_obj->make_center()- cp))continue;
+		lhs_obj->CurrentCoolTime -= DeltaTime;
 
 		for (auto& rhs_obj : rhs_list)
 		{
 			if (!rhs_obj->bCollision)continue;
 			if (&lhs_obj == &rhs_obj)continue;
 			if (!math::RectInPoint(CameraRange, rhs_obj->make_center() - cp))continue;
+			rhs_obj->CurrentCoolTime -= DeltaTime;
 
 			++CollisionObjNum;
 			// 도형 정보에 따라 충돌 다르게 수행
@@ -429,8 +432,12 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 
 			if (bCollision.has_value())
 			{
-				lhs_obj->Hit(rhs_obj->get_owner());
-				rhs_obj->Hit(lhs_obj->get_owner());
+			
+					lhs_obj->Hit(rhs_obj->get_owner());
+				
+				
+					rhs_obj->Hit(lhs_obj->get_owner());
+				
 
 				auto _ptr = rhs_obj->get_owner().lock();
 
@@ -450,7 +457,7 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				{
 					_ptr->_transform->_location += *bCollision;
 				}
-				if (lhs_obj->bHitEffect)
+				/*if (lhs_obj->bHitEffect)
 				{
 					if (!_ptr->_transform)continue;
 					if (false == IsHitEffectMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))return;
@@ -469,7 +476,7 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 					vec r = _ptr->_transform->_location + math::RandVec() * math::Rand<int>({ -30,30});
 
 					CollisionHitEffectList.push_back({r,Col,Row,dt});
-				}
+				}*/
 			}
 		}
 	}

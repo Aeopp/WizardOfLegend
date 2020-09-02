@@ -16,6 +16,8 @@ void sound_mgr::initialize()
 	}
 }
 
+
+
 bool sound_mgr::Play( std::string SoundKey,
 	bool IsBgm, const float Volume) {
 
@@ -142,3 +144,13 @@ bool sound_mgr::Init()
 
 	return true;
 };
+
+void SOUNDPLAY(const std::string& Key, float Volume, bool IsBgm)
+{
+	sound_mgr::instance().Play(Key, Volume, IsBgm);
+}
+
+void RAND_SOUNDPLAY(const std::string& Key, std::pair<uint8_t, uint8_t> Range, float Volume, bool IsBgm)
+{
+	sound_mgr::instance().RandSoundKeyPlay(Key, Range,Volume);
+}

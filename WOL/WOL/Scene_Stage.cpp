@@ -19,6 +19,7 @@
 #include "GoldEffect.h"
 #include "Debuger.h"
 #include "ARCHER.h"
+#include "sound_mgr.h"
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 {
@@ -84,6 +85,7 @@ void Scene_Stage::initialize()
 			L"SUMMON", layer_type::EEffect, 8, 0, 1.4f, 1.0f, 225, 730,
 			1.f, 1.6f);
 
+		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
 	/*late_initialize(int ImgLocationX, int ImgLocationY,
 		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
 		int AnimRowIndex, float Duration, float AnimDuration,
@@ -91,6 +93,7 @@ void Scene_Stage::initialize()
 	// TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
+		sound_mgr::instance().Play("teleport", false, 1.f);
 
 		auto _Player = obj_mgr.insert_object<Player>();
 		_Player->_transform->_location = PlayerSpawnLocation;

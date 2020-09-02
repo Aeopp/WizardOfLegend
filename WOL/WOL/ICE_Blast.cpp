@@ -5,6 +5,7 @@
 #include "render_component.h"
 #include "object_mgr.h"
 #include "Effect.h"
+#include "sound_mgr.h"
 
 void ICE_Blast::initialize()
 {
@@ -47,7 +48,7 @@ void ICE_Blast::initialize()
 	_Shadow.bShadow = false;
 	_Shadow.correction = { 0,60 };
 
-	id = object::ID::player_attack;
+	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
 
 	Duration = 0.8f;
@@ -55,6 +56,8 @@ void ICE_Blast::initialize()
 	bAttacking = true;
 
 	Attack = { 15,25 };
+
+	sound_mgr::instance().RandSoundKeyPlay("ICE_BLAST", { 1,4 }, 1.f);
 };
 
 Event ICE_Blast::update(float dt)

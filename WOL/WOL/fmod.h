@@ -43,7 +43,7 @@ FMOD_RESULT F_API FMOD_System_Release              (FMOD_SYSTEM *system);
 FMOD_RESULT F_API FMOD_System_SetOutput                 (FMOD_SYSTEM *system, FMOD_OUTPUTTYPE output);
 FMOD_RESULT F_API FMOD_System_GetOutput                 (FMOD_SYSTEM *system, FMOD_OUTPUTTYPE *output);
 FMOD_RESULT F_API FMOD_System_GetNumDrivers             (FMOD_SYSTEM *system, int *numdrivers);
-FMOD_RESULT F_API FMOD_System_GetDriverInfo             (FMOD_SYSTEM *system, int id, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels);
+FMOD_RESULT F_API FMOD_System_GetDriverInfo             (FMOD_SYSTEM *system, int ObjectTag, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels);
 FMOD_RESULT F_API FMOD_System_SetDriver                 (FMOD_SYSTEM *system, int driver);
 FMOD_RESULT F_API FMOD_System_GetDriver                 (FMOD_SYSTEM *system, int *driver);
 FMOD_RESULT F_API FMOD_System_SetSoftwareChannels       (FMOD_SYSTEM *system, int numsoftwarechannels);
@@ -132,11 +132,11 @@ FMOD_RESULT F_API FMOD_System_UnlockDSP                 (FMOD_SYSTEM *system);
 
 /* Recording API. */
 FMOD_RESULT F_API FMOD_System_GetRecordNumDrivers       (FMOD_SYSTEM *system, int *numdrivers, int *numconnected);
-FMOD_RESULT F_API FMOD_System_GetRecordDriverInfo       (FMOD_SYSTEM *system, int id, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels, FMOD_DRIVER_STATE *state);
-FMOD_RESULT F_API FMOD_System_GetRecordPosition         (FMOD_SYSTEM *system, int id, unsigned int *position);
-FMOD_RESULT F_API FMOD_System_RecordStart               (FMOD_SYSTEM *system, int id, FMOD_SOUND *sound, FMOD_BOOL loop);
-FMOD_RESULT F_API FMOD_System_RecordStop                (FMOD_SYSTEM *system, int id);
-FMOD_RESULT F_API FMOD_System_IsRecording               (FMOD_SYSTEM *system, int id, FMOD_BOOL *recording);
+FMOD_RESULT F_API FMOD_System_GetRecordDriverInfo       (FMOD_SYSTEM *system, int ObjectTag, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels, FMOD_DRIVER_STATE *state);
+FMOD_RESULT F_API FMOD_System_GetRecordPosition         (FMOD_SYSTEM *system, int ObjectTag, unsigned int *position);
+FMOD_RESULT F_API FMOD_System_RecordStart               (FMOD_SYSTEM *system, int ObjectTag, FMOD_SOUND *sound, FMOD_BOOL loop);
+FMOD_RESULT F_API FMOD_System_RecordStop                (FMOD_SYSTEM *system, int ObjectTag);
+FMOD_RESULT F_API FMOD_System_IsRecording               (FMOD_SYSTEM *system, int ObjectTag, FMOD_BOOL *recording);
 
 /* Geometry API. */
 FMOD_RESULT F_API FMOD_System_CreateGeometry            (FMOD_SYSTEM *system, int maxpolygons, int maxvertices, FMOD_GEOMETRY **geometry);

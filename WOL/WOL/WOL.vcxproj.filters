@@ -235,6 +235,7 @@
     <ClInclude Include="ArcherBow.h" />
     <ClInclude Include="ArcherArrow.h" />
     <ClInclude Include="RotationBoomerang.h" />
+    <ClInclude Include="objectUniqueID.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">

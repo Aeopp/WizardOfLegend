@@ -9,6 +9,7 @@
 #include "Input_mgr.h"
 #include "Bmp_mgr.h"
 #include "game.h"
+#include "sound_mgr.h"
 
 
 
@@ -64,6 +65,7 @@ void UIStart::OnMouse(const vec hit_pos)
 
 void UIStart::Click(vec hit_pos)
 {
+	
 	switch (eMenu)
 	{
 	case UIStart::Ready:
@@ -118,16 +120,27 @@ Event UIStart::update(float dt)
 	auto omv =_Input.GetWindowMousePos();
 
 	POINT pt = make_pt(omv->x,omv->y);
-
-	
 	RECT main{ 685,441,907,487 }, opt{ 743,639,848,674 }, quit{ 763,773,837,803 };
 
-	if (PtInRect(&main, pt))
-		eMenu = EMenu::Main;
-	 if (PtInRect(&opt, pt))
-		eMenu = EMenu::Option;
-	 if (PtInRect(&quit, pt))
-		eMenu = EMenu::Quit;
+		if (PtInRect(&main, pt))
+		{
+			if (eMenu != EMenu::Main)
+			sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
+			eMenu = EMenu::Main;
+		}
+		if (PtInRect(&opt, pt))
+		{
+			if (eMenu != EMenu::Option)
+			sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
+			eMenu = EMenu::Option;
+		}
+		if (PtInRect(&quit, pt))
+		{
+			if(eMenu != EMenu::Quit)
+				sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
+			eMenu = EMenu::Quit;
+		}
+
 
 	return Event::None;
 }

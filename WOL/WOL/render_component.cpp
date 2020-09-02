@@ -64,50 +64,19 @@ void render_component::Render(HDC CurrentHdc)
 {
 	auto sp_Image = wp_Image.lock();
 	if (!sp_Image)return;
-	
-	const vec& dl = Dest_Loc;
-	const vec& ps = Dest_Paint_Size;
 
-	RECT CullingRect{ dl.x,dl.y,ps.x + dl.x,ps.y + dl.y };
-	RECT _rt = game::instance().client_rect;
-
-	if (bDebug)
-	{
-		static DWORD CurTime = GetTickCount();
-		static int CullingObj = 0;
-		static int RenderObj = 0;
-		if (CurTime + 1000 < GetTickCount())
-		{
-			CurTime = GetTickCount();
-			game::instance().debug_cul_obj_setup(CullingObj, RenderObj);
-			CullingObj = 0;
-			RenderObj = 0;
-		}
-
-		if (!math::rectVSrect(CullingRect, _rt))
-		{
-			++CullingObj;
-			return;
-		}
-		else
-			++RenderObj;
-	}
 	_Anim.update();
-
-	HDC _BDC = sp_Image->Get_MemDC();
-
-	const RECT& s = _Img_src;
-	const vec& ds = Default_Src_Paint_Size;
 
 	switch (_RenderDesc)
 	{
 	case Transparent:
 		GdiTransparentBlt(CurrentHdc
-			, dl.x,dl.y
-			, ps.x, ps.y
-			, _BDC
-			, s.left + _Anim.ColIndex *ds.x, s.top + _Anim.RowIndex* ds.y
-			, s.right  , s.bottom 
+			, Dest_Loc.x, Dest_Loc.y
+			, Dest_Paint_Size.x, Dest_Paint_Size.y
+			, sp_Image->Get_MemDC()
+			, _Img_src.left + _Anim.ColIndex * Default_Src_Paint_Size.x,
+			_Img_src.top + _Anim.RowIndex* Default_Src_Paint_Size.y
+			, _Img_src.right  , _Img_src.bottom
 			, _ColorKey);
 		break;
 	default:

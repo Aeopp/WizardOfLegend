@@ -21,8 +21,8 @@ void Boomerang::initialize()
 
 	Duration = 20.f;
 
-	ScaleX = 1.f;
-	ScaleY = 1.f;
+	ScaleX = 0.5f;
+	ScaleY = 0.5f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 200;
@@ -38,7 +38,7 @@ void Boomerang::initialize()
 	sp_collision->bTileHitEffect = true;
 
 	bAttacking = true;
-	id = object::ID::player_attack;
+	ObjectTag = object::Tag::player_attack;
 	Attack = { 20,30 };
 	bAttacking = true;
 	_Shadow.correction = { 0,60 };

@@ -26,3 +26,7 @@ public:
 private:
 	std::string CurrentBgmKey;
 };
+
+void SOUNDPLAY(const std::string& Key, float Volume = 1.f, bool IsBgm = false);
+void RAND_SOUNDPLAY(const std::string& Key, std::pair<uint8_t,uint8_t> Range,
+float Volume = 1.f, bool IsBgm = false);

@@ -18,7 +18,8 @@ void EffectPlayerAttack::AttackStart(float Duration, float AnimDuration
 	this->ImgLocationY = InitLocation.y;
 	this->CurrentAttackNum = Num;
 
-	id = object::ID::player_attack;
+	UniqueID = EobjUniqueID::NormalAttack;
+	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
 	
 	auto sp_comp = _collision_component.lock();
@@ -120,7 +121,7 @@ void EffectPlayerAttack::initialize()
 
 		if (!sp_collision)return;
 		sp_collision->bCollisionTargetPushFromForce = true;
-		sp_collision->PushForce = 30.f;
+		sp_collision->PushForce = 20.f;
 
 		sp_collision->_size = { 45.f,45.0f };
 		sp_collision->bRender = true;

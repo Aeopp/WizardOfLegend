@@ -8,6 +8,7 @@ class RotationBoomerang :
 	public Boomerang
 {
 public:
+	void initialize()override;
 	Event update(float dt)override;
 	void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	float ImgAngle = 0;

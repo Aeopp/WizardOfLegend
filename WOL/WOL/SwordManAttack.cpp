@@ -133,7 +133,7 @@ void SwordManAttack::initialize()
 
 	CurrentAttackDuration = DefaultAttackDuration = 0.2f;
 
-	id = object::ID::monster_attack;
+	ObjectTag = object::Tag::monster_attack;
 	bInvalidatedefense = true;
 }
 
@@ -145,7 +145,7 @@ void SwordManAttack::Hit(std::weak_ptr<object> _target)
 	if (!sp_target)return;
 	if (!sp_target->_transform)return;
 
-	if (sp_target->id == object::ID::player_shield)
+	if (sp_target->ObjectTag == object::Tag::player_shield)
 	{
 		if (CurrentAttackDuration > 0)
 		{

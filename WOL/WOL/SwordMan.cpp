@@ -12,6 +12,7 @@
 #include "game.h"
 #include "Debuger.h"
 #include "GoldEffect.h"
+#include "sound_mgr.h"
 
 
 void SwordMan::initialize()
@@ -45,7 +46,7 @@ void SwordMan::initialize()
 		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 
 	NormalAttack = object_mgr::instance().insert_object<SwordManAttack>(0, 0,
-		L"SWORDMAN_ATTACK", layer_type::EEffect, 4, 0, 1.f, 1.f, 200, 200, 1.0f, 1.0f);
+		L"__SWORDMAN_ATTACK", layer_type::EEffect, 4, 0, 1.f, 1.f, 200, 200, 1.0f, 1.0f);
 	auto sp_NormalAttack = NormalAttack.lock();
 	if (!sp_NormalAttack)return;
 	sp_NormalAttack->_owner = _ptr;
@@ -53,6 +54,8 @@ void SwordMan::initialize()
 	DefaultHitDuration = 0.25f;
 	Attack = { 40,50 };
 	InitTime = 4.7f;
+
+	InvincibleTime = 0.3f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
@@ -142,13 +145,13 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
 	if (!sp_target->bAttacking)return;
-	if (sp_target->id == object::ID::player_shield)return;
-	if (sp_target->id == object::ID::monster)return;
-	if (sp_target->id == object::ID::monster_attack)return;
-
-
+	//if (sp_target->ObjectTag == object::Tag::player_shield)return;
+	if (sp_target->ObjectTag == object::Tag::monster)return;
+	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
 	if (bInvincible)return;
-
+	
+	if (sp_target->UniqueID == EobjUniqueID::NormalAttack)
+		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1.f);
 
 
 	Timer::instance().event_regist(time_event::EOnce, InvincibleTime,
@@ -180,6 +183,7 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 
 	_render_component->ChangeAnim(EAnimState::Hit, DefaultHitDuration);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
+	collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
 
 	if (_EnemyInfo.HP < 0)
 	{

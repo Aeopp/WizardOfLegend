@@ -196,6 +196,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MY_RECT.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="objectUniqueID.h" />
     <ClInclude Include="object_mgr.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />

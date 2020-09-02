@@ -2,6 +2,7 @@
 #include "Bmp_mgr.h"
 #include "bmp.h"
 #include "Shadow.h"
+#include <filesystem>
 
 Bmp_mgr::~Bmp_mgr()noexcept
 {
@@ -26,8 +27,16 @@ void Bmp_mgr::initialize()
 	 DecoTileInfoMap[EDecoTileInfo::pool_12] = { 0,438,145,510 };
 	 DecoTileInfoMap[EDecoTileInfo::pool_22] = { 292,365,437,510 };
 
-	 
+	 namespace fs = std::filesystem;
 
+	 //for (const fs::directory_entry& entry :
+		// fs::directory_iterator(fs::current_path() / L".." / L".." / L"Resources" / L"WOL_TEXTURE")) 
+	 //{
+		// auto filename = entry.path().wstring();
+		// auto key = entry.path().stem().wstring();
+
+		// Insert_Bmp(filename, key);
+	 //}
 	 Shadow::ShadowImgInit();
 
 	 Insert_Bmp(DefaultPath + L"Back.bmp", L"Back");
@@ -54,6 +63,9 @@ void Bmp_mgr::initialize()
 
 	 Insert_Bmp(DefaultPath + L"SWORDMAN_RIGHT.bmp", L"SWORDMAN_RIGHT");
 	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK.bmp", L"SWORDMAN_ATTACK");
+	 Insert_Bmp(DefaultPath + L"__SWORDMAN_ATTACK.bmp", L"__SWORDMAN_ATTACK");
+
+	
 	 Insert_Bmp(DefaultPath + L"HITEFFECT.bmp", L"HITEFFECT");
 
 	 Insert_Bmp(DefaultPath + L"ARCHER_BOW_LEFT.bmp", L"ARCHER_BOW_LEFT");
@@ -63,8 +75,6 @@ void Bmp_mgr::initialize()
 	 Insert_Bmp(DefaultPath + L"ARCHER_LEFT.bmp", L"ARCHER_LEFT");
 	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK_RESET.bmp", L"SWORDMAN_ATTACK_RESET");
 	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK_ROTATION.bmp", L"SWORDMAN_ATTACK_ROTATION");
-
-
 };	 	
 
 

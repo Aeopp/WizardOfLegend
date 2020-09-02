@@ -61,7 +61,7 @@ void FireDragon::initialize()
 			RowNum = 0;
 	}	
 	
-	id = object::ID::player_attack;
+	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
 }
 

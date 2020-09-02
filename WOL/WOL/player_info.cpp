@@ -4,7 +4,7 @@
 
 void player_info::AddGold(int Gold)
 {
-	sound_mgr::instance().Play("MONEY_TAKE", false, 30.f);
+	sound_mgr::instance().Play("MONEY_TAKE", false, 1.f);
 	gold += Gold;
 }
 

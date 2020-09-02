@@ -13,8 +13,17 @@ public :
 	void CalcIdx();
 	uint32_t get_layer_id()const& override;
 	vec HoleLocation{};
-
 	void late_initialize(Transform _Transform);
+
+
+	// 스프라이트 각 30도마다 준비되어 있음 .
+	// =======================================================
+		static inline int ShieldSpriteAngle = 30;
+		static inline int  ShieldRotationSpeed = 75; 
+		static inline double ShieldSpriteChangeDelta = (double)ShieldSpriteAngle / (double)ShieldRotationSpeed;
+		double CurrentImgChangeRemainTime = ShieldSpriteChangeDelta;
+	// ======================================================
+
 
 	float _shield_distance{ 135.0f };
 	float duration{};

@@ -7,6 +7,7 @@
 #include "render_component.h"
 #include "Color.h"
 #include "Bmp_mgr.h"
+#include "sound_mgr.h"
 
 void ICE_Crystal::initialize()
 {
@@ -44,10 +45,12 @@ void ICE_Crystal::initialize()
 
 	TickScale = 1.f;
 	sp_collision->bSlide = false;
-	id = object::ID::player_attack;
+	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
 	sp_collision->bCollisionTargetPushFromForce= false;
 	sp_collision->PushForce = 5.f;
+
+	sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
 
 	//_Shadow.bShadow = true;
 	//_Shadow.correction = { 0,120 };
@@ -56,6 +59,14 @@ void ICE_Crystal::initialize()
 Event ICE_Crystal::update(float dt)
 {
 	Event _event = actor::update(dt);
+
+	CurrentSoundTick -= dt;
+
+	if (CurrentSoundTick < 0)
+	{
+		CurrentSoundTick = SoundTick; 
+		sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);
+	}
 
 	Duration -= dt;
 	if (Duration < 0)return Event::Die;

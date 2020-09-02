@@ -13,14 +13,16 @@ struct player_info
 	bool bIdle{ true };
 	bool bDash{ false };
 	bool bMove{ false };
-	float DashDuration = 0.3;
-	float DefaultAttackDuration = 0.5f;
+	bool bHit{ false };
+
+	float DashDuration = 0.25;
+	float DefaultAttackDuration = 0.37f;
 	float CurrentAttackDuration = DefaultAttackDuration;
 
-	float SkillBoomerangMotionDuration = 1.0f;
-	float SkillICECrystalMotionDuration = 1.0f;
-	float SkillICEBlastMotionDuration = 1.0f;
-	float SkillShieldMotionDuration = 1.0f;
+	float SkillBoomerangMotionDuration = 0.35f;
+	float SkillICECrystalMotionDuration = 0.9f;
+	float SkillICEBlastMotionDuration = 0.9f;
+	float SkillShieldMotionDuration = 0.9f;
 	float SkillFireDragonMotionDuration = 0.4f;
 	float MpRegenerationAtSec = 30.f;
 	float HpRegenerationAtSec=50.f;

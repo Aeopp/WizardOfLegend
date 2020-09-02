@@ -8,6 +8,7 @@
 #include "Bmp_mgr.h"
 #include "Effect.h"
 #include "GoldEffect.h"
+#include "sound_mgr.h"
 
 
 
@@ -59,8 +60,9 @@ void Monster::initialize()
 
 	_Shadow.correction = shadow_correction;
 	_Shadow.world_size_correction = ShadowWorldSizeCorrection;
-	id = object::ID::monster;
+	ObjectTag = object::Tag::monster;
 
+	
 };
 
 Event Monster::update(float dt)
@@ -76,7 +78,7 @@ Event Monster::update(float dt)
 void Monster::Hit(std::weak_ptr<object> _target)
 {
 	actor::Hit(_target);
-	
+
 }
 
 void Monster::late_initialize(std::weak_ptr<class object> SetTarget, vec SetLocation)
@@ -98,4 +100,7 @@ void Monster::CardEffect(vec v,std::wstring ImageKey)
 	object_mgr::instance().insert_object<Effect>(v.x,
 		v.y,ImageKey,layer_type::EEffect,
 		32,0,4.0f,3.0f,150,230,1.0f,1.0f);
+
+	sound_mgr::instance().Play("CARD_SUMMON.mp3", false, 1.f);
+
 };

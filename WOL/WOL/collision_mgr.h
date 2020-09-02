@@ -22,10 +22,10 @@ public:
 		figure_type _type = ERect);
 
 	std::shared_ptr<class Bmp> HitEffectImg{};
-	
-	float CollisionHitEffectDelta = 0.15f;
+
+
 	// 이펙트 위치 컬럼 로우 델타
-	std::list<std::tuple<vec, int,int,float>> CollisionHitEffectList{};
+	std::list<std::tuple<vec, int,int,float,float>> CollisionHitEffectList{};
 
 	void collision(collision_tag lhs, collision_tag rhs);
 	void render(HDC hdc, std::pair<float, float>  size_factor) ;

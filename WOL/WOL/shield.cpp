@@ -7,6 +7,8 @@
 #include "Bmp.h"
 #include "Effect.h"
 #include "object_mgr.h"
+#include "sound_mgr.h"
+
 
 void shield::DefenseMsg(vec loc)
 {
@@ -32,35 +34,40 @@ void shield::initialize()
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	};
 
-	id = object::ID::player_shield;
+	ObjectTag = object::Tag::player_shield;
 
 	bAttacking = true;
 	Attack = { 5,10 };
+
 }
 
 Event shield::update(float dt)
 {
-	actor::update(dt);
-
+	Event _E =  actor::update(dt);
 	duration -= dt;
 	if (duration < 0)return Event::Die;
-
-	DegreeTick -= dt;
-	if (DegreeTick < 0) {
-		DegreeTick = DegreePerSecond;
-		++ImgIndex;
-		ImgIndex %= 12;
-	}
-
-	Event _E = object::update(dt);
 
 	auto Owner = _owner.lock();
 	if (!Owner) return Event::Die;
 
+	CurrentImgChangeRemainTime -= dt;
+	if (CurrentImgChangeRemainTime < 0)
+	{
+		CurrentImgChangeRemainTime = ShieldSpriteChangeDelta;
+		++_render_component->_Anim.ColIndex; 
+		_render_component->_Anim.ColIndex %= 12;
+		/*CalcIdx();*/
+	}
+
 	vec w = Owner->_transform->_location;
 
 	vec& r = _transform->_dir;
-	r = math::rotation_dir_to_add_angle(r, _speed*dt);
+	Angle += ShieldRotationSpeed * dt;
+	if (Angle >= 360)
+	{
+		Angle = 0 + (360 - Angle);
+	}
+	r = math::rotation_dir_to_add_angle(r, ShieldRotationSpeed *dt);
 
 	_transform->_location = w + r * _shield_distance;
 
@@ -70,19 +77,44 @@ Event shield::update(float dt)
 
 void shield::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	actor::render(hdc, camera_pos, size_factor);
+	if (!_render_component) return;
+	_render_component->Dest_Loc =
+	_transform->_location - camera_pos - (_render_component->Dest_Paint_Size * 0.5);
+
+	_Shadow.render(hdc, camera_pos);
+
+	auto sp_Image = _render_component->wp_Image.lock();
+	if (!sp_Image)return;
+
+	switch (_render_component->_RenderDesc)
+	{
+	case Transparent:
+		GdiTransparentBlt(hdc
+			, _render_component->Dest_Loc.x,
+			_render_component->Dest_Loc.y
+			, _render_component->Dest_Paint_Size.x, 
+			_render_component->Dest_Paint_Size.y
+
+			, sp_Image->Get_MemDC()
+
+			, _render_component->_Img_src.left + 
+			_render_component->_Anim.ColIndex *
+			_render_component->Default_Src_Paint_Size.x,
+			_render_component->_Img_src.top
+			, _render_component->_Img_src.right,
+			_render_component->_Img_src.bottom
+			, _render_component->_ColorKey);
+		break;
+	default:
+		break;
+	}
 }
 
 void shield::Hit(std::weak_ptr<object> _target)
 {
 	object::Hit(_target);
-	//auto sp_target = _target.lock();
-	//// 공격 무효화
-	//bool bNullAttack = sp_target->bInvalidatedefense;
-	//if (bNullAttack)
-	//{
 
-	//}
+	RAND_SOUNDPLAY("GAIA_ARMOR_HIT", { 1,4 });
 }
 
 void shield::CalcIdx()
@@ -131,7 +163,6 @@ void shield::late_initialize(Transform _Transform)
 	PaintSizeX = 100;
 	PaintSizeY = 105;
 	float Scale = 1.f;
-	_speed = 120.f;
 
 	_render_component = std::make_shared<render_component>();
 	_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"GAIA_ARMOR");
@@ -140,8 +171,10 @@ void shield::late_initialize(Transform _Transform)
 	_render_component->_ColorKey = COLOR::MEGENTA();
 	_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 	_render_component->_Anim.SetAnimationClip(
-		{ 12 }, 360.f / _speed);
+		{ 12 }, 99999999.f);
 
-	id = object::ID::player_shield;
+	ObjectTag = object::Tag::player_shield;
 
+	// 쉴드 이니셜 방향에 따라 시작 각도 이미지 인덱스만 초기화때 구해놓는다 .
+	CalcIdx();
 };

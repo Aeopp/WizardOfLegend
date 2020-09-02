@@ -84,7 +84,7 @@ void ArcherArrow::initialize()
 	ScaleX = 1;
 	ScaleY = 1;
 	speed = 1100.f;
-	id = object::ID::monster_attack;
+	ObjectTag = object::Tag::monster_attack;
 
 	Attack={ 20,40 };
 	// 방어하는 스킬과 상호작용
@@ -106,7 +106,7 @@ void ArcherArrow::Hit(std::weak_ptr<object> _target)
 	if (!_transform)return;
 
 
-	if (sp_target->id == object::ID::player_shield)
+	if (sp_target->ObjectTag == object::Tag::player_shield)
 	{
 		bDie = true;
 		shield::DefenseMsg(_transform->_location);

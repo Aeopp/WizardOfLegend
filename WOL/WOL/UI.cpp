@@ -7,8 +7,6 @@
 void UI::initialize()
 {
 	object::initialize();
-
-	_render_component = std::make_shared<render_component>();
 };
 
 void UI::render(HDC hdc, vec camera_pos,vec size_factor)

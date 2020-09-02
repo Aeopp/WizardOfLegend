@@ -21,7 +21,7 @@ public:
 	// 상호작용시에 출력할 폰트 컬러
 	COLORREF HitColor;
 
-	float DefaultCoolTime = 0.0f;
+	float CurrentCoolTime = 0.0f;
 
 	void Hit(std::weak_ptr<class object> _target);
 	figure_type _figure_type{ figure_type::ERect };

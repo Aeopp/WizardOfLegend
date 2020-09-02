@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "RotationBoomerang.h"
 
+void RotationBoomerang::initialize()
+{
+	Boomerang::initialize();
+
+	ScaleX = 1.f;
+	ScaleY = 1.f;
+
+}
+
 Event RotationBoomerang::update(float dt)
 {
 	Event _event = Boomerang::update(dt);

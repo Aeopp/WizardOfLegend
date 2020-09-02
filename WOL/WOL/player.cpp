@@ -136,7 +136,7 @@ void Player::initialize()
 
 	sp_nAttack->_owner = _ptr;
 
-	id = object::ID::player;
+	ObjectTag = object::Tag::player;
 
 	CurrentInvincibletime = DefaultInvincibletime = 0.1f;
 };
@@ -159,12 +159,23 @@ void Player::Hit(std::weak_ptr<object> _target)
 	if (CurrentInvincibletime > 0)return;
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
-	if (sp_target->id != object::ID::monster_attack)return;
+	if (sp_target->ObjectTag != object::Tag::monster_attack)return;
+
+	Timer& _Timer = Timer::instance();
 
 	if(_player_info->GetHP()>0)
 	{
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.4f, AnimTable::idle);
+		_player_info->bHit = true;
+		if (!_player_info->bDash)
+			_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.5f, AnimTable::idle);
+			collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
+			_Timer.event_regist(time_event::EOnce, 0.5f,
+			[&bHit = _player_info->bHit]() 
+			{
+				bHit = false; 
+			return true; 
+			});
 	}
 	else
 	{
@@ -172,10 +183,14 @@ void Player::Hit(std::weak_ptr<object> _target)
 		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
 		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f,	AnimTable::dead);
 	
-		Timer::instance().time_scale = 0.1f;
-		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
-			MB_OK);
-		Timer::instance().time_scale = 1.0f;
+	//	Timer::instance().time_scale = 0.1f;
+		sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
+		_Timer.event_regist(EOnce, 1.f, []() {
+			MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
+				MB_OK);
+			return true;
+			});;
+		_Timer.time_scale = 1.0f;
 		DeltaTime = 0.0f;
 
 		_player_info->SetHp(_player_info->max_hp);
@@ -237,7 +252,7 @@ void Player::MakeShield()
 		_shield->_owner = _ptr;
 
 		_shield->Angle = degree * i;
-		_shield->CalcIdx();
+	    	_shield->CalcIdx();
 	}
 	_player_info->bIdle = false;
 	_player_info->bAttack = true;
@@ -257,7 +272,7 @@ void Player::MakeShield()
 	Camera_Shake(15, dir, 0.3f);
 	_player_info->AddMp(-200);
 
-
+	sound_mgr::instance().Play("GAIA_ARMOR_START", false, 1.f);
 }
 
 void Player::ICE_BLAST(int Num)
@@ -422,7 +437,7 @@ void Player::player_check(float dt)
 		SkillBoomerang();
 	}
 	if (_Input.Key_Down('V')) {
-		MultiBoomerang(8);
+		MultiRotBoomerang(8);
 	}
 
 	if (_Input.Key_Down(VK_SPACE))
@@ -731,8 +746,14 @@ void Player::MultiRotBoomerang(int Num)
 
 	_player_info->AddMp(-50);
 
+	sound_mgr::instance().Play("ULT_USE", false, 1.f);
+	SkillInCastSlowTime(0.25f, 0.5f);
 }
-;
+
+void Player::GetSkill()
+{
+	sound_mgr::instance().Play("GET_SKILL", false, 1.f);
+}
 
 void Player::SkillInCastSlowTime(float Duration,float SlowTimeScale)
 {
@@ -871,6 +892,7 @@ void Player::Dash(float speed)
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
+	if (_player_info->bHit) return;
 
 	_player_info->bDash = true;
 	// 대쉬전에 방향 다시금 설정
@@ -970,7 +992,7 @@ void Player::Attack()
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
 	Camera_Shake(1, dir, 0.01f);
-	sound_mgr::instance().RandSoundKeyPlay("NORMAL_ATTACK_", { 1,3 }, 1);
+	sound_mgr::instance().RandSoundKeyPlay("NORMAL_ATTACK", { 1,3 }, 1);
 };
 
 void Player::Player_Move(float dt)
@@ -1073,7 +1095,6 @@ void Player::Player_Move(float dt)
 	if (_player_info->bMove = true)
 	{
 		sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
-	//	sound_mgr::instance().Play("RUN_1", false, 1);
 
 	}
 }

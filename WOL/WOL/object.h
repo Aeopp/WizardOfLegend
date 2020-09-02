@@ -3,6 +3,8 @@
 #include "layer_type.h"
 #include "transform.h"
 #include "event.h"
+#include "objectUniqueID.h"
+
 
 class  object abstract 
 {
@@ -14,9 +16,8 @@ public:
 	void late_initialize() {};
 	virtual void Hit(std::weak_ptr<object> _target);
 	virtual void HitTile(RECT TileRt);
-
 public:
-	enum class ID
+	enum class Tag
 	{
 		object,
 		map, 
@@ -26,7 +27,7 @@ public:
 		player_attack,
 		player_shield,
 	};
-	ID id{ ID::object };
+	Tag ObjectTag{ Tag::object };
 
 	virtual uint32_t get_layer_id()const&;
 	void set_ptr(std::weak_ptr<object> _ptr)&;
@@ -36,10 +37,11 @@ public:
 	std::weak_ptr<object> _ptr{};
 	std::weak_ptr<object> _owner{};
 
-
+	float HitCoolTime = 0.1f;
 	bool bInvalidatedefense = false;
 	bool bDie{ false };
 	bool bAttacking{ false };
 	std::pair<int, int> Attack;
+	EobjUniqueID UniqueID = EobjUniqueID::None;;
 };
 

@@ -72,7 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (bFrameLimit)
 		{
-			if (_Timer.tick + (1) < GetTickCount())
+			if (_Timer.tick + (10) < GetTickCount())
 			{
 				if (bDeltaTimeUnFixed)
 				{

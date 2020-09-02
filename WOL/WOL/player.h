@@ -72,6 +72,8 @@ private:
     void SkillRotBoomerang();
     void MultiRotBoomerang(int Num);
 
+    void GetSkill();
+
     void SkillInCastSlowTime(float Duration,float SlowTimeScale);
     void CheckDirInput();
     void make_gold_UI();

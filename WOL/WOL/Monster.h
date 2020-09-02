@@ -33,9 +33,9 @@ public:
 	vec collision_lower_correction{};
 
 	bool bDying = false;
-	float DefaultHitDuration = 0.25f;
+	float DefaultHitDuration = 0.35f;
 	bool bInvincible = false;
-	float InvincibleTime = 0.1f;
+	float InvincibleTime = 0.3f;
 	float StateDuration{};
 	EMonsterState CurrentState{ EMonsterState::Idle };
 	std::weak_ptr<class object> _AttackTarget;

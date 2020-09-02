@@ -16,6 +16,8 @@ void object::initialize()
 	_transform = std::make_shared<Transform>();
 	_transform->_location = vec{ 0,0 };
 	_transform->_dir = vec{ 0,+1 };
+	UniqueID = EobjUniqueID::None;
+
 }
 
 void object::release()
