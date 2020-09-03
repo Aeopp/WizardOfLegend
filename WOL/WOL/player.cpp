@@ -28,7 +28,7 @@
 #include "FireDragon.h"
 #include "EffectPlayerAttack.h"
 #include "sound_mgr.h"
-#include "RotationBoomerang.h"
+#include "ScrewBoomerang.h"
 
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -127,7 +127,7 @@ void Player::initialize()
 	int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 	auto sp_nAttack = object_mgr::instance().insert_object<EffectPlayerAttack>(
 		0, 0, L"WOL_NORMAL_ATTACK", layer_type::EEffect, 4,
-		0, _player_info->DefaultAttackDuration, _player_info->DefaultAttackDuration,
+		0, _player_info->DefaultAttackDuration, _player_info->AttackAnimDuration,
 		200, 200, 0.8f, 0.8f);
 
 	if (!sp_nAttack) return;
@@ -152,6 +152,18 @@ Event Player::update(float dt)
 	_player_info->AddHp(_player_info->HpRegenerationAtSec * dt);
 	_player_info->AddMp(_player_info->MpRegenerationAtSec* dt);
 
+	_player_info->SkillCurrentICEBlastCoolTime = 
+	min(_player_info->SkillCurrentICEBlastCoolTime+dt, _player_info->SkillICEBlastCoolTime);  
+
+	_player_info->SkillCurrentBoomerangNum= 
+	min(_player_info->SkillCurrentBoomerangNum + dt, _player_info->SkillBoomerangMaxNum);
+
+	_player_info->SkillCurrentICECrystalCoolTime= 
+	min(_player_info->SkillCurrentICECrystalCoolTime + dt, _player_info->SkillICECrystalCoolTime);
+
+	_player_info->SkillCurrentShieldCoolTime = 
+	min(_player_info->SkillCurrentShieldCoolTime + dt, _player_info->SkillShieldCoolTime);
+
 	return _E;
 }
 void Player::Hit(std::weak_ptr<object> _target)
@@ -159,8 +171,24 @@ void Player::Hit(std::weak_ptr<object> _target)
 	if (CurrentInvincibletime > 0)return;
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
-	if (sp_target->ObjectTag != object::Tag::monster_attack)return;
+	if (!sp_target->bAttacking)return;
+	if (sp_target->ObjectTag == object::Tag::player_attack)return;
+	//if (sp_target->ObjectTag == object::Tag::monster)return;
 
+	if (sp_target->ObjectTag == object::Tag::monster&& sp_target->UniqueID != EObjUniqueID::EWizardBall)return;
+
+	if (_player_info->bProtected == true){
+		sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
+		return;}
+
+	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
+
+	int Dice = math::Rand<int>(_player_info->MissRange);
+	if (Dice == 0)
+	{
+		MissMsg();
+		return;
+	}
 	Timer& _Timer = Timer::instance();
 
 	if(_player_info->GetHP()>0)
@@ -169,7 +197,7 @@ void Player::Hit(std::weak_ptr<object> _target)
 		_player_info->bHit = true;
 		if (!_player_info->bDash)
 			_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.5f, AnimTable::idle);
-			collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
+			collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 			_Timer.event_regist(time_event::EOnce, 0.5f,
 			[&bHit = _player_info->bHit]() 
 			{
@@ -213,9 +241,8 @@ void Player::Hit(std::weak_ptr<object> _target)
 
 	Camera_Shake(Atk, 
 		(_transform->_location - sp_target->_transform->_location).get_normalize(),
-		0.15f);
+		Atk*0.01);
 
-	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
 
 	CurrentInvincibletime = DefaultInvincibletime;
 };
@@ -230,11 +257,37 @@ void Player::temp(float temp)
 	MessageBox(game::instance().hWnd, __FUNCTIONW__, __FUNCTIONW__, MB_OK);
 }
 
+void Player::InputDirSpriteChange(vec Dir)
+{
+	math::EDir _Dir = math::checkDir(Dir);
+
+	switch (_Dir)
+	{
+	case math::EDir::left:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::left]);
+		break;
+	case math::EDir::right:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::right]);
+		break;
+	case math::EDir::up:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::front]);
+		break;
+	case math::EDir::down:
+		_render_component->ChangeImg(AnimDirFileTable[(int)EAnimDir::back]);
+		break;
+	default:
+		break;
+	}
+}
+
 void Player::MakeShield()
 {
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+	if (_player_info->SkillCurrentShieldCoolTime < _player_info->SkillShieldCoolTime)return;
+	_player_info->SkillCurrentShieldCoolTime =0;
+
 	Input_mgr& _Input = Input_mgr::instance();
-
-
 	object_mgr& _obj_mgr = object_mgr::instance();
 
 	float degree= 360.0f / 8.f;
@@ -250,10 +303,16 @@ void Player::MakeShield()
 		auto _shield = _obj_mgr.insert_object<shield>(std::move(_Transform));
 		if (!_shield) return;
 		_shield->_owner = _ptr;
-
+		_shield->duration = _player_info->ShieldDuration;
 		_shield->Angle = degree * i;
-	    	_shield->CalcIdx();
+		_shield->CalcIdx();
 	}
+	// 지속시간 종료시 쉴드 무적 해제
+	Timer::instance().event_regist(time_event::EOnce, _player_info->ShieldDuration, 
+	[&PInfo = _player_info]() {PInfo->bProtected = false; return true;  });
+
+	_player_info->bProtected = true;
+
 	_player_info->bIdle = false;
 	_player_info->bAttack = true;
 
@@ -269,7 +328,7 @@ void Player::MakeShield()
 	_render_component->ChangeAnim(AnimTable::attack2, _player_info->SkillShieldMotionDuration);
 
 	vec dir{ math::Rand<float>({ -10,+10 }), math::Rand<float>({ -0,+0 }) };
-	Camera_Shake(15, dir, 0.3f);
+	Camera_Shake(15, dir, 0.5f);
 	_player_info->AddMp(-200);
 
 	sound_mgr::instance().Play("GAIA_ARMOR_START", false, 1.f);
@@ -280,6 +339,8 @@ void Player::ICE_BLAST(int Num)
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
 	if (!_transform)return;
+	if (_player_info->SkillCurrentICEBlastCoolTime < _player_info->SkillICEBlastCoolTime)return;
+	_player_info->SkillCurrentICEBlastCoolTime = 0;
 
 	Input_mgr& _Input = Input_mgr::instance();
 
@@ -289,11 +350,11 @@ void Player::ICE_BLAST(int Num)
 	Timer& _Timer = Timer::instance();
 
 	float BlastDistanceBetween = 75.f;
-	float BlastSpawnCycle = 0.1f;
+	float BlastSpawnCycle = 0.05f;
 	int    IcePilarNum = 3;
 	float IcePilarDuration = 5.f;
 	int IcePilarDistribution = 300;
-	float IcePilarBeetWeen = 90.f;
+	float IcePilarBeetWeen = 100.f;
 
 	// 블라스트 생성 이펙트 한번 뿌려주기
 	object_mgr& obj_mgr = object_mgr::instance();
@@ -354,8 +415,6 @@ void Player::ICE_BLAST(int Num)
 								BLAST->_transform->_location = PilarSpwanLocation + (CurrentDir * IcePilarBeetWeen * i);
 							}
 						}
-
-
 					return true; 
 					});
 			
@@ -411,7 +470,7 @@ void Player::player_check(float dt)
 
 	if (_Input.Key_Down(VK_RBUTTON)) 
 	{
-		SkillFireDragon();
+		SkillRotBoomerang();
 	}
 
 	if (_Input.Key_Down('R'))
@@ -423,7 +482,7 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('E'))
 	{
 		
-		SkillIceCrystal(math::Rand<int>({ 1,12 }));
+		SkillIceCrystal(8);
 	}
 
 	if (_Input.Key_Down('Z')) {
@@ -439,7 +498,12 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('V')) {
 		MultiRotBoomerang(8);
 	}
-
+	if (_Input.Key_Down('B')) {
+		SkillScrewBoomerang();
+	}
+	if (_Input.Key_Down('N')) {
+		MultiScrewBoomerang(8);
+	}
 	if (_Input.Key_Down(VK_SPACE))
 	{
 		Dash(_player_info->dash_speed);
@@ -457,6 +521,8 @@ void Player::SkillBoomerang()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
+	if (_player_info->SkillCurrentBoomerangNum< _player_info->SkillBoomerangMaxNum)return;
+	_player_info->SkillCurrentICECrystalCoolTime -= 1;
 
 	object_mgr& _object_mgr = object_mgr::instance();
 
@@ -464,7 +530,7 @@ void Player::SkillBoomerang()
 	if (!_Boom)return;
 	if (!_Boom->_transform)return;
 
-	float InitSpeed = 100.f;
+	float InitSpeed = 1.f;
 
 	vec MyLocation = _transform->_location;
 	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
@@ -506,6 +572,8 @@ void Player::SkillIceCrystal(uint32_t Num)
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
+	if (_player_info->SkillCurrentICECrystalCoolTime < _player_info->SkillICECrystalCoolTime)return;
+	_player_info->SkillCurrentICECrystalCoolTime = 0;
 
 	object_mgr& _object_mgr = object_mgr::instance();
 
@@ -533,6 +601,12 @@ void Player::SkillIceCrystal(uint32_t Num)
 
 	_player_info->AddMp(-100);
 
+	Timer::instance().time_scale = 0.5f;
+
+	Timer::instance().event_regist(time_event::EOnce, 0.2f, []() {
+		Timer::instance().time_scale = 1.f; return true; });
+
+	SOUNDPLAY("ULT_USE", 1.f, false);
 }
 void Player::SkillFireDragon()
 {
@@ -660,7 +734,7 @@ void Player::SkillRotBoomerang()
 	if (!_Boom)return;
 	if (!_Boom->_transform)return;
 
-	float InitSpeed = 100.f;
+	float InitSpeed = 0.5f;
 
 	vec MyLocation = _transform->_location;
 	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
@@ -678,6 +752,8 @@ void Player::SkillRotBoomerang()
 	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
 
 	int AttackAnimNum = math::Rand<int>({ 1,2 });
+
+	InputDirSpriteChange(Dir);
 
 	if (AttackAnimNum == 1)
 	{
@@ -748,6 +824,113 @@ void Player::MultiRotBoomerang(int Num)
 
 	sound_mgr::instance().Play("ULT_USE", false, 1.f);
 	SkillInCastSlowTime(0.25f, 0.5f);
+}
+
+void Player::SkillScrewBoomerang()
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	float InitSpeed = 0.5f;
+
+	vec MyLocation = _transform->_location;
+	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
+	vec Dir = Dis.get_normalize();
+
+	auto _Boom = _object_mgr.insert_object<ScrewBoomerang>
+	(MyLocation + Dir * InitSpeed,Dir);
+
+	if (!_Boom)return;
+	if (!_Boom->_transform)return;
+
+	_Boom->_transform->_dir = Dir;
+	_Boom->_transform->_location = MyLocation + Dir * InitSpeed;
+	_Boom->CalcImgAngle(math::radian_to_degree(atan2f(Dir.y, Dir.x)));
+
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+
+	int AttackAnimNum = math::Rand<int>({ 1,2 });
+
+	if (AttackAnimNum == 1)
+	{
+		_render_component->ChangeAnim(AnimTable::attack1,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+	else
+	{
+		_render_component->ChangeAnim(AnimTable::attack2,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+
+	Camera_Shake(1, dir, 0.2f);
+
+	_player_info->AddMp(-50);
+}
+
+void Player::MultiScrewBoomerang(int Num)
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+
+	object_mgr& _object_mgr = object_mgr::instance();
+
+
+	float InitSpeed = 10.f;
+
+	vec MyLocation = _transform->_location;
+	vec Dis = *Input_mgr::instance().GetWorldMousePos() - MyLocation;
+	vec Dir = Dis.get_normalize();
+
+	for (int i = 0; i < Num; ++i)
+	{
+		vec InitDir = math::rotation_dir_to_add_angle(Dir, (360.f / Num) * i);
+		auto _Boom = _object_mgr.insert_object<ScrewBoomerang>(
+		MyLocation + InitDir * InitSpeed, InitDir);
+		if (!_Boom)return;
+		if (!_Boom->_transform)return;
+		_Boom->_transform->_dir = InitDir;
+		_Boom->_transform->_location = MyLocation + InitDir * InitSpeed;
+		_Boom->CalcImgAngle(math::radian_to_degree(atan2f(InitDir.y, InitDir.x)));
+	}
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+
+	int AttackAnimNum = math::Rand<int>({ 1,2 });
+
+	if (AttackAnimNum == 1)
+	{
+		_render_component->ChangeAnim(AnimTable::attack1,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+	else
+	{
+		_render_component->ChangeAnim(AnimTable::attack2,
+			_player_info->SkillBoomerangMotionDuration);
+	}
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+
+	Camera_Shake(8, dir, 0.4f);
+
+	_player_info->AddMp(-50);
+
+	sound_mgr::instance().Play("ULT_USE", false, 1.f);
+	SkillInCastSlowTime(0.25f, 0.5f);
+
 }
 
 void Player::GetSkill()
@@ -870,18 +1053,26 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 	case ESkill::FIRE:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 202,838 }, L"FIRE_DRAGON_SKILLBAR.bmp");
+		USBI->Current = &_player_info->SkillCurrentBoomerangNum;
+		USBI->Max = &_player_info->SkillBoomerangMaxNum;
 		break;
 	case ESkill::BLAST:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 259,838 }, L"ICE_BLAST_SKILLBAR.bmp");
+		USBI->Current = &_player_info->SkillCurrentICEBlastCoolTime;
+		USBI->Max = &_player_info->SkillICEBlastCoolTime;
 		break;
 	case ESkill::CRYSTAL:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 315,838 }, L"ICE_KRYSTAL_SKILLBAR.bmp");
+		USBI->Current = &_player_info->SkillCurrentICECrystalCoolTime;
+		USBI->Max = &_player_info->SkillICECrystalCoolTime;
 		break;
 	case ESkill::ARMOR:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 315 + 57,838 }, L"GAIA_ARMOR_SKILLBAR.bmp");
+		USBI->Current = &_player_info->SkillCurrentShieldCoolTime;
+		USBI->Max     =	&_player_info->SkillCurrentShieldCoolTime;
 		break;
 	default:
 		break;
@@ -926,13 +1117,13 @@ void Player::Attack()
 	if (!_transform)return;
 	auto sp_Attack = NormalAttack.lock();
 	if (!sp_Attack) return;
+	sound_mgr::instance().RandSoundKeyPlay("NORMAL_ATTACK", { 1,3 }, 1.f);
 
 	Anim& MyAnim = _render_component->_Anim;
 	// 어택 듀레이션이 지난 다음에 어택을 풀어주기
 	_player_info->bAttack = true;
 	float DefaultAttackDuration = _player_info->DefaultAttackDuration;
 	_player_info->CurrentAttackDuration = DefaultAttackDuration;
-	
 
 	if (!_transform) return;
 	vec dis = *Input_mgr::instance().GetWorldMousePos() - _transform->_location;
@@ -947,7 +1138,7 @@ void Player::Attack()
 	Dir.y *= -1;
 
 	_transform->_dir = Dir;
-	_transform->Move(_transform->_dir, 20.f);
+	_transform->Move(_transform->_dir, 15.f);
 
 	math::EDir _Dir = math::checkDir(attack_dir);
 
@@ -976,23 +1167,22 @@ void Player::Attack()
 	if ((int)AnimTable::attack1 == MyAnim.CurClipRowIndex())
 	{
 		AttackNumber  _ANum = AttackNumber::_1;
-		_render_component->ChangeAnim(AnimTable::attack2, _player_info->DefaultAttackDuration);
+		_render_component->ChangeAnim(AnimTable::attack2, _player_info->AttackAnimDuration);
 	}
 	else
 	{
 		AttackNumber  _ANum = AttackNumber::_2;
-		_render_component->ChangeAnim(AnimTable::attack1, _player_info->DefaultAttackDuration);
+		_render_component->ChangeAnim(AnimTable::attack1, _player_info->AttackAnimDuration);
 	};
 
 	
-	sp_Attack->AttackStart(DefaultAttackDuration,
-		DefaultAttackDuration, _player_info->NormalAttackPushForce,
+	sp_Attack->AttackReady(_player_info->AttackCollisionDuration,
+		_player_info->AttackAnimDuration, _player_info->NormalAttackPushForce,
 		_transform->_location + _transform->_dir * _player_info->NormalAttackRich, _ANum,
 		fDegree);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
 	Camera_Shake(1, dir, 0.01f);
-	sound_mgr::instance().RandSoundKeyPlay("NORMAL_ATTACK", { 1,3 }, 1);
 };
 
 void Player::Player_Move(float dt)
@@ -1102,5 +1292,20 @@ void Player::Player_Move(float dt)
 void Player::Die()
 {
 	sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
+}
+
+void Player::MissMsg()
+{
+	vec randvec = math::RandVec();
+	randvec.y = (abs(randvec.y));
+	vec v = _transform->_location;
+	v.y -= 35;
+	v.x += math::Rand<int>({ -40,+40 });
+
+	object_mgr::instance().TextEffectMap[RGB(108, 32,200)].
+		push_back({ v ,vec{0,1}*3,
+		1.f,30,L"MISS" });
+
+	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 }
 

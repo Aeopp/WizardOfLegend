@@ -12,6 +12,6 @@ public:
 	Event update(float dt)override;
 	void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	float ImgAngle = 0;
-	float RotationSpeed = 1600.f;
+	float RotationSpeed = 900.f;
 };
 

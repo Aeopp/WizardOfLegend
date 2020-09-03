@@ -236,6 +236,9 @@
     <ClInclude Include="ArcherArrow.h" />
     <ClInclude Include="RotationBoomerang.h" />
     <ClInclude Include="objectUniqueID.h" />
+    <ClInclude Include="WizardFire.h" />
+    <ClInclude Include="ScrewBoomerang.h" />
+    <ClInclude Include="WizardBall.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -440,6 +443,15 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="RotationBoomerang.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="WizardFire.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrewBoomerang.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="WizardBall.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

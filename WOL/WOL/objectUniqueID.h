@@ -2,9 +2,13 @@
 
 using uint32_t = unsigned int;
 
-enum class EobjUniqueID : uint32_t
+enum class EObjUniqueID : uint32_t
 {
 	None,
 	NormalAttack,
+	EWizardBall,
+	ICEBLAST,
+	ICECRYSTAL,
+	Boomerang,
 	Max,
 };

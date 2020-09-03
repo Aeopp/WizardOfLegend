@@ -28,10 +28,11 @@ public:
     PlayerState CurrentState{ PlayerState::Idle };
 
     float CurrentInvincibletime;
-    float DefaultInvincibletime;
+    float DefaultInvincibletime = 0.2f;
     bool bInputDiagonal{ false };
 
     std::shared_ptr<class player_info> _player_info;
+    void Camera_Shake(float force, vec dir, float duration);
 private:
     enum class AnimTable
     {
@@ -59,18 +60,22 @@ private:
     std::array<std::weak_ptr<class Bmp>,(int)EAnimDir::max> AnimDirFileTable;
 
     void temp(float temp);
- 
-    void Camera_Shake(float force, vec dir, float duration);
+    void InputDirSpriteChange(vec Dir);
+
     void player_check(float dt);
 
     void MakeShield();
     void ICE_BLAST(int Num);
     void SkillIceCrystal(uint32_t Num);
     void SkillFireDragon();
+
     void SkillBoomerang();
     void MultiBoomerang(int Num);
     void SkillRotBoomerang();
     void MultiRotBoomerang(int Num);
+    void SkillScrewBoomerang();
+    void MultiScrewBoomerang(int Num);
+
 
     void GetSkill();
 
@@ -84,5 +89,6 @@ private:
     void Attack();
     void Player_Move(float dt);
     void Die();
+    void MissMsg();
 };
 

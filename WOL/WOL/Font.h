@@ -8,11 +8,9 @@ public:
 
 		template<typename ... Strs>
 		Font(HDC hdc,   COLORREF _color, int x , int y , int fontsize ,
-			Strs&&... text);
+		Strs&&... text);
 private:
-
 		HFONT hFont, oldFont;
-
 };
 
 template<typename ...Strs>

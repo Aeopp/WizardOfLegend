@@ -27,17 +27,24 @@ public:
 	void Hit(std::weak_ptr<object> _target)override;
 	void late_initialize(std::weak_ptr<class object> SetTarget,
 	vec SetLocation);
+	void HitSoundPlayBackByTag(EObjUniqueID CheckID, object::Tag CheckTag);
+	void DieSoundPlay();
+	void MonsterDie();
+	void HitSoundPlay();
+	void ICEHitSoundPlay();
+	void WINDHitSoundPlay();
+	void NormalHitSoundPlay();
+	void BoomerangSoundPlay();
 public:
 	std::weak_ptr<collision_component>  _collision_component{};
 
 	vec collision_lower_correction{};
 
 	bool bDying = false;
-	float DefaultHitDuration = 0.35f;
+	float DefaultHitDuration = 0.4f;
 	bool bInvincible = false;
 	float InvincibleTime = 0.3f;
 	float StateDuration{};
-	EMonsterState CurrentState{ EMonsterState::Idle };
 	std::weak_ptr<class object> _AttackTarget;
 	EnemyInfo _EnemyInfo{};
 public:

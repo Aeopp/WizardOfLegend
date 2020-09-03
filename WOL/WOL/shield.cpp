@@ -37,8 +37,7 @@ void shield::initialize()
 	ObjectTag = object::Tag::player_shield;
 
 	bAttacking = true;
-	Attack = { 5,10 };
-
+	Attack = { 0,0 };
 }
 
 Event shield::update(float dt)
@@ -58,7 +57,7 @@ Event shield::update(float dt)
 		_render_component->_Anim.ColIndex %= 12;
 		/*CalcIdx();*/
 	}
-
+	
 	vec w = Owner->_transform->_location;
 
 	vec& r = _transform->_dir;
@@ -113,8 +112,9 @@ void shield::render(HDC hdc, vec camera_pos, vec size_factor)
 void shield::Hit(std::weak_ptr<object> _target)
 {
 	object::Hit(_target);
+	//auto sp_target = _target.lock();
+	//if (!sp_target)return;
 
-	RAND_SOUNDPLAY("GAIA_ARMOR_HIT", { 1,4 });
 }
 
 void shield::CalcIdx()
@@ -155,11 +155,10 @@ void shield::late_initialize(Transform _Transform)
 	if (!sp_collision)return;
 
 	sp_collision->bSlide = true;
-	sp_collision->PushForce = 1.f;
+	sp_collision->PushForce = 5.f;
 	sp_collision->bCollisionTargetPushFromForce = true;
 	sp_collision->_size = { 50.f,50.0f };
 
-	duration = 15.f;
 	PaintSizeX = 100;
 	PaintSizeY = 105;
 	float Scale = 1.f;

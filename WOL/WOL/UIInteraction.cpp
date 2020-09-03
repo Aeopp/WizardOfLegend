@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "UIInteraction.h"
 #include "Input_mgr.h"
+#include "sound_mgr.h"
 
 Event UIInteraction::update(float dt)
 {
@@ -24,6 +25,7 @@ Event UIInteraction::update(float dt)
 		bOnMouse = true;
 		if (bClick)
 		{
+			SOUNDPLAY("CLICK_MENU", 1.f, false);
 			Click(*pos);
 		}
 		else

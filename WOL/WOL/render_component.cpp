@@ -6,8 +6,7 @@
 
 render_component::~render_component() noexcept
 {
-	static int render_destroy = 0;
-	render_destroy++;
+	
 }
 
 void render_component::release() noexcept

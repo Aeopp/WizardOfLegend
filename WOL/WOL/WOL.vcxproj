@@ -81,6 +81,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\\..\\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -211,6 +212,7 @@
     <ClInclude Include="Scene_mgr.h" />
     <ClInclude Include="Scene_Stage.h" />
     <ClInclude Include="Scene_Start.h" />
+    <ClInclude Include="ScrewBoomerang.h" />
     <ClInclude Include="Shadow.h" />
     <ClInclude Include="shield.h" />
     <ClInclude Include="singleton_interface.h" />
@@ -234,6 +236,8 @@
     <ClInclude Include="UIStart.h" />
     <ClInclude Include="UI_PlayerBar.h" />
     <ClInclude Include="WIZARD.h" />
+    <ClInclude Include="WizardBall.h" />
+    <ClInclude Include="WizardFire.h" />
     <ClInclude Include="WOL.h" />
   </ItemGroup>
   <ItemGroup>
@@ -287,6 +291,7 @@
     <ClCompile Include="Scene_mgr.cpp" />
     <ClCompile Include="Scene_Stage.cpp" />
     <ClCompile Include="Scene_Start.cpp" />
+    <ClCompile Include="ScrewBoomerang.cpp" />
     <ClCompile Include="Shadow.cpp" />
     <ClCompile Include="shield.cpp" />
     <ClCompile Include="singleton_interface.cpp" />
@@ -309,6 +314,8 @@
     <ClCompile Include="UIStart.cpp" />
     <ClCompile Include="UI_PlayerBar.cpp" />
     <ClCompile Include="WIZARD.cpp" />
+    <ClCompile Include="WizardBall.cpp" />
+    <ClCompile Include="WizardFire.cpp" />
     <ClCompile Include="WOL.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -44,7 +44,8 @@ Event GoldEffect::update(float dt)
 
     if (dis.length() < distance)
     {
-        sp_player->_player_info->gold += Gold;
+        sp_player->_player_info->AddGold(Gold);
+        
 
         std::wstring str = L"+";
         str += std::to_wstring(Gold);

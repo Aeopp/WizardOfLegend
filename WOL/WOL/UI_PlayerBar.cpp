@@ -39,7 +39,7 @@ void UI_PlayerBar::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	loc -= _render_component->Dest_Paint_Size * 0.5f;
 
-	
+	/*
 	{
 		std::wstringstream wss;
 		wss << (int)sp_info->GetHP()<< L"/" << (int)sp_info->max_hp << std::endl;
@@ -52,7 +52,7 @@ void UI_PlayerBar::render(HDC hdc, vec camera_pos, vec size_factor)
 			Font(hdc, wss.str(), 20, RGB(228, 255, 193), (int)loc.x + 100, (int)loc.y - 13);
 			Font(hdc, L"", 20, RGB(255, 0, 0));
 		}
-		
+		*/
 	
 		
 }

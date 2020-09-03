@@ -20,6 +20,8 @@
 #include "Debuger.h"
 #include "ARCHER.h"
 #include "sound_mgr.h"
+#include "WizardBall.h"
+
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 {
@@ -64,8 +66,6 @@ void Scene_Stage::update(float dt)
 	_Input.update();
 
 	collision_mgr::instance().update();
-
-
 }
 
 void Scene_Stage::initialize()
@@ -82,10 +82,12 @@ void Scene_Stage::initialize()
 
 	auto Effect_SUMMON = object_mgr::instance().insert_object<Effect>
 		(PlayerSpawnLocation.x,+100,
-			L"SUMMON", layer_type::EEffect, 8, 0, 1.4f, 1.0f, 225, 730,
+			L"SUMMON", layer_type::EEffect, 8, 0, 1.0f, 1.0f, 225, 730,
 			1.f, 1.6f);
 
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
+		SOUNDPLAY("teleport", 1.f, true);
+
 	/*late_initialize(int ImgLocationX, int ImgLocationY,
 		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
 		int AnimRowIndex, float Duration, float AnimDuration,
@@ -93,7 +95,6 @@ void Scene_Stage::initialize()
 	// TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
-		sound_mgr::instance().Play("teleport", false, 1.f);
 
 		auto _Player = obj_mgr.insert_object<Player>();
 		_Player->_transform->_location = PlayerSpawnLocation;
@@ -107,7 +108,7 @@ void Scene_Stage::initialize()
 		float s = 0.f;
 		float Distance = 400.f;
 
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < 8; ++i)
 		{
 			s += Angle;
 			vec v = PlayerSpawnLocation;
@@ -115,11 +116,19 @@ void Scene_Stage::initialize()
 			Distance * std::sinf(s) };
 			v += w;
 
-			Monster::CardEffect(v, SwordMan::SummonCardImgKey);
 
-			auto archer = obj_mgr.insert_object<SwordMan>
-				(_Player, v);
-			manage_objs.push_back(archer);
+			vec InitPos = v +
+				math::RandVec() * math::Rand<float>({ -100,100 });
+			//Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
+			//auto sp_WizBall = WizardBall::BallCast();
+			//sp_WizBall->_transform->_location = InitPos;
+			//sp_WizBall->wp_AttackTarget = _Player;
+
+			//manage_objs.push_back(sp_WizBall);
+
+			auto qwe = object_mgr::instance().insert_object<ARCHER>(_Player, v);
+			
+			manage_objs.push_back(qwe);
 		}
 		
 		manage_objs.push_back(_camera);

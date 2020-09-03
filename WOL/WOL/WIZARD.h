@@ -8,21 +8,38 @@ public:
     void initialize()override;
     Event update(float dt)override;
     void Hit(std::weak_ptr<object> _target)override;
+    void render(HDC hdc, vec camera_pos, vec size_factor)override;
+
+    static inline const std::wstring SummonCardImgKey = L"SUMMON_CARD_WIZARD";
+
+    static inline float FireCoolTime = 5.0f;
+    static inline float BallCoolTime = 10.f;
+
+
+    float CurrentFireCoolTime = FireCoolTime; 
+    float CurrentBallCoolTime = BallCoolTime; 
+
+    float AttackPreparation = 1.f;
+    vec EscapeVec{};
+    float EscapeDuration;
+    float EscapeRamainTick;
+    float StalkerPosReTargetDuration;
+    vec RandMoveVec{};
+    static inline float RandMoveVecDuration = 4.f;
+    float CurrentRandMoveDuration;
+    std::shared_ptr<class Bmp> FireImg{};
+    void FireCast();
+    
 private:
-    enum class AnimTable
+    void DirCheckAnimFileChange();
+
+    enum class EAnimState : uint8_t
     {
-        idle,
-        walk,
-        attack,
-        hit,
-        dead,
+        Idle,
+        Walk,
+        Attack,
+        Hit,
+        Dead,
     };
-    enum class EAnimDir
-    {
-        right,
-        left,
-        max,
-    };
-    std::array<std::weak_ptr<class Bmp>, (int)EAnimDir::max> AnimDirFileTable;
 };
 

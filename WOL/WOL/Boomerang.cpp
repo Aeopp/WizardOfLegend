@@ -5,11 +5,13 @@
 #include "Color.h"
 #include "Bmp_mgr.h"
 #include "Bmp.h"
+#include "sound_mgr.h"
 
 
 void Boomerang::initialize()
 {
 	actor::initialize();
+	RAND_SOUNDPLAY("FIRE_DRAGON", { 1,3 }, 1.f, false);
 
 	_collision_component = collision_mgr::instance().
 	insert(_ptr, collision_tag::EPlayerAttack, ECircle);
@@ -19,19 +21,19 @@ void Boomerang::initialize()
 	if (!sp_collision)return;
 
 
-	Duration = 20.f;
+	Duration = 30.f;
 
-	ScaleX = 0.5f;
-	ScaleY = 0.5f;
+	ScaleX = 0.7f;
+	ScaleY = 0.7f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 200;
 	// 직선 운동 속도
-	_speed = 2500.f;
+	_speed = 1500.f;
 	AnimSpeed = 2.f;
 	sp_collision->bSlide = true;
 	sp_collision->bCollisionTargetPushFromForce = true;
-	sp_collision->PushForce = 1.f;
+	sp_collision->PushForce = 30.f;
 	sp_collision->_size = { 60.f,60.f };
 	sp_collision->bCollision = true;
 	sp_collision->bRender = true;
@@ -39,7 +41,7 @@ void Boomerang::initialize()
 
 	bAttacking = true;
 	ObjectTag = object::Tag::player_attack;
-	Attack = { 20,30 };
+
 	bAttacking = true;
 	_Shadow.correction = { 0,60 };
 	_Shadow.bShadow = false;
@@ -59,7 +61,9 @@ void Boomerang::initialize()
 	wp_ResetImg = Bmp_mgr::instance().Find_Image_WP(L"SWORDMAN_ATTACK_RESET");
 	wp_RotImg = Bmp_mgr::instance().Find_Image_WP(L"SWORDMAN_ATTACK_ROTATION");
 
-	Attack = { 5,15};
+	Attack = { 30,40};
+
+	UniqueID = EObjUniqueID::Boomerang;
 
 }
 
@@ -71,9 +75,6 @@ Event Boomerang::update(float dt)
 	if (Duration < 0)return Event::Die;
 
 	_transform->_location +=_transform->_dir * _speed * dt;
-
-	//ImgAngle += dt * 1280.f;
-
 	
 
 	return _event;
@@ -181,6 +182,8 @@ void Boomerang::HitTile(RECT TileRt)
 	vec dir = _transform->_dir;
 	dir *= -1;
 
+	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+	
 	float RandAngle = math::Rand<int>({ -45,+45 });
 
 	dir =math::rotation_dir_to_add_angle(dir,RandAngle);
@@ -215,4 +218,10 @@ void Boomerang::CalcImgAngle(float RotationImgDegree)
 
 	RotPts[2].y = (LONG)(y + sinf(
 		math::degree_to_radian(225.f + RotationImgDegree)) * Dis);
+}
+
+Boomerang::~Boomerang() noexcept
+{
+	RAND_SOUNDPLAY("FIRE_DRAGON_DIE", { 0,3 }, 1.f, false);
+
 }

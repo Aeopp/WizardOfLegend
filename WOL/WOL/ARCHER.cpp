@@ -17,7 +17,7 @@ void ARCHER::initialize()
 {
 	collision_lower_correction = { 0,+40 };
 
-	lower_size = { 20,45 };
+	lower_size = { 25,50 };
 	
 
 
@@ -27,7 +27,7 @@ void ARCHER::initialize()
 	_EnemyInfo.HP = 200.f;
 	_EnemyInfo.DeadTimer = 1.5f;
 	_EnemyInfo.AttackRange = { 20,30 };
-	_EnemyInfo.AttackStartDistance = 300.f;
+	_EnemyInfo.AttackStartDistance = 600.f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 200;
@@ -51,6 +51,7 @@ void ARCHER::initialize()
 	DefaultHitDuration = 0.15f;
 	EscapeRamainTick = EscapeDuration = 1.3f;
 	_speed = 200.f;
+	InitTime = 4.5f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
@@ -63,9 +64,8 @@ Event ARCHER::update(float dt)
 	if (bDying)
 		return Event::None;
 
-	CoolTime -= dt;
+	CurrentFireCoolTime -= dt;
 	Event _E = Monster::update(dt);
-	StateDuration -= dt;
 	EscapeRamainTick -= dt;
 
 	if (_EnemyInfo.bHit)
@@ -109,7 +109,7 @@ Event ARCHER::update(float dt)
 		
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 		// 여기서 공격
-		if (CoolTime < 0)
+		if (CurrentFireCoolTime < 0)
 		{
 			Timer::instance().event_regist(time_event::EOnce, 2.3f,
 				[&bParticle = NormalAttack,
@@ -118,7 +118,7 @@ Event ARCHER::update(float dt)
 				&_Shadow = _Shadow, &_Info = _EnemyInfo,
 				&render = _render_component,
 				&_NormalAttack = NormalAttack,
-				&_CoolTime = this->CoolTime](){
+				&_CoolTime = this->CurrentFireCoolTime](){
 
 				if (!bParticle)return true;
 				if (_Info.bHit)return true;
@@ -133,10 +133,10 @@ Event ARCHER::update(float dt)
 				return true;
 			});				
 
-			CoolTime = 2.3f;
+			CurrentFireCoolTime = 2.3f;
 
 		}
-		else if (CoolTime > 0)
+		else if (CurrentFireCoolTime > 0)
 		{
 			_render_component->ChangeAnim(EAnimState::Attack, 0.3f);
 			_Shadow.CurrentShadowState = EShadowState::NORMAL;
@@ -148,11 +148,11 @@ Event ARCHER::update(float dt)
 		NormalAttack->Preparation(false);
 		_EnemyInfo.bAttack = false;
 
-		StalkerDuration -= dt;
-		if (StalkerDuration < 0)
+		StalkerPosReTargetDuration -= dt;
+		if (StalkerPosReTargetDuration < 0)
 		{
 			_transform->_dir = math::rotation_dir_to_add_angle(dir, math::Rand<float>({ -89,89 }));
-			StalkerDuration = 1.5f;
+			StalkerPosReTargetDuration = 1.5f;
 		}
 
 		_transform->_location += _transform->_dir * dt * _speed;
@@ -181,9 +181,7 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	if (sp_target->ObjectTag == object::Tag::monster)return;
 	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
 
-	if (sp_target->UniqueID == EobjUniqueID::NormalAttack)
-		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1.f);
-	
+	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
 
 	bInvincible = true;
 	NormalAttack->Preparation(false);
@@ -192,11 +190,8 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 
 	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
-	collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
+	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 
-	StateDuration = 0.25f;
-	CurrentState = EMonsterState::Hit;
-	
 	float Atk = math::Rand<int>(sp_target->Attack);
 	_EnemyInfo.HP -= Atk;
 
@@ -221,31 +216,8 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 
 	if (_EnemyInfo.HP < 0)
 	{
-		bDying = true;
-		CurrentState = EMonsterState::Dead;
-
-		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.9f, EAnimState::Dead);
-
-		Timer::instance().event_regist(time_event::EOnce, 1,
-
-			[AttackTarget = _AttackTarget, 
-			v = _transform->_location, 
-			&bDie = this->bDie]()
-
-		   {
-			
-			bDie = true;
-		    auto _gold = GoldEffect::MakeGold(v.x, v.y,
-			L"MONEY", layer_type::EEffect, 2,
-			math::Rand<int>({ 0,2 }), FLT_MAX, 0.5f, 24, 24, 1.f, 1.f, AttackTarget);
-		    return true;
-		
-			}	
-		);
-
-		auto sp_col = _collision_component.lock();
-		if (!sp_col)return;
-		sp_col->bDie = true;
+		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.87f, EAnimState::Dead);
+		MonsterDie();
 	}
 	else
 	{

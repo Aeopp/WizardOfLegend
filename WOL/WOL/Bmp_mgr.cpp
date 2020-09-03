@@ -75,6 +75,15 @@ void Bmp_mgr::initialize()
 	 Insert_Bmp(DefaultPath + L"ARCHER_LEFT.bmp", L"ARCHER_LEFT");
 	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK_RESET.bmp", L"SWORDMAN_ATTACK_RESET");
 	 Insert_Bmp(DefaultPath + L"SWORDMAN_ATTACK_ROTATION.bmp", L"SWORDMAN_ATTACK_ROTATION");
+
+	 Insert_Bmp(DefaultPath + L"WIZARD_LEFT.bmp", L"WIZARD_LEFT");
+	 Insert_Bmp(DefaultPath + L"WIZARD_RIGHT.bmp", L"WIZARD_RIGHT");
+
+	 Insert_Bmp(DefaultPath + L"WIZARD_FIRE.bmp", L"WIZARD_FIRE");
+	 Insert_Bmp(DefaultPath + L"WIZARD_BALL.bmp", L"WIZARD_BALL");
+	 Insert_Bmp(DefaultPath + L"SUMMON_CARD_WIZARDBALL.bmp", L"SUMMON_CARD_WIZARDBALL");
+
+	
 };	 	
 
 

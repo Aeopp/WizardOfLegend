@@ -12,14 +12,14 @@ public:
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
 
     static inline const std::wstring SummonCardImgKey = L"SUMMON_CARD_ARCHER";
-    float CoolTime;
+    float CurrentFireCoolTime;
     float AttackPreparation = 1.f;
     vec EscapeVec{};
     float EscapeDuration;
     float EscapeRamainTick;
-    float StalkerDuration;
+    float StalkerPosReTargetDuration;
     std::shared_ptr<class ArcherBow> NormalAttack{};
-    std::shared_ptr<class Bmp> BowImg{};
+    std::shared_ptr<class Bmp> FireImg{};
 private:
     void DirCheckAnimFileChange();
 

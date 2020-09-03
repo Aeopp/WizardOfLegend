@@ -10,7 +10,7 @@
 void SwordManAttack::EffectStart(vec dir, vec location)
 {
 	_Dir = math::checkDir(dir);
-	CurrentAttackDuration = DefaultAttackDuration;
+	CurrentAttackDuration = DefaultAttackDuration = 0.1f;
 	auto sp_comp = _collision_component.lock();
 	if (!sp_comp)return;
 	sp_comp->bCollision = true;
@@ -38,8 +38,9 @@ void SwordManAttack::EffectStart(vec dir, vec location)
 	ImgLocationY = location.y;
 	bRender = true; 
 	Attack = { 40,50 };
+	bAttacking = true;
 
-	AnimDuration = 0.3f;
+	AnimDuration = 0.1f;
 
 	ScaleX = 0.9f;
 	ScaleY = 0.9f;
@@ -71,7 +72,7 @@ Event SwordManAttack::update(float dt)
 	if (AnimDelta < 0)
 	{
 		AnimDelta = (float)AnimDuration / ((float)AnimColNum *2);
-		++CurrentCol;
+		//++CurrentCol;
 		if (CurrentCol >= AnimColNum)
 		{
 			switch (_Dir)
@@ -130,7 +131,7 @@ void SwordManAttack::initialize()
 	sp_comp->PushForce = 0.01f;
 	sp_comp->_size = { 80.f,80.f };
 	sp_comp->bRender = true;
-
+	bAttacking = true;
 	CurrentAttackDuration = DefaultAttackDuration = 0.2f;
 
 	ObjectTag = object::Tag::monster_attack;

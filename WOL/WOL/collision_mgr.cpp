@@ -219,7 +219,7 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 
 			vec w = v - cpos;
 			
-			float wx{ 100 }, wy{ 100 };
+			float wx{ 150 }, wy{ 150 };
 			GdiTransparentBlt(hdc, w.x-(wx/2), w.y-(wy/2),
 				wx, wy, srcDC, col * 230, row * 230, 230, 230, RGB(255, 250, 255));
 		}
@@ -314,9 +314,9 @@ void collision_mgr::update()
 	collision(EMonster, EMonster);
 	collision(EMonster, EPlayer);
 	collision(EPlayerAttack, EMonster);
+	collision(EPlayerAttack, EMonsterAttack);
 	collision(EFireDragon, EMonster);
 	collision(EMonsterAttack, EPlayer);
-
 	collision(EShield, EMonster);
 	collision(EShield,EMonsterAttack);
 
@@ -359,7 +359,7 @@ bool collision_mgr::IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs
 }
 void collision_mgr::HitEffectPush(vec location, float Duration)
 {
-	CollisionHitEffectList.push_back({ location,0,math::Rand<int>({ 0,3 }),Duration/5 ,Duration / 5 });
+	CollisionHitEffectList.push_back({ location,0,math::Rand<int>({ 0,3 }),Duration/4 ,Duration / 4 });
 }
 void collision_mgr::check_erase()&
 {
@@ -412,8 +412,9 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 			auto rhs_figure = rhs_obj->_figure_type;
 
 			std::optional<vec> bCollision{ std::nullopt };
+			bCollision = math::rectVSrect(lhs_obj->make_rect(), rhs_obj->make_rect());
 
-			if (lhs_figure == ERect && rhs_figure == ERect)
+			/*if (lhs_figure == ERect && rhs_figure == ERect)
 			{
 				bCollision= math::rectVSrect(lhs_obj->make_rect(), rhs_obj->make_rect());
 			}
@@ -428,7 +429,7 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 			else if (lhs_figure == ECircle&& rhs_figure == ERect)
 			{
 				bCollision = math::circleVSrect(lhs_obj->make_circle(), rhs_obj->make_rect());
-			}
+			}*/
 
 			if (bCollision.has_value())
 			{
@@ -455,11 +456,11 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				}
 				if (lhs_obj->bCollisionSlideAnObject || IsObjectSlideMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))
 				{
-					_ptr->_transform->_location += *bCollision;
+					_ptr->_transform->_location += (*bCollision * rhs_obj->fSlideFactor);
 				}
-				/*if (lhs_obj->bHitEffect)
+				if (lhs_obj->bHitEffect)
 				{
-					if (!_ptr->_transform)continue;
+				/*	if (!_ptr->_transform)continue;
 					if (false == IsHitEffectMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))return;
 
 					auto sp_owner = lhs_obj->get_owner().lock();
@@ -475,8 +476,8 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 
 					vec r = _ptr->_transform->_location + math::RandVec() * math::Rand<int>({ -30,30});
 
-					CollisionHitEffectList.push_back({r,Col,Row,dt});
-				}*/
+					CollisionHitEffectList.push_back({r,Col,Row,dt});*/
+				}
 			}
 		}
 	}

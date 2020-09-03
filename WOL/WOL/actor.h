@@ -16,6 +16,6 @@ public:
     std::shared_ptr<class render_component> _render_component{};
     Shadow _Shadow;
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
-    float _speed{300.f};
+    float _speed{50.f};
 };
 

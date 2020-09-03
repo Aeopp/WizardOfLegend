@@ -2,7 +2,8 @@
 
 
 #include "ARCHER.h"
-
+#include "SwordMan.h"
+#include "WIZARD.h"
 #include "Scene_Boss.h"
 #include "collision_mgr.h"
 #include "Scene_mgr.h"
@@ -89,21 +90,62 @@ void Scene_Boss::initialize()
 		float s = 0.f;
 		float Distance = 400.f;
 
-		for (int i = 0; i < 16; ++i)
+		SOUNDPLAY("BOSS_BGM", 1.f, true );
+
+		for (int i = 0; i < 100; ++i)
 		{
-			s += Angle;
-			vec v = PlayerSpawnLocation;
-			vec w{ Distance * std::cosf(s),
-			Distance * std::sinf(s) };
-			v += w;
+			Timer::instance().event_regist(time_event::EOnce, 10*i, [=,this]() {
+				float s = 0.f;	s += Angle;
+				vec v = PlayerSpawnLocation;
+				vec w{ Distance * std::cosf(s),
+				Distance * std::sinf(s) };
+				v += w;
+				v += math::RandVec() * math::Rand<int>({ -200, 200 });
+				Monster::CardEffect(v, WIZARD::SummonCardImgKey);
 
-			Monster::CardEffect(v, ARCHER::SummonCardImgKey);
-
-			auto archer = obj_mgr.insert_object<ARCHER>
-				(_Player, v);
-			manage_objs.push_back(archer);
+				auto archer = object_mgr::instance().insert_object<WIZARD>
+					(_Player, v);
+				manage_objs.push_back(archer);
+				return true;
+				});
 		}
+		for (int i = 0; i < 100; ++i)
+		{
+			Timer::instance().event_regist(time_event::EOnce, 10 * i, [=, this]() {
+				float s = 0.f;
+				s += Angle;
+				vec v = PlayerSpawnLocation;
+				vec w{ Distance * std::cosf(s),
+				Distance * std::sinf(s) };
+				v += w;
+				v += math::RandVec() * math::Rand<int>({ -200, 200 });
+				Monster::CardEffect(v, SwordMan::SummonCardImgKey);
 
+				auto archer = object_mgr::instance().insert_object<SwordMan>
+					(_Player, v);
+				manage_objs.push_back(archer);
+				return true;
+				});
+		}
+		for (int i = 0; i < 100; ++i)
+		{
+			Timer::instance().event_regist(time_event::EOnce, 10 * i, [=, this]() {
+				float s = 0.f;	s += Angle;
+				vec v = PlayerSpawnLocation;
+				vec w{ Distance * std::cosf(s),
+				Distance * std::sinf(s) };
+				v += w;
+				v += math::RandVec() * math::Rand<int>({ -200, 200 });
+				Monster::CardEffect(v, ARCHER::SummonCardImgKey);
+
+				auto archer = object_mgr::instance().insert_object<ARCHER>
+					(_Player, v);
+				manage_objs.push_back(archer);
+				return true;
+				});
+		}
+		manage_objs.push_back(_Player);
+		manage_objs.push_back(_camera);
 	};
 }
 

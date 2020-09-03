@@ -26,7 +26,7 @@ void UIStart::initialize()
 	wp_bmp_ready= Bmp_mgr::instance().Insert_Bmp(L"READY_MENU.bmp", L"READY_MENU");
 
 	_render_component = std::make_shared<render_component>();
-	_render_component->Default_Src_Paint_Size = vec{ 1600 * x,900* y };
+	_render_component->Default_Src_Paint_Size = vec{ 1280 * x,720* y };
 	_render_component->_ColorKey = COLOR::MEGENTA();
 	_render_component->_Img_src = RECT{ 0,0,1920,1080};
 	_render_component->_RenderDesc = ERender::Transparent;

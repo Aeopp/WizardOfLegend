@@ -1,105 +1,279 @@
 #include "pch.h"
 #include "WIZARD.h"
 
+#include "sound_mgr.h"
+
 #include "Bmp_mgr.h"
 #include "collision_mgr.h"
 #include "render_component.h"
 #include "Color.h"
 #include "timer.h"
+#include "object_mgr.h"
+#include "ArcherArrow.h"
+#include "ArcherBow.h"
+#include "GoldEffect.h"
+#include "WizardFire.h"
+#include "WizardBall.h"
 
 void WIZARD::initialize()
 {
+	collision_lower_correction = { 0,+40 };
+
+	lower_size = { 25,50 };
+
+	LeftAnimKey = L"WIZARD_LEFT";
+	RightAnimKey = L"WIZARD_RIGHT";
+
+	_EnemyInfo.HP = 200.f;
+	_EnemyInfo.DeadTimer = 1.5f;
+	_EnemyInfo.AttackRange = { 20,30 };
+	_EnemyInfo.AttackStartDistance = 600.f;
+
+	PaintSizeX = 170;
+	PaintSizeY = 230;
+	ScaleX = 0.8f;
+	ScaleY = 0.8f;
+
+	MyAnimDuration = 1.f;
+	MyAnimInfo = { 1,4,4,2,4 };
+
+	shadow_correction = { 0,PaintSizeY * 0.4f };
+	ShadowWorldSizeCorrection = { 20,0 };
+	/*void late_initialize(int ImgLocationX, int ImgLocationY,
+		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
+		int AnimRowIndex, float Duration, float AnimDuration,
+		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
+
+
+	DefaultHitDuration = 0.15f;
+	EscapeRamainTick = EscapeDuration = 1.3f;
+	_speed = 200.f;
+	InitTime = 4.5f;
+
+	FireImg = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_FIRE");
+
+	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
-	Bmp_mgr& BMgr = Bmp_mgr::instance();
-
-	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"WIZARD_LEFT.bmp", L"WIZARD_LEFT");
-	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"WIZARD_RIGHT.bmp", L"WIZARD_RIGHT");
-
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision = _collision_component.lock();
-
-	if (!sp_collision)return;
-
-	sp_collision->_size = { 30.f,30.0f };
-
-	//Anim SetUp
-	{
-		_render_component = render_component::LoadRenderComponent_SP
-		(L"WIZARD_RIGHT.bmp", L"WIZARD_RIGHT");
-		// 200 216
-		vec _ImageDefaultSize{ 170,230};
-
-		_render_component->Default_Src_Paint_Size = _ImageDefaultSize;
-		_render_component->Dest_Paint_Size = _ImageDefaultSize * 0.8;
-		_render_component->_ColorKey = COLOR::MEGENTA();
-		_render_component->_Img_src = RECT{ 0,0,170,230};
-		_render_component->_Anim.SetAnimationClip(
-			{ 1,4,4,2,4 }, 0.3f);
-	};
 }
 
 Event WIZARD::update(float dt)
 {
+	if (bDie)
+		return Event::Die;
+	if (bDying)
+		return Event::None;
+
+	CurrentBallCoolTime -= dt;
+	CurrentRandMoveDuration -= dt;
+	CurrentFireCoolTime -= dt;
 	Event _E = Monster::update(dt);
+	EscapeRamainTick -= dt;
 
-	auto sp_AttackTarget = _AttackTarget.lock();
-	if (!sp_AttackTarget) return Event::None;
-
-	vec target_loc = sp_AttackTarget->_transform->_location;
-	vec my_loc = _transform->_location;
-
-	vec to_target = target_loc - my_loc;
-	vec to_dir = to_target.get_normalize();
-
-	float cur_distance = to_target.length();
-
-	_render_component->ChangeAnim(AnimTable::walk, 0.3f, AnimTable::idle);
-
-	_transform->_dir = to_dir;
-	_transform->Move(_transform->_dir,_speed * dt);
-
-
-	float start_dis = _EnemyInfo.AttackStartDistance;
-
-	if (cur_distance < start_dis)
+	if (_EnemyInfo.bHit)
 	{
+		_render_component->ChangeAnim(EAnimState::Hit, 1.0f, EAnimState::Hit);
+		return Event::None;
 	}
 
-	vec dir = _transform->_dir;
-
-	if (dir.x > 0)
+	if (EscapeRamainTick > 0)
 	{
-		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::right];
-	}
-	else
-	{
-		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::left];
+		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+		_transform->_location += EscapeVec * dt * _speed;
+		return _E;
 	}
 
+	auto sp_Target = _AttackTarget.lock();
+	if (!sp_Target)return Event::None;
+
+
+	vec TargetLocation = sp_Target->_transform->_location;
+	vec MyLocation = _transform->_location;
+
+	vec dis = TargetLocation - MyLocation;
+	vec dir = (dis.get_normalize());
+
+	float distance = dis.length();
+	float Attack_distance = _EnemyInfo.AttackStartDistance;
+
+	if (distance < Attack_distance && !_EnemyInfo.bAttack)
+	{
+		//NormalAttack->Preparation(true);
+
+		_render_component->ChangeAnim(EAnimState::Attack, 2.3f, EAnimState::Attack);
+
+		//sound_mgr::instance().Play("ARCHER_AIM", false, 1.f);
+
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+		// 여기서 공격
+		if (CurrentFireCoolTime < 0)
+		{
+			_EnemyInfo.bAttack = true;
+
+			Timer::instance().event_regist(time_event::EOnce, 2.3f,
+				[dir,this](){
+				if (_EnemyInfo.bHit)return true;
+				if (!_EnemyInfo.bAttack)return true;
+				if (!FireImg)return true;
+				auto NormalAttack = object_mgr::instance().insert_object<WizardFire>();
+				if (!NormalAttack)return true;
+				NormalAttack->_owner = _ptr;
+				NormalAttack->wp_Target = _AttackTarget;
+				NormalAttack->Cast(_transform->_location +  math::RandVec() * math::Rand<int>({ 20,200}), dir, 0, FireImg);
+				_Shadow.CurrentShadowState = EShadowState::BIG;
+				_EnemyInfo.bAttack = false;
+
+				SOUNDPLAY("GET_SKILL", 1.f, false);
+
+				// 사운드 터뜨리기
+				//sound_mgr::instance().Play("WIZARD_CAST", false, 1.f);
+				return true;
+			});
+			
+			
+			CurrentFireCoolTime = FireCoolTime;
+		}
+		else if (CurrentFireCoolTime > 0)
+		{
+			
+
+			_render_component->ChangeAnim(EAnimState::Attack, 0.3f);
+			_Shadow.CurrentShadowState = EShadowState::NORMAL;
+
+		}
+
+		if (CurrentBallCoolTime < 0)
+		{
+			_EnemyInfo.bAttack = true;
+			CurrentBallCoolTime = BallCoolTime;
+
+			vec InitPos = _transform->_location +
+				math::RandVec() * math::Rand<float>({ -100,100 });
+			Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
+			auto sp_WizBall = WizardBall::BallCast();
+			sp_WizBall->_transform->_location = InitPos;
+			sp_WizBall->wp_AttackTarget = _AttackTarget;
+
+			SOUNDPLAY("GET_SKILL", 1.f, false);
+
+			Timer::instance().event_regist(time_event::EOnce, 2.3f,
+				[&EInfo = _EnemyInfo]() {
+					EInfo.bAttack = false;
+					return true; });
+		}
+	}
+	else if (Attack_distance < distance)
+	{
+		//NormalAttack->Preparation(false);
+		_EnemyInfo.bAttack = false;
+
+		StalkerPosReTargetDuration -= dt;
+		if (StalkerPosReTargetDuration < 0)
+		{
+			_transform->_dir = math::rotation_dir_to_add_angle(dir, math::Rand<float>({ -89,89 }));
+			StalkerPosReTargetDuration = 1.5f;
+		}
+		_transform->_location += _transform->_dir * dt * _speed;
+		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+	}
+	else if (Attack_distance > distance &&!_EnemyInfo.bHit && !_EnemyInfo.bAttack && CurrentRandMoveDuration>0)
+	{
+		_render_component->ChangeAnim(EAnimState::Walk, 0.3f);
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
+		_transform->_location += RandMoveVec* dt * _speed;
+	}
+	if (CurrentRandMoveDuration < 0) {
+		 CurrentRandMoveDuration = RandMoveVecDuration;
+		 RandMoveVec = math::RandVec();
+	 }
+	//RandMoveVec = vec{ 0,0 };
 	return _E;
 }
 
 void WIZARD::Hit(std::weak_ptr<object> _target)
 {
 	Monster::Hit(_target);
+	if (bInvincible)return;
+	if (bDying)return;
+	auto sp_target = _target.lock();
+	if (!sp_target)return;
+	if (!sp_target->bAttacking)return;
+	//	if (sp_target->ObjectTag == object::Tag::player_shield)return;
+	if (sp_target->ObjectTag == object::Tag::monster)return;
+	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
 
-	Anim& MyAnim = _render_component->_Anim;
+	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
 
+	bInvincible = true;
+	_EnemyInfo.bHit = true;
+	_EnemyInfo.bAttack = false;
 
-	if (_EnemyInfo.HP > 0)
+	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+
+	float Atk = math::Rand<int>(sp_target->Attack);
+	_EnemyInfo.HP -= Atk;
+
+	Timer::instance().event_regist(time_event::EOnce, 0.3f,
+		[&bInvincible = bInvincible]()->bool
+		{  bInvincible = false; return true;  });
+
+	Timer::instance().event_regist(time_event::EOnce, 0.3f,
+		[&bHit = _EnemyInfo.bHit](){
+		bHit = false;
+		return true; });
+
+	vec randvec = math::RandVec();
+	randvec.y = (abs(randvec.y));
+	vec v = _transform->_location;
+	v.y -= 35;
+	v.x += math::Rand<int>({ -40,+40 });
+
+	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
+		push_back({ v ,vec{0,1}*3,
+		1.f,int(Atk),std::to_wstring((int)Atk) });
+
+	if (_EnemyInfo.HP < 0)
 	{
-		_render_component->ChangeAnim(AnimTable::hit, 0.2f, AnimTable::idle);
+		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.8f, EAnimState::Dead);
+		MonsterDie();
 	}
 	else
 	{
-		_render_component->ChangeAnim(AnimTable::dead, 0.4f, AnimTable::dead);
+		//NormalAttack->Preparation(false);
+		EscapeVec = math::RandVec();
+		EscapeRamainTick = EscapeDuration;
+		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+	}
+}
+void WIZARD::render(HDC hdc, vec camera_pos, vec size_factor)
+{
 
-		Timer::instance().event_regist(time_event::EOnce, 0.4f, std::move([&_Die = this->bDie]()->bool
-			{
-				_Die = true;
-				return true;
 
-			}));
-	};
+
+
+
+	Monster::render(hdc, camera_pos, size_factor);
+}
+void WIZARD::FireCast()
+{
+}
+void WIZARD::DirCheckAnimFileChange()
+{
+	vec dir = _transform->_dir;
+	dir = dir.get_normalize();
+
+	if (dir.x < 0)
+	{
+		_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(
+			LeftAnimKey);
+	}
+	else
+	{
+		_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(
+			RightAnimKey);
+	}
 };
-

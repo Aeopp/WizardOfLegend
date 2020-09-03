@@ -18,12 +18,11 @@ public:
 	int	print_cul_obj{};
 	int print_render_obj{};
 
-
 	std::shared_ptr<class player_info> _player_info{};
 
 	static inline RECT client_rect{};
-	static constexpr int width = 1280;
-	static constexpr int height = 720;
+	static constexpr int width = 1600;
+	static constexpr int height = 900;
 
 	// 타일의 월드 사이즈를 지정합니다.
 	static constexpr int TileWorldX{ 53 };

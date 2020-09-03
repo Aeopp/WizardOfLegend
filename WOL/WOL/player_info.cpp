@@ -10,30 +10,12 @@ void player_info::AddGold(int Gold)
 
 void player_info::AddHp(int32_t HP)
 {
-	hp += HP;
-
-	if (hp < 0)
-	{
-		hp = 0;
-	}
-	else if (hp > max_hp)
-	{
-		hp = max_hp;
-	}
+	hp = std::clamp<>(hp + HP, 0, max_hp);
 }
 
 void player_info::AddMp(int32_t MP)
 {
-	mp += MP;
-
-	if (mp < 0)
-	{
-		mp = 0;
-	}
-	else if (mp > max_mp)
-	{
-		mp = max_mp;
-	};
+	mp = std::clamp<>(mp + MP, 0, max_mp);
 };
 
 void player_info::SetHp(uint32_t HP)

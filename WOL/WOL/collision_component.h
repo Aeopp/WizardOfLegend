@@ -30,6 +30,7 @@ public:
 	// 해당 컴포넌트가 Src 일경우 히트 이펙트 재생시킬지 여부
 	bool bHitEffect{ true };
 	bool bTileHitEffect{ false }; 
+	float fSlideFactor = 1.f;
 
 	float PushForce{};
 	vec _size;

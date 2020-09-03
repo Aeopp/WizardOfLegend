@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "SwordMan.h"
 
+#include "Bmp.h"
+
 #include "Bmp_mgr.h"
 #include "collision_mgr.h"
 #include "render_component.h"
@@ -19,21 +21,20 @@ void SwordMan::initialize()
 {
 	collision_lower_correction = { 0,+40 };
 
-	lower_size = { 20,45 };
-
+	lower_size = { 25,50 };
 
 	LeftAnimKey = L"SWORDMAN_LEFT";
 	RightAnimKey = L"SWORDMAN_RIGHT";
 
-	_EnemyInfo.HP = 100.f;
-	_EnemyInfo.DeadTimer = 15.f;
+	_EnemyInfo.HP = 350.f;
+	_EnemyInfo.DeadTimer = 1.5f;
 	_EnemyInfo.AttackRange = { 10,20 };
-	_EnemyInfo.AttackStartDistance = 170.f;
+	_EnemyInfo.AttackStartDistance = 150.f;
 
 	PaintSizeX = 200;
-	PaintSizeY = 209;
-	ScaleX = 0.7f;
-	ScaleY = 0.7f;
+	PaintSizeY = 209; //  
+	ScaleX = 0.8f;
+	ScaleY = 0.8f;
 
 	MyAnimDuration = 1.f;
 	MyAnimInfo = {1,6,3,2,6};
@@ -51,29 +52,81 @@ void SwordMan::initialize()
 	if (!sp_NormalAttack)return;
 	sp_NormalAttack->_owner = _ptr;
 
-	DefaultHitDuration = 0.25f;
+	
 	Attack = { 40,50 };
 	InitTime = 4.7f;
-
+	
 	InvincibleTime = 0.3f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
+
+	auto sp_comp = _collision_component.lock();
+	if (!sp_comp)return;
+	sp_comp->bCollisionSlideAnObject = true;
+	sp_comp->fSlideFactor = 1.f;
+	_speed = 300.f;
+
+
 };
 
 Event SwordMan::update(float dt)
 {
+	RunSoundTick -= dt;
 	InitTime -= dt;
-	if (bDie)
-	{
-		return Event::Die;
-	}
-	if (bDying)return Event::None;
-	if(InitTime>0)return Event::None;
-	
-	StateDuration -= dt;
+	AttackEndRemainTime -= dt;
+	AttackStartTime -= dt;
 
-	Event _E = Monster::update(dt);
+	if (InitTime > 0)return Event::None;
+	if (bDie)return Event::Die;
+	if (bDying)return Event::None;
+
+	if (AttackEndRemainTime > 0)
+	{
+		_render_component->_Anim.RowIndex = (int)EAnimState::Attack;
+		_render_component->_Anim.ColIndex = 2;
+		 return Event::None;
+	}
+	else
+	{
+		_render_component->_Anim.bOn = true;
+	}
+
+	if (AttackStartTime > 0)
+	{
+		_Shadow.CurrentShadowState = EShadowState::BIG;
+		_render_component->_Anim.bOn = false;
+		_render_component->_Anim.RowIndex = (int)EAnimState::Attack;
+		_render_component->_Anim.ColIndex = 0;
+		return Event::None;;
+	}
+	else if (_EnemyInfo.bAttack)
+	{
+		_EnemyInfo.bAttack = false;
+		auto sp_Particle = NormalAttack.lock();
+		if (!_EnemyInfo.bHit && sp_Particle)
+		{
+			sp_Particle->EffectStart(_transform->_dir, _transform->_location + _transform->_dir * 90.f);
+			AttackEndRemainTime = 0.3f;
+		}
+
+	}
+
+	if (!_EnemyInfo.bAttack)
+	{
+		vec dir = _transform->_dir;
+		float scala = dir.dot(vec{ 1,0 });
+
+		if (scala > 0)
+		{
+			_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(RightAnimKey);
+		}
+		else
+		{
+			_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(LeftAnimKey);
+		}
+	}
+
 	auto sp_Target =_AttackTarget.lock();
 	if (!sp_Target)return Event::None;
 
@@ -90,42 +143,26 @@ Event SwordMan::update(float dt)
 	{
 		_EnemyInfo.bAttack = true;
 		_transform->_dir = dir;
-		_render_component->ChangeAnim(EAnimState::Attack, 0.6f);
-		_render_component->_Anim.ColIndex = 0;
-		_render_component->_Anim.bOn = false;
-		_Shadow.CurrentShadowState = EShadowState::BIG;
-		// 여기서 공격
-		Timer::instance().event_regist(time_event::EOnce,0.6f,
-		[&bOn = _render_component->_Anim.bOn,
-		&bParticle = NormalAttack,dir = _transform->_dir,loc = _transform->_location,
-		&_Shadow = _Shadow](){
-			auto sp_Particle = bParticle.lock();
-			if (!sp_Particle)return true;
-			sp_Particle->EffectStart(dir,loc+dir*90.f);
-		
-			_Shadow.CurrentShadowState = EShadowState::BIG;
-			bOn = true;
-			return true; 
-			});
-
-		Timer::instance().event_regist(time_event::EOnce, 1.2f,
-			[&bAttack = _EnemyInfo.bAttack](){
-			bAttack = false;
-			return true;
-		});
+		AttackStartTime = 0.7f;
 	}
-	else if (Attack_distance<distance && !_EnemyInfo.bHit && !_EnemyInfo.bAttack)
+	else if (Attack_distance<distance && !_EnemyInfo.bAttack && !_EnemyInfo.bHit)
 	{
 		vec rand_dir = dir;
 
-		StalkerDuration -= dt;
-		if (StalkerDuration < 0)
+		StalkerPosReTargetDuration -= dt;
+		if (StalkerPosReTargetDuration < 0)
 		{
 			_transform->_dir = math::rotation_dir_to_add_angle(dir, math::Rand<float>({ -55,55 }));
-			StalkerDuration = 1.f;
+			StalkerPosReTargetDuration = 1.f;
 		}
+
 		_transform->_location += _transform->_dir * dt * _speed;
 		_render_component->ChangeAnim(EAnimState::Walk, 1.f);
+		if (RunSoundTick < 0)
+		{
+			RunSoundTick = 0.3f;
+		}
+		
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	}
 	else if (!_EnemyInfo.bHit && !_EnemyInfo.bAttack)
@@ -133,14 +170,16 @@ Event SwordMan::update(float dt)
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 	}
 
-	return _E;
+	return  Event::None;
+
 };
 void SwordMan::Hit(std::weak_ptr<object> _target)
 {
 	if (InitTime > 0)return;
 	
 	Monster::Hit(_target);
-
+	if (bInvincible)return;
+	if (_EnemyInfo.bHit)return;
 	if (bDying)return;
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
@@ -148,22 +187,23 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 	//if (sp_target->ObjectTag == object::Tag::player_shield)return;
 	if (sp_target->ObjectTag == object::Tag::monster)return;
 	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
-	if (bInvincible)return;
 	
-	if (sp_target->UniqueID == EobjUniqueID::NormalAttack)
-		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1.f);
-
-
 	Timer::instance().event_regist(time_event::EOnce, InvincibleTime,
 	[&bInvincible = bInvincible]()->bool {  bInvincible = false; return true;  });
 
-	bInvincible = true;
-	StateDuration = DefaultHitDuration;
-	CurrentState = EMonsterState::Hit;
-
 	float Atk = math::Rand<int>(sp_target->Attack);
+
+	bInvincible = true;
 	_EnemyInfo.HP -= Atk;
 	_EnemyInfo.bHit = true;
+	_EnemyInfo.bAttack = false;
+	AttackStartTime = AttackEndRemainTime = -1;
+
+	_render_component->ChangeAnim(EAnimState::Hit, 0.5f);
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+
+	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
 
 	vec randvec = math::RandVec();
 	randvec.y = (abs(randvec.y));
@@ -171,41 +211,21 @@ void SwordMan::Hit(std::weak_ptr<object> _target)
 	v.y -= 35;
 	v.x += math::Rand<int>({ -40,+40 });
 
-	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
-		push_back({ v ,vec{0,1}*3,
-		   1.f,int(Atk),std::to_wstring((int)Atk) });
-
-	Timer::instance().event_regist(time_event::EOnce, DefaultHitDuration,
+	Timer::instance().event_regist(time_event::EOnce, 0.5f,
 		[&bHit = _EnemyInfo.bHit](){
 		bHit = false;
 		return true;
 	});
 
-	_render_component->ChangeAnim(EAnimState::Hit, DefaultHitDuration);
-	_Shadow.CurrentShadowState = EShadowState::BIG;
-	collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
+	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
+		push_back({ v ,vec{0,1}*3,
+		   1.f,int(Atk),std::to_wstring((int)Atk) });
 
 	if (_EnemyInfo.HP < 0)
 	{
-		bDying = true;
-		CurrentState = EMonsterState::Dead;
-		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.8f, EAnimState::Dead);
-
-		Timer::instance().event_regist(time_event::EOnce, 1,
-
-			[AttackTarget = _AttackTarget, v = _transform->_location, &bDie = this->bDie]()
-		{
-			bDie = true;
-
-			auto _gold = GoldEffect::MakeGold(v.x, v.y,
-				L"MONEY", layer_type::EEffect, 2,
-				math::Rand<int>({ 0,2 }), FLT_MAX, 0.5f, 24, 24, 1.f, 1.f, AttackTarget);
-			return true;
-		});
-
-		auto sp_col = _collision_component.lock();
-		if (!sp_col)return;
-		sp_col->bDie = true;
+		_render_component->_Anim.bOn = true;
+		_render_component->ChangeAnim(EAnimState::Dead, 0.95, EAnimState::Dead);
+		Monster::MonsterDie();
 	};
 }
 void SwordMan::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -213,6 +233,42 @@ void SwordMan::render(HDC hdc, vec camera_pos, vec size_factor)
 	if (InitTime > 0)return;
 
 	Monster::render(hdc, camera_pos, size_factor);
+}
+
+void SwordMan::AttackReadyCheck()
+{
+	if (AttackEndRemainTime > 0)
+	{
+		_render_component->_Anim.RowIndex = (int)EAnimState::Attack;
+		_render_component->_Anim.ColIndex = 2;
+		return;
+	}
+	else
+	{
+		_render_component->_Anim.bOn = true;
+	}
+
+	if (AttackStartTime > 0)
+	{
+		_Shadow.CurrentShadowState = EShadowState::BIG;
+		_render_component->_Anim.bOn = false;
+		_render_component->_Anim.RowIndex = (int)EAnimState::Attack;
+		_render_component->_Anim.ColIndex = 0;
+		return;
+	}
+	else
+	{
+		_EnemyInfo.bAttack = false;
+		auto sp_Particle = NormalAttack.lock();
+		if (!_EnemyInfo.bHit && sp_Particle)
+		{
+			sound_mgr::instance().Play("SWORDMAN_ATTACK");
+			sp_Particle->EffectStart(_transform->_dir,
+			_transform->_location + _transform->_dir * 90.f);
+			AttackEndRemainTime = 0.3f;
+		}
+
+	}
 }
 
 

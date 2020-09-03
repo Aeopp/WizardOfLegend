@@ -13,13 +13,16 @@ class EffectPlayerAttack :
 public:
 	std::weak_ptr<class collision_component> _collision_component;
 
-	void AttackStart(float Duration,
+	void AttackReady(float Duration,
 		float AnimDuration, float PushForce,vec InitLocation,
 		AttackNumber _Num,float AnimAngle);
 	
 	float Angle{};
 	// 1 or 2
 	 // bool bAttacking{ false } ;
+	bool bRender{ false };
+
+	float AnimT = 0;
 
 	AttackNumber CurrentAttackNum {};
 	Event update(float dt)override;

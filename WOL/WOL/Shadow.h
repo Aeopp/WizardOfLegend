@@ -30,7 +30,7 @@ public:
 	void update();
 	void initialize();
 	void render(HDC hdc, vec camera_pos);
-	std::weak_ptr<class actor> _owner{};
+	std::weak_ptr<class object> _owner{};
 	std::pair<int,int> world_size_correction{0,0};
 	std::pair<int, int> correction{ 0,0 };
 	EShadowState CurrentShadowState{EShadowState::NORMAL};

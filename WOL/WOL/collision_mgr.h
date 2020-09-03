@@ -24,6 +24,8 @@ public:
 	std::shared_ptr<class Bmp> HitEffectImg{};
 
 
+	float CollisionHitEffectDelta = 0.15f;
+
 	// 이펙트 위치 컬럼 로우 델타
 	std::list<std::tuple<vec, int,int,float,float>> CollisionHitEffectList{};
 
@@ -51,6 +53,6 @@ private:
 
 	int CollisionObjNum{};
 
-	float TileHitEffectDuration = 0.2f;
+	float TileHitEffectDuration = 0.5f;
 };
 

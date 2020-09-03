@@ -23,6 +23,7 @@ public:
 	std::array<POINT, 3> RotPts;
 
 	void CalcImgAngle(float RotationImgDegree);
+	virtual ~Boomerang()noexcept;
 public:
 	// 직선 방향 스피드
 	float Duration;
@@ -31,7 +32,5 @@ public:
 	int CurrentColIdx;
 	float AnimDelta;
 	float CurrentAnimRemainTime;
-	
-
 };
 

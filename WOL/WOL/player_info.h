@@ -7,28 +7,51 @@ struct player_info
 	int32_t max_hp{1000};
 	int32_t max_mp{1000};
 
-	float dash_speed{ 1500.f };
+	float dash_speed{ 1400.f };
 
 	bool bAttack{ false };
 	bool bIdle{ true };
 	bool bDash{ false };
 	bool bMove{ false };
 	bool bHit{ false };
-
-	float DashDuration = 0.25;
-	float DefaultAttackDuration = 0.37f;
+	bool bProtected = false;
+	float DashDuration = 0.3;
+	float AttackCollisionDuration = 0.1f;
+	float DefaultAttackDuration = 0.5;
+	float AttackAnimDuration = 0.5;
 	float CurrentAttackDuration = DefaultAttackDuration;
-
+	
+	
 	float SkillBoomerangMotionDuration = 0.35f;
 	float SkillICECrystalMotionDuration = 0.9f;
 	float SkillICEBlastMotionDuration = 0.9f;
 	float SkillShieldMotionDuration = 0.9f;
+
+
+	float SkillBoomerangMaxNum = 8; 
+	float SkillICECrystalCoolTime = 15.f;
+	float SkillICEBlastCoolTime = 5.f;
+	float SkillShieldCoolTime = 10.f;
+
+	float SkillCurrentICECrystalCoolTime = SkillICECrystalCoolTime;
+	float SkillCurrentICEBlastCoolTime = SkillICEBlastCoolTime;
+	float SkillCurrentShieldCoolTime = SkillShieldCoolTime;
+	float SkillCurrentBoomerangNum = SkillBoomerangMaxNum;
+
 	float SkillFireDragonMotionDuration = 0.4f;
+
+
 	float MpRegenerationAtSec = 30.f;
 	float HpRegenerationAtSec=50.f;
 
+	float ShieldDuration = 20.f;
+
 	float NormalAttackRich{80.f};
-	float NormalAttackPushForce{0.3f};
+	float NormalAttackPushForce{10.f};
+
+
+
+	std::pair<int, int> MissRange{0,8};
 public : 
 	void AddGold(int Gold);
 	void AddHp(int32_t HP); 

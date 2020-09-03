@@ -42,6 +42,6 @@ public:
 	bool bDie{ false };
 	bool bAttacking{ false };
 	std::pair<int, int> Attack;
-	EobjUniqueID UniqueID = EobjUniqueID::None;;
+	EObjUniqueID UniqueID = EObjUniqueID::None;;
 };
 

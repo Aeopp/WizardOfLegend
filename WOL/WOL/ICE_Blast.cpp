@@ -37,7 +37,7 @@ void ICE_Blast::initialize()
 
 		if (!sp_collision)return;
 		sp_collision->bCollisionTargetPushFromForce = true;
-		sp_collision->PushForce = 20.f;
+		sp_collision->PushForce = 50.f;
 
 		sp_collision->_size = { 30.f,30.0f };
 		sp_collision->bRender = true;
@@ -55,9 +55,11 @@ void ICE_Blast::initialize()
 
 	bAttacking = true;
 
-	Attack = { 15,25 };
+	Attack = { 30,40 };
 
 	sound_mgr::instance().RandSoundKeyPlay("ICE_BLAST", { 1,4 }, 1.f);
+
+	UniqueID = EObjUniqueID::ICEBLAST;
 };
 
 Event ICE_Blast::update(float dt)

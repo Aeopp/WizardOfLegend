@@ -27,11 +27,26 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 
 			return lhs->_transform->_location.y < rhs->_transform->_location.y;
 		});
-
 	size_t RenderObjCount = 0;
+
+	for (auto& Deco: object_map[layer_type::EMapDeco])
+	{
+		if (!Deco->_transform)continue;
+
+		vec culling_obj_pos = Deco->_transform->_location - camera_pos;
+		if (math::RectInPoint(game::client_rect, culling_obj_pos))
+		{
+			RenderObjCount++;
+
+			Deco->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
+		}
+	}
+
 
 	for (auto& obj : RenderSortY)
 	{
+		if (!obj->_transform)continue;
+
 		vec culling_obj_pos = obj->_transform->_location - camera_pos;
 		if (math::RectInPoint(game::client_rect, culling_obj_pos))
 		{

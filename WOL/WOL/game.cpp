@@ -37,14 +37,12 @@ void game::render()
 		}
 
 		{
-			std::wstring msg = bDeltaTimeUnFixed ? L"bDeltaTimeUnFixed ON " : L"bDeltaTimeUnFixed OFF";
+			std::wstring msg = bDeltaTimeUnFixed ? L"DeltaTimeUnFixed ON " : L"DeltaTimeUnFixed OFF";
 			Font(CurrentHdc, RGB(111, 111, 111), 0, 350, 20, msg);
 		}
 	}
 
 	Scene_mgr::instance().render(HBackBuffer, size_factor());
-
-
 	
 
 	BitBlt(hDC, 0, 0, client_rect.right, client_rect.bottom, HBackBuffer, 0, 0, SRCCOPY);

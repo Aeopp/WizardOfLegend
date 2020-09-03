@@ -4,7 +4,7 @@
 #include "Bmp.h"
 #include "collision_mgr.h"
 
-void EffectPlayerAttack::AttackStart(float Duration, float AnimDuration
+void EffectPlayerAttack::AttackReady(float Duration, float AnimDuration
 ,float PushForce, vec InitLocation, AttackNumber Num, float AnimAngle)
 {
 	if (!_transform) return;
@@ -18,7 +18,7 @@ void EffectPlayerAttack::AttackStart(float Duration, float AnimDuration
 	this->ImgLocationY = InitLocation.y;
 	this->CurrentAttackNum = Num;
 
-	UniqueID = EobjUniqueID::NormalAttack;
+	UniqueID = EObjUniqueID::NormalAttack;
 	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
 	
@@ -28,6 +28,9 @@ void EffectPlayerAttack::AttackStart(float Duration, float AnimDuration
 	sp_comp->PushForce = PushForce;
 	sp_comp->bCollision = true;
 	sp_comp->bSlide = false;
+	bRender = true;
+	AnimT = AnimDuration;
+
 }
 
 void EffectPlayerAttack::AttackEnd()
@@ -39,16 +42,22 @@ void EffectPlayerAttack::AttackEnd()
 	sp_comp->bCollision = false;
 	sp_comp->bCollisionTargetPushFromForce = false;
 	sp_comp->PushForce = 0.f;
+
 }
 
 Event EffectPlayerAttack::update(float dt)
 {
-	if (!bAttacking)return Event::None;
-
+	if (!bRender)return Event::None;
 	Event _event = object::update(dt);
 
 	Duration -= dt;
 	AnimDelta -= dt;
+	AnimT -= dt;
+
+	if (AnimT < 0)
+	{
+		bRender = false;
+	}
 	if (Duration < 0) {
 		AttackEnd();
 	}
@@ -73,7 +82,7 @@ Event EffectPlayerAttack::update(float dt)
 
 	if (AnimDelta < 0)
 	{
-		AnimDelta = (float)AnimDuration / 4;
+		AnimDelta = (float)AnimDuration / 7.f;
 		++CurrentCol;
 		if (CurrentCol > AnimEnd)
 		{
@@ -86,11 +95,10 @@ Event EffectPlayerAttack::update(float dt)
 
 void EffectPlayerAttack::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	if (!bAttacking)return;
-
 	object::render(hdc, camera_pos, size_factor);
 
 	if (!EffectImg)return;
+	if (!bRender)return;
 
 	//월드 사이즈
 	int wsx = (PaintSizeX * ScaleX);
@@ -113,7 +121,8 @@ void EffectPlayerAttack::initialize()
 	_collision_component = 
 	collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
 
-	Attack = { 8,13 };
+	Attack = { 30,40 };
+	UniqueID = EObjUniqueID::NormalAttack;
 
 		// 콜리전 셋업
 	{
@@ -127,5 +136,6 @@ void EffectPlayerAttack::initialize()
 		sp_collision->bRender = true;
 		sp_collision->bSlide = false;
 		sp_collision->bCollision = true;
+		bRender = false; 
 	};
 }

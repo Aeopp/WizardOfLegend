@@ -19,13 +19,15 @@ void ArcherArrow::launch(vec init,vec dir, int Row, std::shared_ptr<class Bmp> S
 
 	auto sp_comp = wp_collision.lock();
 	if (!sp_comp)return;
-	sp_comp->bCollisionTargetPushFromForce = false;
+	sp_comp->bCollisionTargetPushFromForce = true;
 	sp_comp->bCollisionSlideAnObject = false;
 	sp_comp->bHitEffect = true;
 	sp_comp->bCollision= true;
 	sp_comp->bSlide = true;
 	sp_comp->bTileHitEffect = true;
+	sp_comp->PushForce = 10.f;
 
+	bAttacking = true;
 }
 
 void ArcherArrow::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -56,6 +58,8 @@ void ArcherArrow::HitTile(RECT rt)
 	object::HitTile(rt);
 
 // È÷Æ® ÀÌÆåÆ®
+	collision_mgr::instance().HitEffectPush(_transform->_location,
+		0.5f);
 	
 	bDie = true;
 }
@@ -76,14 +80,14 @@ void ArcherArrow::initialize()
 	sp_comp->bCollisionTargetPushFromForce = false;
 	sp_comp->bCollisionSlideAnObject = false;
 	sp_comp->HitColor = RGB(123, 200, 50);
-	sp_comp->PushForce = 1.f;
+	sp_comp->PushForce = 10.f;
 	sp_comp->_size = { 13.f,13.f };
 
 	PaintSizeX = 180;
 	PaintSizeY = 170;
 	ScaleX = 1;
 	ScaleY = 1;
-	speed = 1100.f;
+	speed = 1400.f;
 	ObjectTag = object::Tag::monster_attack;
 
 	Attack={ 20,40 };
@@ -105,10 +109,16 @@ void ArcherArrow::Hit(std::weak_ptr<object> _target)
 	if (!sp_target)return;
 	if (!_transform)return;
 
-
-	if (sp_target->ObjectTag == object::Tag::player_shield)
+	if (sp_target->ObjectTag == object::Tag::player)
 	{
 		bDie = true;
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+
+	}
+	if (sp_target->ObjectTag == object::Tag::player_shield  )
+	{
+		bDie = true;
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		shield::DefenseMsg(_transform->_location);
 	}
 };

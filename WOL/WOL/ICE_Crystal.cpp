@@ -20,7 +20,7 @@ void ICE_Crystal::initialize()
 	if (!sp_collision)return;
 
 	sp_collision->_size = { 25.f,25.0f };
-
+	
 	Duration = 30.f;
 
 	PaintSizeX = 200;
@@ -40,17 +40,19 @@ void ICE_Crystal::initialize()
 	_render_component->_Anim.SetAnimationClip(
 		{ 18 }, 360.f / _speed);
 
-	Attack = { 10,19 };
+	Attack = { 20,40 };
 	bAttacking = true;
 
 	TickScale = 1.f;
 	sp_collision->bSlide = false;
 	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
-	sp_collision->bCollisionTargetPushFromForce= false;
-	sp_collision->PushForce = 5.f;
+	sp_collision->bCollisionTargetPushFromForce= true;
+	sp_collision->PushForce = 10.f;
 
 	sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
+	
+	UniqueID = EObjUniqueID::ICECRYSTAL;
 
 	//_Shadow.bShadow = true;
 	//_Shadow.correction = { 0,120 };
