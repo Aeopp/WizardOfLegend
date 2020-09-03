@@ -1,104 +1,317 @@
 #include "pch.h"
 #include "MIDDLE_BOSS.h"
-
+#include "collision_component.h"
 #include "Bmp_mgr.h"
+#include "Bmp.h"
 #include "collision_mgr.h"
-#include "render_component.h"
-#include "Color.h"
+#include "Shadow.h"
 #include "timer.h"
+#include "object_mgr.h"
+#include "shield.h"
+#include "sound_mgr.h"
+
 
 void MIDDLE_BOSS::initialize()
 {
-	Monster::initialize();
-	Bmp_mgr& BMgr = Bmp_mgr::instance();
+	object::initialize();
 
-	AnimDirFileTable[(int)EAnimDir::left] = BMgr.Insert_Bmp(L"MIDDLE_BOSS_LEFT.bmp", L"MIDDLE_BOSS_LEFT");
-	AnimDirFileTable[(int)EAnimDir::right] = BMgr.Insert_Bmp(L"MIDDLE_BOSS_RIGHT.bmp", L"MIDDLE_BOSS_LEFT");
+	sp_Bmp.first = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_BALL");
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonster, ERect);
-	auto sp_collision = _collision_component.lock();
+	wp_collision = collision_mgr::instance().
+		insert(_ptr, collision_tag::EMonster, figure_type::ECircle);
+
+	auto sp_collision = wp_collision.lock();
 
 	if (!sp_collision)return;
 
-	sp_collision->_size = { 30.f,30.0f };
+	this->bAttacking = false;
+	sp_collision->bCollision = true;
+	sp_collision->bCollisionSlideAnObject = false;
+	sp_collision->bCollisionTargetPushFromForce = false;
+	sp_collision->bHitEffect = true;
+	sp_collision->bRender = true;
+	sp_collision->bSlide = false;
+	sp_collision->PushForce = 1.f;
+	sp_collision->_size = { 20.f,20.f };
 
-	//Anim SetUp
-	{
-		_render_component = render_component::LoadRenderComponent_SP
-		(L"MIDDLE_BOSS_RIGHT.bmp", L"MIDDLE_BOSS_LEFT");
-		// 200 216
-		vec _ImageDefaultSize{ 220,300 };
+	_Shadow.initialize();
+	_Shadow._owner = (_ptr);
+	_Shadow.correction = { 0,150 };
 
-		_render_component->Default_Src_Paint_Size = _ImageDefaultSize;
-		_render_component->Dest_Paint_Size = _ImageDefaultSize * 0.8;
-		_render_component->_ColorKey = COLOR::MEGENTA();
-		_render_component->_Img_src = RECT{ 0,0,220,300 };
-		_render_component->_Anim.SetAnimationClip(
-			{ 1,4,4,4,2,4}, 0.3f);
-	};
+
+	PaintSizeX = 90;
+	PaintSizeY = 90;
+	ScaleX = 0.75f;
+	ScaleY = 0.75f;
+	Speed = 150.f;
+	AttackSpeed = 1500.f;
+	Attack = { 40,50 };
+	AttackStartDistance = 750.f;
+	UniqueID = EObjUniqueID::EWizardBall;
+	ObjectTag = Tag::monster_attack;
+}
+
+void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
+{
+	_Shadow.render(hdc, camera_pos);
+
+	// 애니메이션 정보 세팅
+	AnimUpdateFromCurrentState();
+
+	vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
+	vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
+
+	GdiTransparentBlt(hdc,
+		DestLoc.x, DestLoc.y
+		, DestPaintSize.x, DestPaintSize.y
+		, sp_Bmp->Get_MemDC(),
+		CurrentColIdx * PaintSizeX,
+		CurrentRowIdx * PaintSizeY,
+		PaintSizeX, PaintSizeY,
+		COLOR::MEGENTA());
 }
 
 Event MIDDLE_BOSS::update(float dt)
 {
-	Event _E = Monster::update(dt);
+	Event _Event = object::update(dt);
 
-	auto sp_AttackTarget = _AttackTarget.lock();
-	if (!sp_AttackTarget) return Event::None;
+	if (InitTime > 0)
+		return _Event;
 
-	vec target_loc = sp_AttackTarget->_transform->_location;
-	vec my_loc = _transform->_location;
+	StateDuration -= dt;
+	HitCoolTime -= dt;
 
-	vec to_target = target_loc - my_loc;
-	vec to_dir = to_target.get_normalize();
+	UpdateDir();
+	StateAction();
+	StateTranslation();
 
-	float cur_distance = to_target.length();
-
-	_render_component->ChangeAnim(AnimTable::walk, 0.3f, AnimTable::idle);
-
-	_transform->_dir = to_dir;
-	_transform->Move(_transform->_dir,_speed * dt);
-
-
-	float start_dis = _EnemyInfo.AttackStartDistance;
-
-	if (cur_distance < start_dis)
-	{
-	}
-
-	vec dir = _transform->_dir;
-
-	if (dir.x > 0)
-	{
-		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::right];
-	}
-	else
-	{
-		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::left];
-	}
-
-	return _E;
+	return _Event;
 }
 
 void MIDDLE_BOSS::Hit(std::weak_ptr<object> _target)
 {
-	Monster::Hit(_target);
 
-	Anim& MyAnim = _render_component->_Anim;
+	auto sp_Target = _target.lock();
+	if (!sp_Target)return;
+	float Atk = math::Rand<float>(sp_Target->Attack);
 
-
-	if (_EnemyInfo.HP > 0)
+	if (sp_Target->ObjectTag == object::Tag::player_attack && HitCoolTime < 0)
 	{
-		_render_component->ChangeAnim(AnimTable::hit, 0.2f, AnimTable::idle);
+		HitCoolTime = 0.3f;
+		vec randvec = math::RandVec();
+		randvec.y = (abs(randvec.y));
+		vec v = _transform->_location;
+		v.y -= 35;
+		v.x += math::Rand<int>({ -40,+40 });
+
+		object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
+			push_back({ v ,vec{0,1}*3,
+			1.f,int(Atk),std::to_wstring((int)Atk) });
+
+		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1);
+
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+		CurrentState = WizardBall::EState::HIT;
+		StateDuration = 0.2f;
+
+		HP -= Atk;
+
+		if (HP < 0)
+			bDie = true;
 	}
-	else
+	else if (sp_Target->ObjectTag == object::Tag::player_shield && HitCoolTime < 0)
 	{
-		_render_component->ChangeAnim(AnimTable::dead, 0.4f, AnimTable::dead);
-
-		Timer::instance().event_regist(time_event::EOnce, 0.4f, std::move([&_Die = this->bDie]()->bool
-			{
-				_Die = true;
-				return true;
-			}));
-	};
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+		CurrentState = WizardBall::EState::HIT;
+		StateDuration = 0.2f;
+		HitCoolTime = 0.3f;
+		if (bAttacking)
+			shield::DefenseMsg(_transform->_location);
+	}
 }
 
+
+
+void MIDDLE_BOSS::AnimColUpdate(bool Updown)
+{
+	CurrentAnimDelta -= DeltaTime;
+	if (CurrentAnimDelta < 0)
+	{
+		CurrentAnimDelta = AnimDelta;
+		if (Updown)
+			CurrentColIdx++;
+		else
+			CurrentColIdx--;
+
+		CurrentColIdx = std::clamp<>(CurrentColIdx, 0, 3);
+	}
+};
+
+void MIDDLE_BOSS::AnimUpdateFromCurrentState()
+{
+	switch (CurrentState)
+	{
+	case WizardBall::EState::BALL:
+		CurrentRowIdx = 0;
+		CurrentColIdx = 0;
+		break;
+	case WizardBall::EState::AttackReady:
+		CurrentRowIdx = AnimRowCalcFromAngle();
+		AnimColUpdate(true);
+		break;
+	case WizardBall::EState::Attacking:
+		CurrentRowIdx = AnimRowCalcFromAngle();
+		break;
+	case  WizardBall::EState::AttackEnd:
+		CurrentRowIdx = AnimRowCalcFromAngle();
+		AnimColUpdate(false);
+		break;
+	case WizardBall::EState::HIT:
+		CurrentColIdx = 1;
+		CurrentRowIdx = 0;
+		break;
+	default:
+		break;
+	}
+}
+
+int MIDDLE_BOSS::AnimRowCalcFromAngle()
+{
+	if (!_transform)return 0;
+
+	vec CurrentDir = _transform->_dir;
+	float Angle360 = math::AngleFromVec(CurrentDir);
+	int RowIDX = std::round((360 - Angle360) / 22.5f);
+	RowIDX = std::clamp<>(RowIDX, 1, 16);
+	return RowIDX;
+}
+
+void MIDDLE_BOSS::StateTranslation()
+{
+	if (StateDuration > 0)return;
+
+	switch (CurrentState)
+	{
+	case WizardBall::EState::BALL:
+		CurrentState = WizardBall::EState::AttackReady;
+		AttackReady();
+		StateDuration = 1.5;
+		break;
+	case WizardBall::EState::AttackReady:
+		CurrentState = WizardBall::EState::Attacking;
+		StateDuration = 0.5f;
+		AttackStart();
+		break;
+	case WizardBall::EState::Attacking:
+		CurrentState = WizardBall::EState::AttackEnd;
+		StateDuration = 1.0;
+		AttackEnd();
+		break;
+	case WizardBall::EState::AttackEnd:
+		CurrentState = WizardBall::EState::BALL;
+		StateDuration = 1.f;
+		break;
+	case WizardBall::EState::HIT:
+		CurrentState = WizardBall::EState::BALL;
+		StateDuration = 0.5f;
+		break;
+	default:
+		break;
+	}
+}
+
+void MIDDLE_BOSS::AttackStart()
+{
+	CurrentColIdx = 3;
+	sound_mgr::instance().Play("BALL_ATTACK", false, 1.f);
+
+	auto sp_AttackTarget = wp_AttackTarget.lock();
+	if (!sp_AttackTarget)return;
+	vec TargetLocation = sp_AttackTarget->_transform->_location;
+	vec Dis = TargetLocation - _transform->_location;
+	vec Dir = Dis.get_normalize();
+	AttackDir = Dir;
+
+	bAttacking = true;
+}
+
+void MIDDLE_BOSS::StateAction()
+{
+	switch (CurrentState)
+	{
+	case WizardBall::EState::BALL:
+		IdleAction();
+		break;
+	case WizardBall::EState::AttackReady:
+		break;
+	case WizardBall::EState::Attacking:
+		Attacking();
+		break;
+	case WizardBall::EState::AttackEnd:
+		break;
+	case WizardBall::EState::HIT:
+		break;
+	default:
+		break;
+	}
+}
+
+void MIDDLE_BOSS::UpdateDir()
+{
+
+	auto sp_AttackTarget = wp_AttackTarget.lock();
+	if (!sp_AttackTarget)return;
+	vec TargetLocation = sp_AttackTarget->_transform->_location;
+	vec Dis = TargetLocation - _transform->_location;
+	vec Dir = Dis.get_normalize();
+	_transform->_dir = Dir;
+
+}
+
+void MIDDLE_BOSS::ConditionCheck()
+{
+
+
+}
+
+bool MIDDLE_BOSS::Attacking()
+{
+	if (!_transform)return true;
+
+	_transform->_location += AttackDir * AttackSpeed * DeltaTime;
+	return true;
+}
+
+bool MIDDLE_BOSS::AttackEnd()
+{
+	bAttacking = false;
+	CurrentColIdx = 3;
+
+	return true;
+}
+
+void MIDDLE_BOSS::AttackReady()
+{
+	sound_mgr::instance().Play("BALL_ATTACKMODE", false, 1.f);
+	CurrentColIdx = 0;
+}
+
+void MIDDLE_BOSS::IdleAction()
+{
+	auto sp_AttackTarget = wp_AttackTarget.lock();
+	if (!sp_AttackTarget)return;
+	if (!_transform)return;
+
+	vec TargetLocation = sp_AttackTarget->_transform->_location;
+	vec Dis = TargetLocation - _transform->_location;
+	vec Dir = Dis.get_normalize();
+	float Distance = Dis.length();
+
+	_transform->_dir = Dir;
+
+	if (Distance > AttackStartDistance)
+	{
+		_transform->Move(_transform->_dir, Speed * DeltaTime);
+		StateDuration += DeltaTime;
+	}
+}

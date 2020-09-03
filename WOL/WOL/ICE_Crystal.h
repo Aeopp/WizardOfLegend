@@ -13,7 +13,7 @@ public:
 	std::weak_ptr<class collision_component>  _collision_component;
 	uint32_t get_layer_id()const& override;
 
-	static inline const float SoundTick = 0.1f; 
+	static inline const float SoundTick = 0.5f; 
 	float CurrentSoundTick = SoundTick;  
 	float DistancefromCenterMin{ 80.f };
 	float Tick{};

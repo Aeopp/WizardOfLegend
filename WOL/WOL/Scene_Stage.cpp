@@ -86,13 +86,13 @@ void Scene_Stage::initialize()
 			1.f, 1.6f);
 
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
-		SOUNDPLAY("teleport", 1.f, true);
+		SOUNDPLAY("teleport", 1.f, false);
 
 	/*late_initialize(int ImgLocationX, int ImgLocationY,
 		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
 		int AnimRowIndex, float Duration, float AnimDuration,
 		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
-	// TOOD :: Scene Dependent Init 
+//	 TOOD :: Scene Dependent Init 
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
 
@@ -119,12 +119,12 @@ void Scene_Stage::initialize()
 
 			vec InitPos = v +
 				math::RandVec() * math::Rand<float>({ -100,100 });
-			//Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
-			//auto sp_WizBall = WizardBall::BallCast();
-			//sp_WizBall->_transform->_location = InitPos;
-			//sp_WizBall->wp_AttackTarget = _Player;
+			Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
+			auto sp_WizBall = WizardBall::BallCast();
+			sp_WizBall->_transform->_location = InitPos;
+			sp_WizBall->wp_AttackTarget = _Player;
 
-			//manage_objs.push_back(sp_WizBall);
+			manage_objs.push_back(sp_WizBall);
 
 			auto qwe = object_mgr::instance().insert_object<ARCHER>(_Player, v);
 			

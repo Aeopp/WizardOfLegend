@@ -727,7 +727,8 @@ void Player::SkillRotBoomerang()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-
+	if (_player_info->SkillCurrentBoomerangNum < 1.f)return;
+	_player_info->SkillCurrentBoomerangNum -= 1;
 	object_mgr& _object_mgr = object_mgr::instance();
 
 	auto _Boom = _object_mgr.insert_object<RotationBoomerang>();
@@ -830,7 +831,8 @@ void Player::SkillScrewBoomerang()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-
+	if (_player_info->SkillCurrentBoomerangNum < 1.f)return;
+	_player_info->SkillCurrentBoomerangNum -= 1;
 
 	object_mgr& _object_mgr = object_mgr::instance();
 
@@ -1072,7 +1074,7 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 315 + 57,838 }, L"GAIA_ARMOR_SKILLBAR.bmp");
 		USBI->Current = &_player_info->SkillCurrentShieldCoolTime;
-		USBI->Max     =	&_player_info->SkillCurrentShieldCoolTime;
+		USBI->Max     =	&_player_info->SkillShieldCoolTime;
 		break;
 	default:
 		break;

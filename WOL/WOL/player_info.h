@@ -28,10 +28,10 @@ struct player_info
 	float SkillShieldMotionDuration = 0.9f;
 
 
-	float SkillBoomerangMaxNum = 8; 
-	float SkillICECrystalCoolTime = 15.f;
-	float SkillICEBlastCoolTime = 5.f;
-	float SkillShieldCoolTime = 10.f;
+	const float SkillBoomerangMaxNum = 8; 
+	const float SkillICECrystalCoolTime = 15.f;
+	const float SkillICEBlastCoolTime = 5.f;
+	const float SkillShieldCoolTime = 10.f;
 
 	float SkillCurrentICECrystalCoolTime = SkillICECrystalCoolTime;
 	float SkillCurrentICEBlastCoolTime = SkillICEBlastCoolTime;

@@ -83,7 +83,9 @@ void Bmp_mgr::initialize()
 	 Insert_Bmp(DefaultPath + L"WIZARD_BALL.bmp", L"WIZARD_BALL");
 	 Insert_Bmp(DefaultPath + L"SUMMON_CARD_WIZARDBALL.bmp", L"SUMMON_CARD_WIZARDBALL");
 
-	
+	 Insert_Bmp(DefaultPath + L"MIDDLE_BOSS_LEFT.bmp", L"MIDDLE_BOSS_LEFT");
+	 Insert_Bmp(DefaultPath + L"MIDDLE_BOSS_RIGHT.bmp", L"MIDDLE_BOSS_RIGHT");
+
 };	 	
 
 

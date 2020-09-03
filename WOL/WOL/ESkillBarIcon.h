@@ -7,6 +7,6 @@ enum class ESkill :uint8_t
 	BLAST,
 	ARMOR,
 	FIRE,
-	CRYSTAL,ddd
+	CRYSTAL,
 };
 

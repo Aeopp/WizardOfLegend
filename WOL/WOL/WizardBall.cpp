@@ -36,7 +36,7 @@ void WizardBall::initialize()
 
 	_Shadow.initialize();
 	_Shadow._owner = (_ptr);
-	_Shadow.correction = { 0,135 };
+	_Shadow.correction = { 0,150 };
 
 
 	PaintSizeX = 90;
@@ -226,7 +226,7 @@ void WizardBall::StateTranslation()
 void WizardBall::AttackStart()
 {
 	CurrentColIdx = 3;
-	sound_mgr::instance().Play("BALL_ATTACK");
+	sound_mgr::instance().Play("BALL_ATTACK",false ,1.f);
 
 	auto sp_AttackTarget = wp_AttackTarget.lock();
 	if (!sp_AttackTarget)return;
@@ -295,7 +295,7 @@ bool WizardBall::AttackEnd()
 
 void WizardBall::AttackReady()
 {
-	sound_mgr::instance().Play("BALL_ATTACKMODE");
+	sound_mgr::instance().Play("BALL_ATTACKMODE",false ,1.f);
 	CurrentColIdx = 0;
 }
 

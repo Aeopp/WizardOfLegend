@@ -262,7 +262,7 @@ void SwordMan::AttackReadyCheck()
 		auto sp_Particle = NormalAttack.lock();
 		if (!_EnemyInfo.bHit && sp_Particle)
 		{
-			sound_mgr::instance().Play("SWORDMAN_ATTACK");
+			sound_mgr::instance().Play("SWORDMAN_ATTACK",false ,1.f);
 			sp_Particle->EffectStart(_transform->_dir,
 			_transform->_location + _transform->_dir * 90.f);
 			AttackEndRemainTime = 0.3f;

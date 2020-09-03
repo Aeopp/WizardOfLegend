@@ -1,6 +1,8 @@
 #include "pch.h"
 
 
+#include "MIDDLE_BOSS.h"
+
 #include "ARCHER.h"
 #include "SwordMan.h"
 #include "WIZARD.h"
@@ -92,7 +94,11 @@ void Scene_Boss::initialize()
 
 		SOUNDPLAY("BOSS_BGM", 1.f, true );
 
-		for (int i = 0; i < 100; ++i)
+		auto Midboss= object_mgr::instance().insert_object<MIDDLE_BOSS>
+			(_Player, PlayerSpawnLocation + vec{ 300,300 });
+		manage_objs.push_back(Midboss);
+
+	/*	for (int i = 0; i < 100; ++i)
 		{
 			Timer::instance().event_regist(time_event::EOnce, 10*i, [=,this]() {
 				float s = 0.f;	s += Angle;
@@ -143,7 +149,7 @@ void Scene_Boss::initialize()
 				manage_objs.push_back(archer);
 				return true;
 				});
-		}
+		}*/
 		manage_objs.push_back(_Player);
 		manage_objs.push_back(_camera);
 	};

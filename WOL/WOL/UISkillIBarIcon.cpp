@@ -31,18 +31,21 @@ void UISkillIBarIcon::render(HDC hdc, vec camera_pos, vec size_factor)
 	float fMax = *Max;
 
 	float factor = fCurrent / fMax;
-	auto& r = _render_component;
+	auto& Render = _render_component;
 
-	vec v = r->Dest_Loc = _transform->_location;
-	v.x -= r->Default_Src_Paint_Size.x / 2;
-	v.y -= r->Default_Src_Paint_Size.y / 2;
+	vec v = Render->Dest_Loc = _transform->_location;
+	v.x -= Render->Default_Src_Paint_Size.x / 2;
+	v.y -= Render->Default_Src_Paint_Size.y / 2;
 
-	vec s = {r->_Img_src.right, r->_Img_src.bottom};
+	vec WorldSize = Render->Default_Src_Paint_Size;
 
+	vec ImgSize = {Render->_Img_src.right, Render->_Img_src.bottom};
 
-	GdiTransparentBlt(hdc, v.x, v.y, r->Default_Src_Paint_Size.x,
-	r->Default_Src_Paint_Size.y,
-		r->wp_Image.lock()->Get_MemDC(), 0, 0, s.x, s.y, RGB(255, 0, 255));
+	float re = 1 - factor;
+
+	GdiTransparentBlt(hdc, v.x, v.y+WorldSize.y*re, Render->Default_Src_Paint_Size.x,
+	/*r->Default_Src_Paint_Size.y*/0 + WorldSize.y * factor,
+		Render->wp_Image.lock()->Get_MemDC(), 0, 0+ImgSize.y*re, ImgSize.x, /*s.y*/0 + ImgSize.y*factor, RGB(255, 0, 255));
 }
 
 Event UISkillIBarIcon::update(float dt)

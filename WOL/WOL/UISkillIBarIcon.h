@@ -11,7 +11,7 @@ public:
 
     static inline float Tick = 0;
 
-    float* Max{};
+   const float* Max{};
     float* Current{};
 };
 
