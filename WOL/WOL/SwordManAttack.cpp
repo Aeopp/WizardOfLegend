@@ -40,7 +40,7 @@ void SwordManAttack::EffectStart(vec dir, vec location)
 	Attack = { 40,50 };
 	bAttacking = true;
 
-	AnimDuration = 0.1f;
+	AnimDuration = 0.3f;
 
 	ScaleX = 0.9f;
 	ScaleY = 0.9f;

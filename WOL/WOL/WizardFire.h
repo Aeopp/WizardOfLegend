@@ -32,5 +32,6 @@ public:
 	void initialize();
 	uint32_t get_layer_id()const& override;
 	void Hit(std::weak_ptr<object> _target)override;
-};
 
+	
+};

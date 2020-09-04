@@ -102,7 +102,8 @@ void Input_mgr::update()
 		bFrameLimit = !bFrameLimit;
 	if (Key_Down('I'))
 		bDeltaTimeUnFixed = !bDeltaTimeUnFixed;
-
+	if (Key_Down('U'))
+		bDebugTimeScale= !bDebugTimeScale;
 	Key_Update();
 
 	// Event_Update();

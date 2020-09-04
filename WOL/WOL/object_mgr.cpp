@@ -29,12 +29,21 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 		});
 	size_t RenderObjCount = 0;
 
+	RECT CullingRect = game::client_rect;
+
+	int width = (game::client_rect.right - game::client_rect.left )/ 2;
+	int height = (game::client_rect.bottom - game::client_rect.top) / 2;
+	CullingRect.left -= width;
+	CullingRect.right += width;
+	CullingRect.top -= height;
+	CullingRect.bottom += height;
+
 	for (auto& Deco: object_map[layer_type::EMapDeco])
 	{
 		if (!Deco->_transform)continue;
 
 		vec culling_obj_pos = Deco->_transform->_location - camera_pos;
-		if (math::RectInPoint(game::client_rect, culling_obj_pos))
+		if (math::RectInPoint(CullingRect, culling_obj_pos))
 		{
 			RenderObjCount++;
 

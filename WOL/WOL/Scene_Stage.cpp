@@ -108,9 +108,17 @@ void Scene_Stage::initialize()
 		float s = 0.f;
 		float Distance = 400.f;
 
-		for (int i = 0; i < 8; ++i)
+		for (int i = 0; i < 1; ++i)
 		{
-			s += Angle;
+			auto SWORDMAN = object_mgr::instance().insert_object<ARCHER>(_Player,_Player->_transform->_location + vec{ 100,0 });
+			//auto  ar= object_mgr::instance().insert_object<ARCHER>(_Player, _Player->_transform->_location + vec{ 100,0 });
+
+		/*
+			auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
+			Midboss->SetUp(_Player, PlayerSpawnLocation + math::RandVec() * math::Rand<int>({ 500,1000 }));
+
+			manage_objs.push_back(Midboss);*/
+		/*	s += Angle;
 			vec v = PlayerSpawnLocation;
 			vec w{ Distance * std::cosf(s),
 			Distance * std::sinf(s) };
@@ -128,7 +136,7 @@ void Scene_Stage::initialize()
 
 			auto qwe = object_mgr::instance().insert_object<ARCHER>(_Player, v);
 			
-			manage_objs.push_back(qwe);
+			manage_objs.push_back(qwe);*/
 		}
 		
 		manage_objs.push_back(_camera);

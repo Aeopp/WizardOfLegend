@@ -94,9 +94,14 @@ void Scene_Boss::initialize()
 
 		SOUNDPLAY("BOSS_BGM", 1.f, true );
 
-		auto Midboss= object_mgr::instance().insert_object<MIDDLE_BOSS>
-			(_Player, PlayerSpawnLocation + vec{ 300,300 });
-		manage_objs.push_back(Midboss);
+		for (int i = 0; i < 1; ++i)
+		{
+
+			auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
+			Midboss->SetUp(_Player, PlayerSpawnLocation + math::RandVec() * math::Rand<int>({ 500,1000 }));
+
+			manage_objs.push_back(Midboss);
+		}
 
 	/*	for (int i = 0; i < 100; ++i)
 		{

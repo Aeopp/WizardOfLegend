@@ -81,7 +81,7 @@ Event WizardBall::update(float dt)
 		return _Event;
 
 	StateDuration -= dt;
-	HitCoolTime -= dt;
+	CurrentHitCoolTime -= dt;
 	
 	UpdateDir();
 	StateAction();
@@ -98,9 +98,9 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 	if (!sp_Target)return;
 	float Atk = math::Rand<float>(sp_Target->Attack);
 
-	if (sp_Target->ObjectTag == object::Tag::player_attack && HitCoolTime<0)
+	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
-		HitCoolTime = 0.3f;
+		CurrentHitCoolTime = 0.3f;
 		vec randvec = math::RandVec();
 		randvec.y = (abs(randvec.y));
 		vec v = _transform->_location;
@@ -122,12 +122,12 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 		if (HP < 0)
 			bDie = true;
 	}
-	else if (sp_Target->ObjectTag == object::Tag::player_shield && HitCoolTime < 0)
+	else if (sp_Target->ObjectTag == object::Tag::player_shield && CurrentHitCoolTime < 0)
 	{
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
 		StateDuration = 0.2f;
-		HitCoolTime = 0.3f;
+		CurrentHitCoolTime = 0.3f;
 		if(bAttacking)
 		shield::DefenseMsg(_transform->_location);
 	}

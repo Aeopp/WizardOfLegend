@@ -290,6 +290,13 @@ float vec::length_2() const
 	return (x * x + y * y);
 }
 
+float vec::CrossZ(vec Rhs) const
+{
+	/*float x = y * 0 - 0 * Rhs.y;
+	float y = 0 * Rhs.x - x * 0;*/
+	return  x * Rhs.y - y * Rhs.x;
+}
+
 bool vec::operator==(const vec& _rhs) const
 {
 	return EQUAL(x, _rhs.x) && EQUAL(y, _rhs.y);

@@ -37,5 +37,6 @@ public:
 		return std::wstring(std::begin(str), std::end(str));
 	};
 
+	static void MissMsg(vec Loation);;
 };
 

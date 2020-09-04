@@ -7,7 +7,7 @@ struct player_info
 	int32_t max_hp{1000};
 	int32_t max_mp{1000};
 
-	float dash_speed{ 1400.f };
+	float dash_speed{ 2000.f };
 
 	bool bAttack{ false };
 	bool bIdle{ true };
@@ -15,7 +15,8 @@ struct player_info
 	bool bMove{ false };
 	bool bHit{ false };
 	bool bProtected = false;
-	float DashDuration = 0.3;
+	float DashDuration = 0.2;
+	float AnimDashDuration = 0.4f;
 	float AttackCollisionDuration = 0.1f;
 	float DefaultAttackDuration = 0.5;
 	float AttackAnimDuration = 0.5;

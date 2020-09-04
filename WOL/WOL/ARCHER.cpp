@@ -59,6 +59,10 @@ void ARCHER::initialize()
 
 Event ARCHER::update(float dt)
 {
+	InitTime -= dt;
+
+	if (InitTime > 0)return Event::None;;
+
 	if (bDie)
 		return Event::Die;
 	if (bDying)
@@ -108,9 +112,12 @@ Event ARCHER::update(float dt)
 		sound_mgr::instance().Play("ARCHER_AIM", false, 1.f);
 		
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+		// 여기서 공격 지점 표시 해줌
+	
 		// 여기서 공격
 		if (CurrentFireCoolTime < 0)
 		{
+			bArrowLineRender = false; 
 			Timer::instance().event_regist(time_event::EOnce, 2.3f,
 				[&bParticle = NormalAttack,
 				&TargetLoc = sp_Target->_transform->_location,
@@ -230,6 +237,9 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 }
 void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 {
+	if (InitTime > 0)return;
+
+
 	Monster::render(hdc, camera_pos, size_factor);
 }
 void ARCHER::DirCheckAnimFileChange()

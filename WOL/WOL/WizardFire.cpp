@@ -25,6 +25,7 @@ void WizardFire::Cast(vec init, vec dir, int Row, std::shared_ptr<class Bmp> Set
 	sp_comp->bHitEffect = true;
 	sp_comp->bCollision = true;
 	sp_comp->bTileHitEffect = true;
+	sp_comp->_size = { 30,30};
 
 	bAttacking = true;
 }
@@ -157,6 +158,5 @@ void WizardFire::Hit(std::weak_ptr<object> _target)
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 	//	sp_Camera->camera_shake(100.f, math::RandVec(), 10.f);
 	}
-};
-
+}
 

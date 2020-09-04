@@ -160,6 +160,8 @@
     <ClInclude Include="Bmp_mgr.h" />
     <ClInclude Include="Boomerang.h" />
     <ClInclude Include="BOSS.h" />
+    <ClInclude Include="BossCrystal.h" />
+    <ClInclude Include="BossInfo.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="collision_component.h" />
     <ClInclude Include="collision_mgr.h" />
@@ -185,6 +187,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="GoldEffect.h" />
     <ClInclude Include="helper.h" />
+    <ClInclude Include="HomingBlast.h" />
     <ClInclude Include="ICE_Blast.h" />
     <ClInclude Include="ICE_Crystal.h" />
     <ClInclude Include="Input_mgr.h" />
@@ -226,6 +229,8 @@
     <ClInclude Include="transform.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="UIBar.h" />
+    <ClInclude Include="UIBossHPBar.h" />
+    <ClInclude Include="UIBossName.h" />
     <ClInclude Include="UIGold.h" />
     <ClInclude Include="UIHPBar.h" />
     <ClInclude Include="UIInteraction.h" />
@@ -250,6 +255,8 @@
     <ClCompile Include="Bmp_mgr.cpp" />
     <ClCompile Include="Boomerang.cpp" />
     <ClCompile Include="BOSS.cpp" />
+    <ClCompile Include="BossCrystal.cpp" />
+    <ClCompile Include="BossInfo.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="collision_component.cpp" />
     <ClCompile Include="collision_mgr.cpp" />
@@ -262,6 +269,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GoldEffect.cpp" />
     <ClCompile Include="helper.cpp" />
+    <ClCompile Include="HomingBlast.cpp" />
     <ClCompile Include="ICE_Blast.cpp" />
     <ClCompile Include="ICE_Crystal.cpp" />
     <ClCompile Include="Input_mgr.cpp" />
@@ -304,6 +312,8 @@
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="UIBar.cpp" />
+    <ClCompile Include="UIBossHPBar.cpp" />
+    <ClCompile Include="UIBossName.cpp" />
     <ClCompile Include="UIGold.cpp" />
     <ClCompile Include="UIHPBar.cpp" />
     <ClCompile Include="UIInteraction.cpp" />

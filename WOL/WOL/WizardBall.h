@@ -41,7 +41,7 @@ public:
     float CurrentAnimDelta = AnimDelta; 
     float AttackStartDistance;
     float StateDuration;
-    float HitCoolTime = 0.1f;
+    float CurrentHitCoolTime = 0.1f;
 
     void AnimColUpdate(bool Updown);
     void AnimUpdateFromCurrentState();

@@ -239,6 +239,11 @@
     <ClInclude Include="WizardFire.h" />
     <ClInclude Include="ScrewBoomerang.h" />
     <ClInclude Include="WizardBall.h" />
+    <ClInclude Include="UIBossHPBar.h" />
+    <ClInclude Include="BossInfo.h" />
+    <ClInclude Include="UIBossName.h" />
+    <ClInclude Include="BossCrystal.h" />
+    <ClInclude Include="HomingBlast.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -452,6 +457,21 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="WizardBall.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UIBossHPBar.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="BossInfo.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UIBossName.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="BossCrystal.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="HomingBlast.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -449,7 +449,7 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				}
 				
 				// 우항 오브젝트 밀어버리기
-				if (lhs_obj->bCollisionTargetPushFromForce)
+				if (lhs_obj->bCollisionTargetPushFromForce && !rhs_obj->bSuperArmor)
 				{
 					_ptr->_transform->_location += (*bCollision).get_normalize()
 						* lhs_obj->PushForce;

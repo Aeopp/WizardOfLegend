@@ -23,8 +23,8 @@ void Boomerang::initialize()
 
 	Duration = 30.f;
 
-	ScaleX = 0.7f;
-	ScaleY = 0.7f;
+	ScaleX = 0.6f;
+	ScaleY = 0.6f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 200;

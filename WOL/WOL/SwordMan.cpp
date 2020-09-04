@@ -106,7 +106,7 @@ Event SwordMan::update(float dt)
 		auto sp_Particle = NormalAttack.lock();
 		if (!_EnemyInfo.bHit && sp_Particle)
 		{
-			sp_Particle->EffectStart(_transform->_dir, _transform->_location + _transform->_dir * 90.f);
+			sp_Particle->EffectStart(_transform->_dir, _transform->_location + _transform->_dir * 45.f);
 			AttackEndRemainTime = 0.3f;
 		}
 

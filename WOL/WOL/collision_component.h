@@ -26,6 +26,7 @@ public:
 	void Hit(std::weak_ptr<class object> _target);
 	figure_type _figure_type{ figure_type::ERect };
 
+	bool bSuperArmor = false;
 	bool bCollisionTargetPushFromForce{ false };
 	// 해당 컴포넌트가 Src 일경우 히트 이펙트 재생시킬지 여부
 	bool bHitEffect{ true };

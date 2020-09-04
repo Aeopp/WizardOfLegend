@@ -8,21 +8,38 @@ public:
     enum class EState : uint8_t
     {
         IDLE,
-        SKILL1,
-        SKILL2,
-        SKILL3,
+        WALK,
+        READY,
+        CAST,
         HIT,
+        DIE,
     };
+    enum class EPattern : uint8_t
+    {
+        FIRE,
+        BALLSPAWN,
+        CRYSTAL,
+        BLAST,
+    };
+    virtual ~MIDDLE_BOSS()noexcept;
 
     void initialize()override;
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
     Event update(float dt)override;
     void Hit(std::weak_ptr<object> _target)override;
+    void SetUp(std::weak_ptr<class object> AttackTarget,vec Location);
 
     //left right 스프라이트
-    std::pair< std::shared_ptr<class Bmp> , std::shared_ptr<class Bmp> > sp_Bmp;
+    std::pair< std::shared_ptr<class Bmp> , std::shared_ptr<class Bmp> > sp_Bmps;
     std::weak_ptr<class collision_component> wp_collision;
     std::weak_ptr<class object> wp_AttackTarget;
+    std::shared_ptr<class BossInfo> sp_MyInfo{};
+    std::shared_ptr<class Bmp> FireImg{};
+    std::weak_ptr<class UIBossName> wp_UIBossName{};
+
+    std::weak_ptr<class UIBossHPBar> wp_UIBossHPBar{};
+
+
     Shadow _Shadow;
 
     int PaintSizeX;
@@ -31,31 +48,64 @@ public:
     float ScaleY;
     int CurrentRowIdx = 0;
     int CurrentColIdx = 0;
-    float AttackSpeed;
     float Speed;
     static inline float AnimDelta = 0.15f;
     vec AttackDir{};
+    vec MoveMark{};
+    vec TargetLocation{};
 
     float CurrentAnimDelta = AnimDelta;
     float AttackStartDistance;
     float StateDuration;
-    float HitCoolTime = 0.1f;
+    float CurrentHitCoolTime = 0.1f;
+    const float MonsterSpawnCycle = 30.f;
+    float MonsterSpawnCurrentTick = MonsterSpawnCycle ;
 
-    void AnimColUpdate(bool Updown);
-    void AnimUpdateFromCurrentState();
-    int AnimRowCalcFromAngle();
-    void StateTranslation();
+    static inline float DefaultHitCoolTime = 0.3f; 
+
+    float BallSpawnSkillCurrentAngle = 0.f;
+
+    std::function<void()> CurrentSKILL;
+    std::vector<uint32_t> CurrentAnimColNumTalble{ 1,4,4,4,2,4 };
+    std::shared_ptr<class Bmp> AnimDirSpriteUpdate();
+
+
+    std::vector<EPattern> PatternTable
+    { EPattern::FIRE,EPattern::BALLSPAWN,EPattern::CRYSTAL,EPattern::BLAST,
+     EPattern::FIRE,EPattern::CRYSTAL,EPattern::BALLSPAWN,EPattern::BLAST,EPattern::CRYSTAL,
+    EPattern::BALLSPAWN,EPattern::BLAST,EPattern::FIRE,EPattern::BLAST,EPattern::BALLSPAWN };
+
+    int PatternTableNum;
+    int CurrentPatternIdx = 0;
+
+
+    void HitCalc(std::pair<int, int> AttackRange);
+    void ReadyAction();
+    void CastAction();
+    void MoveMarkReNew();
+    void WalkAction();
     void AttackStart();
+    void AnimColUpdate();
+    void AnimUpdateFromCurrentState();
+    void StateTranslation();
     void StateAction();
     void UpdateDir();
+    void StateSetUp(EState NewState, float Duration);
     void ConditionCheck();
     EState CurrentState = EState::IDLE;
-    bool Attacking();
-    bool AttackEnd();
-    void AttackReady();
     void IdleAction();
-    bool bAttackEnd = false;
 
-    int HP = 200;
+    void BOSS_Skill_Fire();
+    void BOSS_SKill_BallSpawn();
+    // 전방위 각으로 몇개나 발사할지
+    void BOSS_SKill_ICEBlast();
+    void BOSS_Skill_ICECrystal(size_t NUM);
+
+    void FireSpawn();
+    void BallSpawn(size_t NUM);
+    void SummonMonster();
+    void DieAction();
+    // 전방위 각으로 발사할 때의 각을 나누는 개수
+    void BlastSpawn(size_t NUM);
 };
 

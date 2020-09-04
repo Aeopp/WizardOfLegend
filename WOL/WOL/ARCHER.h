@@ -20,6 +20,9 @@ public:
     float StalkerPosReTargetDuration;
     std::shared_ptr<class ArcherBow> NormalAttack{};
     std::shared_ptr<class Bmp> FireImg{};
+
+    bool bArrowLineRender = false; 
+    vec TargetPositionRenderPos{};
 private:
     void DirCheckAnimFileChange();
 

@@ -18,6 +18,8 @@ bool bDebug{ false };
 float DeltaTime{ 0.f };
 bool bFrameLimit{ false };
 bool bDeltaTimeUnFixed{ false };
+bool bDebugTimeScale{ false };
+
 constexpr int ConstDelta = 1000 / 60;
 constexpr float FLOOR_FPS = 1.f / 45.f;
 

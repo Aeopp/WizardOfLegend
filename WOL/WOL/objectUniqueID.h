@@ -10,5 +10,7 @@ enum class EObjUniqueID : uint32_t
 	ICEBLAST,
 	ICECRYSTAL,
 	Boomerang,
+	MIDDLE_BOSS,
+	BOSS,
 	Max,
 };

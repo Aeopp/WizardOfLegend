@@ -1,5 +1,13 @@
 #include "pch.h"
+#include "Monster.h"
+
+#include "WizardBall.h"
+#include "ICE_Crystal.h"
+#include "UIBossHPBar.h"
 #include "MIDDLE_BOSS.h"
+#include "WizardFire.h"
+#include "helper.h"
+#include "BossInfo.h"
 #include "collision_component.h"
 #include "Bmp_mgr.h"
 #include "Bmp.h"
@@ -10,15 +18,31 @@
 #include "shield.h"
 #include "sound_mgr.h"
 
+#include "BossCrystal.h"
+
+#include "UIBossName.h"
+#include "ARCHER.h"
+#include "SwordMan.h"
+#include "WIZARD.h"
+#include "HomingBlast.h"
+
+
+MIDDLE_BOSS::~MIDDLE_BOSS() noexcept
+{
+	DieAction();
+}
 
 void MIDDLE_BOSS::initialize()
 {
 	object::initialize();
 
-	sp_Bmp.first = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_BALL");
+	sp_Bmps.first = Bmp_mgr::instance().Find_Image_SP(L"MIDDLE_BOSS_LEFT");
+	sp_Bmps.second = Bmp_mgr::instance().Find_Image_SP(L"MIDDLE_BOSS_RIGHT");
+
+	FireImg = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_FIRE");
 
 	wp_collision = collision_mgr::instance().
-		insert(_ptr, collision_tag::EMonster, figure_type::ECircle);
+		insert(_ptr, collision_tag::EMonster, figure_type::ERect);
 
 	auto sp_collision = wp_collision.lock();
 
@@ -26,37 +50,63 @@ void MIDDLE_BOSS::initialize()
 
 	this->bAttacking = false;
 	sp_collision->bCollision = true;
-	sp_collision->bCollisionSlideAnObject = false;
+	sp_collision->bCollisionSlideAnObject = true;
 	sp_collision->bCollisionTargetPushFromForce = false;
 	sp_collision->bHitEffect = true;
 	sp_collision->bRender = true;
-	sp_collision->bSlide = false;
-	sp_collision->PushForce = 1.f;
-	sp_collision->_size = { 20.f,20.f };
+	sp_collision->bSlide = true;
+	sp_collision->PushForce = 0.f;
+	sp_collision->_size = { 40,80 };
+	sp_collision->bSuperArmor = true;
 
 	_Shadow.initialize();
 	_Shadow._owner = (_ptr);
-	_Shadow.correction = { 0,150 };
+	_Shadow.correction = { 0,125 };
+	_Shadow.bShadow = true;
+	_Shadow.world_size_correction={ 90,85};
 
-
-	PaintSizeX = 90;
-	PaintSizeY = 90;
-	ScaleX = 0.75f;
-	ScaleY = 0.75f;
-	Speed = 150.f;
-	AttackSpeed = 1500.f;
-	Attack = { 40,50 };
+	PaintSizeX = 220;
+	PaintSizeY = 300;
+	ScaleX = 1.f;
+	ScaleY = 1.f;
+	Speed = 200.f;
+	Attack = { 90,100 };
 	AttackStartDistance = 750.f;
-	UniqueID = EObjUniqueID::EWizardBall;
-	ObjectTag = Tag::monster_attack;
-}
+	UniqueID = EObjUniqueID::MIDDLE_BOSS;
+	ObjectTag = Tag::monster;
+
+	StateDuration = 3.f;
+
+	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
+	wp_UIBossHPBar = HPBar;
+	sp_MyInfo = std::make_shared<BossInfo>();
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 3000;
+	HPBar->current = sp_MyInfo->CurrentHP;
+	HPBar->goal_time = 1.f;
+	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
+
+	auto UI = object_mgr::instance().insert_object<UIBossName>(
+	L"MIDDLEBOSS_NAMEBAR.bmp",L"MIDDLEBOSS_NAMEBAR");
+	if (!UI)return;
+	UI->_owner = _ptr;
+
+	PatternTableNum = PatternTable.size();
+	CurrentPatternIdx = 0;
+
+};
 
 void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	_Shadow.render(hdc, camera_pos);
+	object::render(hdc, camera_pos, size_factor);
 
-	// 애니메이션 정보 세팅
+	MoveToEx(hdc, _transform->_location.x, _transform->_location.y, nullptr);
+	LineTo(hdc, wp_AttackTarget.lock()->_transform->_location.x, wp_AttackTarget.lock()->_transform->_location.y);
+
+	auto sp_Bmp = AnimDirSpriteUpdate();
+	if (!sp_Bmp)return;
+
 	AnimUpdateFromCurrentState();
+	_Shadow.render(hdc, camera_pos);
 
 	vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
 	vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
@@ -75,11 +125,9 @@ Event MIDDLE_BOSS::update(float dt)
 {
 	Event _Event = object::update(dt);
 
-	if (InitTime > 0)
-		return _Event;
-
 	StateDuration -= dt;
-	HitCoolTime -= dt;
+	CurrentHitCoolTime -= dt;
+	MonsterSpawnCurrentTick -= dt;
 
 	UpdateDir();
 	StateAction();
@@ -90,166 +138,246 @@ Event MIDDLE_BOSS::update(float dt)
 
 void MIDDLE_BOSS::Hit(std::weak_ptr<object> _target)
 {
+	object::Hit(_target);
 
 	auto sp_Target = _target.lock();
 	if (!sp_Target)return;
-	float Atk = math::Rand<float>(sp_Target->Attack);
 
-	if (sp_Target->ObjectTag == object::Tag::player_attack && HitCoolTime < 0)
+	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime < 0)
 	{
-		HitCoolTime = 0.3f;
-		vec randvec = math::RandVec();
-		randvec.y = (abs(randvec.y));
-		vec v = _transform->_location;
-		v.y -= 35;
-		v.x += math::Rand<int>({ -40,+40 });
-
-		object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
-			push_back({ v ,vec{0,1}*3,
-			1.f,int(Atk),std::to_wstring((int)Atk) });
-
+		CurrentHitCoolTime = DefaultHitCoolTime;
 		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1);
-
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
-		CurrentState = WizardBall::EState::HIT;
-		StateDuration = 0.2f;
+		
 
-		HP -= Atk;
+		// 공격 준비 , 공격 중에는 슈퍼아머 이므로 상태전이 하기전 체크
+		if ( CurrentState ==  EState::IDLE || CurrentState == EState::HIT)
+		{
+			StateDuration += 0.2f;
+			CurrentState = MIDDLE_BOSS::EState::HIT;
+			HitCalc(sp_Target->Attack);
+		}
+		else
+		{
+			int Accuracy =math::Rand<int>({ 0,1 });
+			if (Accuracy == 0)
+				helper::MissMsg(_transform->_location);
+			else
+				HitCalc({sp_Target->Attack.first*0.5,sp_Target->Attack.second*0.5});
+		}
 
-		if (HP < 0)
-			bDie = true;
-	}
-	else if (sp_Target->ObjectTag == object::Tag::player_shield && HitCoolTime < 0)
-	{
-		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
-		CurrentState = WizardBall::EState::HIT;
-		StateDuration = 0.2f;
-		HitCoolTime = 0.3f;
-		if (bAttacking)
-			shield::DefenseMsg(_transform->_location);
-	}
+		if (!sp_MyInfo)return;
+		if (sp_MyInfo->CurrentHP < 0)
+		{
+			CurrentState = EState::DIE;
+			StateDuration = 0.8f;
+			DieAction(); 
+		}
+	};
 }
 
+void MIDDLE_BOSS::SetUp(std::weak_ptr<class object> AttackTarget, vec Location)
+{
+	if (!_transform)return;
 
+	wp_AttackTarget = std::move(AttackTarget); 
+	_transform->_location = Location;
+}
 
-void MIDDLE_BOSS::AnimColUpdate(bool Updown)
+std::shared_ptr<class Bmp> MIDDLE_BOSS::AnimDirSpriteUpdate()
+{
+	return _transform->_dir.x < 0 ? sp_Bmps.first : sp_Bmps.second;
+}
+
+void MIDDLE_BOSS::HitCalc(std::pair<int,int> AttackRange)
+{
+	float Atk = math::Rand<float>(AttackRange);
+	vec RandVec = math::RandVec();
+	RandVec.y = (abs(RandVec.y));
+	vec MyLocation = _transform->_location;
+	MyLocation.y -= 35;
+	MyLocation.x += math::Rand<int>({ -40,+40 });
+
+	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
+	push_back({ MyLocation ,vec{0,1}*3,
+	1.f,int(Atk),std::to_wstring((int)Atk) });
+
+	sp_MyInfo->CurrentHP -= Atk;
+
+	if (sp_MyInfo->CurrentHP < 0)
+	{
+		CurrentState = EState::DIE;
+		StateDuration = 0.8f;
+	}
+
+	auto sp_UIBossHPBar = wp_UIBossHPBar.lock();
+	if (!sp_UIBossHPBar)return;
+	sp_UIBossHPBar->target = sp_MyInfo->CurrentHP;
+}
+
+void MIDDLE_BOSS::ReadyAction()
+{
+	SummonMonster();
+}
+
+void MIDDLE_BOSS::CastAction()
+{
+	SummonMonster();
+}
+
+void MIDDLE_BOSS::MoveMarkReNew()
+{
+	if (!_transform)return;
+	MoveMark = math::RandVec();
+}
+
+void MIDDLE_BOSS::WalkAction()
+{
+	if (!_transform)return;
+	_transform->_location += MoveMark * Speed * DeltaTime;
+}
+
+void MIDDLE_BOSS::AttackStart()
+{
+	EPattern SelectPattern =PatternTable[CurrentPatternIdx];
+
+	switch (SelectPattern)
+	{
+	case MIDDLE_BOSS::EPattern::FIRE:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_Skill_Fire, this);
+		break;
+	case MIDDLE_BOSS::EPattern::BALLSPAWN:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_BallSpawn, this);
+		break;
+	case MIDDLE_BOSS::EPattern::CRYSTAL:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_Skill_ICECrystal, this, 3);
+		break;
+	case MIDDLE_BOSS::EPattern::BLAST:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_ICEBlast, this);
+		break;
+	default:
+		break;
+	}		
+
+	// TODO TEST 
+	CurrentPatternIdx++;
+	CurrentPatternIdx %= PatternTableNum;
+
+	if (CurrentSKILL)CurrentSKILL();
+}
+
+void MIDDLE_BOSS::AnimColUpdate()
 {
 	CurrentAnimDelta -= DeltaTime;
 	if (CurrentAnimDelta < 0)
 	{
 		CurrentAnimDelta = AnimDelta;
-		if (Updown)
-			CurrentColIdx++;
-		else
-			CurrentColIdx--;
-
-		CurrentColIdx = std::clamp<>(CurrentColIdx, 0, 3);
+		++CurrentColIdx;
+		if (CurrentColIdx >= CurrentAnimColNumTalble[CurrentRowIdx])
+		{
+			CurrentColIdx = 0;
+		}
 	}
 };
 
 void MIDDLE_BOSS::AnimUpdateFromCurrentState()
 {
+
 	switch (CurrentState)
 	{
-	case WizardBall::EState::BALL:
+	case MIDDLE_BOSS::EState::IDLE:
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		CurrentRowIdx = 0;
-		CurrentColIdx = 0;
+		CurrentColIdx = 0; 
 		break;
-	case WizardBall::EState::AttackReady:
-		CurrentRowIdx = AnimRowCalcFromAngle();
-		AnimColUpdate(true);
+	case MIDDLE_BOSS::EState::WALK:
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+		CurrentRowIdx = 1;
+		AnimColUpdate();
+		break; 
+	case MIDDLE_BOSS::EState::READY:
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+		CurrentRowIdx = 2;
+		AnimColUpdate();
+		break; 
+	case MIDDLE_BOSS::EState::CAST:
+		_Shadow.CurrentShadowState = EShadowState::BIG;
+		CurrentRowIdx = 3;
+		AnimColUpdate();
 		break;
-	case WizardBall::EState::Attacking:
-		CurrentRowIdx = AnimRowCalcFromAngle();
+	case MIDDLE_BOSS::EState::HIT:
+		_Shadow.CurrentShadowState = EShadowState::BIG;
+		CurrentRowIdx = 4; 
+		AnimColUpdate();
 		break;
-	case  WizardBall::EState::AttackEnd:
-		CurrentRowIdx = AnimRowCalcFromAngle();
-		AnimColUpdate(false);
-		break;
-	case WizardBall::EState::HIT:
-		CurrentColIdx = 1;
-		CurrentRowIdx = 0;
+	case MIDDLE_BOSS::EState::DIE:
+		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
+		CurrentRowIdx = 5;
+		AnimColUpdate();
 		break;
 	default:
 		break;
 	}
 }
 
-int MIDDLE_BOSS::AnimRowCalcFromAngle()
-{
-	if (!_transform)return 0;
-
-	vec CurrentDir = _transform->_dir;
-	float Angle360 = math::AngleFromVec(CurrentDir);
-	int RowIDX = std::round((360 - Angle360) / 22.5f);
-	RowIDX = std::clamp<>(RowIDX, 1, 16);
-	return RowIDX;
-}
 
 void MIDDLE_BOSS::StateTranslation()
 {
 	if (StateDuration > 0)return;
 
+	int DICE = math::Rand<int>({ 0,1 });
+
 	switch (CurrentState)
 	{
-	case WizardBall::EState::BALL:
-		CurrentState = WizardBall::EState::AttackReady;
-		AttackReady();
-		StateDuration = 1.5;
+	case MIDDLE_BOSS::EState::IDLE:
+		StateSetUp(MIDDLE_BOSS::EState::WALK, 1.5f);
+		MoveMarkReNew();
 		break;
-	case WizardBall::EState::AttackReady:
-		CurrentState = WizardBall::EState::Attacking;
-		StateDuration = 0.5f;
+	case MIDDLE_BOSS::EState::WALK:
+		StateSetUp(MIDDLE_BOSS::EState::READY, 4);
+		break;
+	case MIDDLE_BOSS::EState::READY:
+		StateSetUp(MIDDLE_BOSS::EState::CAST, 10);
 		AttackStart();
 		break;
-	case WizardBall::EState::Attacking:
-		CurrentState = WizardBall::EState::AttackEnd;
-		StateDuration = 1.0;
-		AttackEnd();
+	case MIDDLE_BOSS::EState::CAST:
+		StateSetUp(MIDDLE_BOSS::EState::IDLE, 3);
 		break;
-	case WizardBall::EState::AttackEnd:
-		CurrentState = WizardBall::EState::BALL;
-		StateDuration = 1.f;
+	case MIDDLE_BOSS::EState::HIT:
+		if (DICE == 1)
+		{
+			StateSetUp(MIDDLE_BOSS::EState::WALK, 1.5);
+		}
+		else if (DICE == 2)
+		{
+			StateSetUp(MIDDLE_BOSS::EState::IDLE, 0.5);
+		}
 		break;
-	case WizardBall::EState::HIT:
-		CurrentState = WizardBall::EState::BALL;
-		StateDuration = 0.5f;
+	case MIDDLE_BOSS::EState::DIE:
+		bDie = true;
 		break;
 	default:
 		break;
 	}
-}
-
-void MIDDLE_BOSS::AttackStart()
-{
-	CurrentColIdx = 3;
-	sound_mgr::instance().Play("BALL_ATTACK", false, 1.f);
-
-	auto sp_AttackTarget = wp_AttackTarget.lock();
-	if (!sp_AttackTarget)return;
-	vec TargetLocation = sp_AttackTarget->_transform->_location;
-	vec Dis = TargetLocation - _transform->_location;
-	vec Dir = Dis.get_normalize();
-	AttackDir = Dir;
-
-	bAttacking = true;
 }
 
 void MIDDLE_BOSS::StateAction()
 {
 	switch (CurrentState)
 	{
-	case WizardBall::EState::BALL:
+	case MIDDLE_BOSS::EState::IDLE:
 		IdleAction();
 		break;
-	case WizardBall::EState::AttackReady:
+	case MIDDLE_BOSS::EState::WALK:
+		WalkAction();
 		break;
-	case WizardBall::EState::Attacking:
-		Attacking();
+	case MIDDLE_BOSS::EState::READY:
+		ReadyAction();
 		break;
-	case WizardBall::EState::AttackEnd:
+	case MIDDLE_BOSS::EState::CAST:
+		CastAction();
 		break;
-	case WizardBall::EState::HIT:
+	case MIDDLE_BOSS::EState::HIT:
 		break;
 	default:
 		break;
@@ -258,42 +386,24 @@ void MIDDLE_BOSS::StateAction()
 
 void MIDDLE_BOSS::UpdateDir()
 {
-
 	auto sp_AttackTarget = wp_AttackTarget.lock();
 	if (!sp_AttackTarget)return;
 	vec TargetLocation = sp_AttackTarget->_transform->_location;
 	vec Dis = TargetLocation - _transform->_location;
 	vec Dir = Dis.get_normalize();
 	_transform->_dir = Dir;
+}
 
+void MIDDLE_BOSS::StateSetUp(EState NewState, float Duration)
+{
+	CurrentState = NewState;
+	StateDuration = Duration;
+	CurrentColIdx = 0;
 }
 
 void MIDDLE_BOSS::ConditionCheck()
 {
 
-
-}
-
-bool MIDDLE_BOSS::Attacking()
-{
-	if (!_transform)return true;
-
-	_transform->_location += AttackDir * AttackSpeed * DeltaTime;
-	return true;
-}
-
-bool MIDDLE_BOSS::AttackEnd()
-{
-	bAttacking = false;
-	CurrentColIdx = 3;
-
-	return true;
-}
-
-void MIDDLE_BOSS::AttackReady()
-{
-	sound_mgr::instance().Play("BALL_ATTACKMODE", false, 1.f);
-	CurrentColIdx = 0;
 }
 
 void MIDDLE_BOSS::IdleAction()
@@ -314,4 +424,158 @@ void MIDDLE_BOSS::IdleAction()
 		_transform->Move(_transform->_dir, Speed * DeltaTime);
 		StateDuration += DeltaTime;
 	}
+}
+
+void MIDDLE_BOSS::BOSS_Skill_Fire()
+{
+	Timer::instance().event_regist_ReWhileDelta(10.f, 0.1f, &MIDDLE_BOSS::FireSpawn, this);
+}
+
+
+
+void MIDDLE_BOSS::BOSS_SKill_BallSpawn()
+{
+	auto sp_Target = wp_AttackTarget.lock();
+	if (!sp_Target)return;
+	TargetLocation = sp_Target->_transform->_location;
+
+	Timer::instance().event_regist_ReWhileDelta(2.f, 2.f/10.f,&MIDDLE_BOSS::BallSpawn,this,10);
+}
+
+void MIDDLE_BOSS::BOSS_SKill_ICEBlast()
+{
+	BlastSpawn(6);
+}
+
+void MIDDLE_BOSS::FireSpawn()
+{
+	if (!_transform)return;
+	auto NormalAttack = object_mgr::instance().insert_object<WizardFire>();
+	if (!NormalAttack)return;
+
+
+	NormalAttack->_owner = _owner;
+	NormalAttack->wp_Target = wp_AttackTarget;
+	NormalAttack->speed = 1000.f;
+	auto sp_Target = wp_AttackTarget.lock();
+	if (!sp_Target)return;
+
+	
+	vec Dis = sp_Target->_transform->_location - _transform->_location;
+	vec Dir = Dis.get_normalize();
+	vec SpawnLocation = _transform->_location + Dir * 15.f;
+
+	NormalAttack->Cast(SpawnLocation, Dis.get_normalize(), 0, FireImg);
+}
+
+void MIDDLE_BOSS::BallSpawn(size_t NUM)
+{
+	vec InitDir = math::dir_from_angle(BallSpawnSkillCurrentAngle);
+	        
+
+	vec InitPos = TargetLocation+InitDir * 500.f;
+
+	Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
+	auto sp_WizBall = WizardBall::BallCast();
+	sp_WizBall->_transform->_location = InitPos;
+	sp_WizBall->wp_AttackTarget = wp_AttackTarget;
+	sp_WizBall->HP = 50;
+
+	BallSpawnSkillCurrentAngle += 360.f/NUM;
+}
+
+void MIDDLE_BOSS::BOSS_Skill_ICECrystal(size_t NUM)
+{
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	/*vec TopRight,TopLeft,BottomLeft,BottomRight;
+	TopRight = TopLeft = BottomLeft = BottomRight = vec::unit_diagonal_vec();
+	TopLeft.x *= -1;
+	BottomLeft *= -1;
+	BottomRight.y *= -1;*/
+
+	vec OuterTopRight = vec::unit_diagonal_vec();
+	vec InnerTopRight = OuterTopRight;
+
+	float DistanceFromBoss = 250;
+	float DistanceFromRotationCenter = 250;
+	float CrystalBeetwenAngle = (360 / NUM)-1;
+	float RotationDurationMin= 8.f;
+	float RotationDurationAdd = 0.2f;
+	float AttackSpeed = 2000.f;
+
+	float RotationDuration = RotationDurationMin;
+
+	//(vec RotationCenter, float RotationDuration,
+	//	std::weak_ptr<class object> wp_AttackTarget/*Owner*/, float AttackSpeed
+	
+
+	for (int i = 0; i < NUM; ++i)
+	{
+		for (int j = 0; j < NUM; ++j)
+		{
+			vec RotationCenter = _transform->_location +
+				(OuterTopRight * DistanceFromBoss) + (InnerTopRight * DistanceFromRotationCenter);
+
+			auto _Ice = _object_mgr.insert_object<BossCrystal>
+			(RotationCenter,RotationDuration,wp_AttackTarget,AttackSpeed);
+			if (!_Ice)return;
+
+			_Ice->_transform->_dir = InnerTopRight;
+
+			InnerTopRight= math::rotation_dir_to_add_angle(InnerTopRight, CrystalBeetwenAngle);
+			RotationDuration += RotationDurationAdd;
+		}
+		OuterTopRight = math::rotation_dir_to_add_angle(OuterTopRight, CrystalBeetwenAngle);
+	};
+}
+
+void MIDDLE_BOSS::SummonMonster()
+{
+	if (MonsterSpawnCurrentTick > 0)return;
+	if (!_transform)return;
+
+	float SummonDistance = 150.f;
+	vec BossPos =_transform->_location;
+
+	vec WizardLocation = BossPos + vec{ 0,-1 }*SummonDistance;
+	vec ARHCERLocation = BossPos + vec{ -1,0 }*SummonDistance;
+	vec SwordManLocation = BossPos + vec{ 1,0 }*SummonDistance;
+		
+	Monster::CardEffect(WizardLocation,L"SUMMON_CARD_WIZARD");
+	Monster::CardEffect(SwordManLocation, L"SUMMON_CARD_SWORDMAN");
+	Monster::CardEffect(ARHCERLocation, L"SUMMON_CARD_ARCHER");
+
+	object_mgr::instance().insert_object<SwordMan>(wp_AttackTarget, SwordManLocation);
+	object_mgr::instance().insert_object<ARCHER>(wp_AttackTarget, ARHCERLocation);
+	object_mgr::instance().insert_object<WIZARD>(wp_AttackTarget, WizardLocation);
+
+	MonsterSpawnCurrentTick = MonsterSpawnCycle;
+}
+
+void MIDDLE_BOSS::DieAction()
+{
+	auto sp_UIBOSSHPBar = wp_UIBossHPBar.lock();
+	if (!sp_UIBOSSHPBar)return;
+	sp_UIBOSSHPBar->bDie = true;
+
+	auto sp_wp_UIBossName = wp_UIBossName.lock();
+	if (!sp_wp_UIBossName)return;
+	sp_wp_UIBossName->bDie = true;
+}
+
+void MIDDLE_BOSS::BlastSpawn(size_t NUM)
+{
+	if (!_transform)return;
+	vec InitDir = vec::unit_diagonal_vec();
+	vec InitLocation = _transform->_location;
+	float BLAST_Init_Distance = 150.f;
+
+	for (int i = 0; i < NUM; ++i)
+	{
+		object_mgr::instance().insert_object< HomingBlast>(wp_AttackTarget,
+			InitLocation + InitDir * BLAST_Init_Distance, InitDir);
+
+		InitDir = math::rotation_dir_to_add_angle(InitDir, 360.f / NUM);
+	};
 }

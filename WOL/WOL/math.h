@@ -50,6 +50,7 @@ struct vec
 	vec get_normalize()const;
 	float length()const;
 	float length_2()const;
+	float CrossZ(vec Rhs)const;
 
 	bool operator==(const vec& _rhs)const;
 	bool operator!=(const vec& _rhs)const;

@@ -58,6 +58,9 @@ void WIZARD::initialize()
 
 Event WIZARD::update(float dt)
 {
+	InitTime -= dt;
+	if (InitTime > 0)return Event::None;
+
 	if (bDie)
 		return Event::Die;
 	if (bDying)
@@ -251,9 +254,7 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 }
 void WIZARD::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-
-
-
+	if (InitTime > 0)return;
 
 
 	Monster::render(hdc, camera_pos, size_factor);

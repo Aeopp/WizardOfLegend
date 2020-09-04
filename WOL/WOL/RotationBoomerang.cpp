@@ -5,8 +5,8 @@ void RotationBoomerang::initialize()
 {
 	Boomerang::initialize();
 
-	ScaleX = 1.f;
-	ScaleY = 1.f;
+	ScaleX = 0.8f;
+	ScaleY = 0.8f;
 
 
 }

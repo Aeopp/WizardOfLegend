@@ -76,7 +76,6 @@ private:
     void SkillScrewBoomerang();
     void MultiScrewBoomerang(int Num);
 
-
     void GetSkill();
 
     void SkillInCastSlowTime(float Duration,float SlowTimeScale);

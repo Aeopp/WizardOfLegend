@@ -74,6 +74,28 @@ void Timer::update()
 		}
 	}
 
+	for (auto event_iter = std::begin(rewhileDT_events); event_iter != std::end(rewhileDT_events);)
+	{
+		auto& [remain_time,TargetDT,CurrentDT, function] = *event_iter;
+
+		remain_time -= delta();
+		CurrentDT -= delta();
+		if (remain_time < 0)
+		{
+			event_iter = rewhileDT_events.erase(event_iter);
+			continue;
+		}
+		if (CurrentDT < 0)
+		{
+			CurrentDT = TargetDT;
+			function();
+			++event_iter;
+		}
+		else
+		{
+			++event_iter;
+		}
+	}
 }
 
 void Timer::render(HDC hdc)
@@ -99,5 +121,7 @@ float Timer::delta()
    // return (1000.f / fps) * 0.001 * time_scale;
 	//return 0.016f;
 
-	return (float)dt /1000.f * (float)time_scale;
+	if (bDebugTimeScale)
+		return (float)dt / 1000.f * 0.3f;
+	else  return (float)dt /1000.f * (float)time_scale;
 }

@@ -42,13 +42,13 @@ void ICE_Crystal::initialize()
 
 	Attack = { 20,40 };
 	bAttacking = true;
-
 	TickScale = 1.f;
 	sp_collision->bSlide = false;
 	ObjectTag = object::Tag::player_attack;
-	bAttacking = true;
 	sp_collision->bCollisionTargetPushFromForce= true;
 	sp_collision->PushForce = 10.f;
+	sp_collision->bCollision = true;
+	sp_collision->bHitEffect = true;
 
 	sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
 	
@@ -67,7 +67,7 @@ Event ICE_Crystal::update(float dt)
 	if (CurrentSoundTick < 0)
 	{
 		CurrentSoundTick = SoundTick; 
-		sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);
+		//sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);
 	}
 
 	Duration -= dt;

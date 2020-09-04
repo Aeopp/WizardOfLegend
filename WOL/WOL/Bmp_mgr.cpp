@@ -85,6 +85,16 @@ void Bmp_mgr::initialize()
 
 	 Insert_Bmp(DefaultPath + L"MIDDLE_BOSS_LEFT.bmp", L"MIDDLE_BOSS_LEFT");
 	 Insert_Bmp(DefaultPath + L"MIDDLE_BOSS_RIGHT.bmp", L"MIDDLE_BOSS_RIGHT");
+	 Insert_Bmp(DefaultPath + L"BOSS_LEFT.bmp", L"BOSS_LEFT");
+	 Insert_Bmp(DefaultPath + L"BOSS_RIGHT.bmp", L"BOSS_RIGHT");
+	 Insert_Bmp(DefaultPath + L"BOSS_ATTACK.bmp", L"BOSS_ATTACK");
+
+	 Insert_Bmp(DefaultPath + L"MIDDLEBOSS_NAMEBAR.bmp", L"MIDDLEBOSS_NAMEBAR");
+	 Insert_Bmp(DefaultPath + L"BOSS_NAMEBAR.bmp", L"BOSS_NAMEBAR");
+
+	 Insert_Bmp(DefaultPath + L"ICE_BLAST.bmp", L"ICE_BLAST");
+
+	 
 
 };	 	
 

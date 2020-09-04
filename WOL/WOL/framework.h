@@ -15,6 +15,7 @@ extern bool bDebug;
 extern float DeltaTime;
 extern bool bFrameLimit;
 extern bool bDeltaTimeUnFixed;
+extern bool bDebugTimeScale;
 #include <memory>
 #include <mutex>
 #include <map>

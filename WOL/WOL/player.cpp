@@ -29,10 +29,14 @@
 #include "EffectPlayerAttack.h"
 #include "sound_mgr.h"
 #include "ScrewBoomerang.h"
+#include "helper.h"
 
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
+
+
+
 	actor::render(hdc, camera_pos, size_factor);
 	
 	if (bDebug)
@@ -931,7 +935,7 @@ void Player::MultiScrewBoomerang(int Num)
 	_player_info->AddMp(-50);
 
 	sound_mgr::instance().Play("ULT_USE", false, 1.f);
-	SkillInCastSlowTime(0.25f, 0.5f);
+	SkillInCastSlowTime(0.25f, 0.3f);
 
 }
 
@@ -1105,7 +1109,8 @@ void Player::Dash(float speed)
 		Transform->_location += Transform->_dir *(speed*DeltaTime);
 		return true;
 	}));
-	_render_component->ChangeUnstoppableAnim(AnimTable::dash, _player_info->DashDuration, AnimTable::idle);
+	_render_component->ChangeUnstoppableAnim(AnimTable::dash,
+	_player_info->AnimDashDuration, AnimTable::idle);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
 	Camera_Shake(1, dir, 0.025f);
@@ -1140,7 +1145,7 @@ void Player::Attack()
 	Dir.y *= -1;
 
 	_transform->_dir = Dir;
-	_transform->Move(_transform->_dir, 15.f);
+	_transform->Move(_transform->_dir, 25.f);
 
 	math::EDir _Dir = math::checkDir(attack_dir);
 

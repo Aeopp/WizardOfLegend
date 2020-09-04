@@ -37,7 +37,7 @@ public:
 	std::weak_ptr<object> _ptr{};
 	std::weak_ptr<object> _owner{};
 
-	float HitCoolTime = 0.1f;
+	float CurrentHitCoolTime = 0.1f;
 	bool bInvalidatedefense = false;
 	bool bDie{ false };
 	bool bAttacking{ false };
