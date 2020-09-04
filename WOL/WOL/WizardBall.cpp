@@ -18,7 +18,7 @@ void WizardBall::initialize()
 	sp_Bmp = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_BALL");
 
 	wp_collision =collision_mgr::instance().
-	insert(_ptr, collision_tag::EMonster,figure_type::ECircle);
+	insert(_ptr, collision_tag::EMonsterAttack,figure_type::ECircle);
 
 	auto sp_collision = wp_collision.lock();
 

@@ -15,6 +15,7 @@ public :
 	std::shared_ptr<class Bmp> sp_Bmp;
 	uint32_t get_layer_id()const& override;
 	void AnimUpdate();
+	void ICE_EffectPlay();
 	static inline float const AngleSpeedIncreaseRate = 45.f;
 	static inline const float AnimDelta = 0.2f;
 

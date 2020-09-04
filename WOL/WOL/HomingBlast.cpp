@@ -49,6 +49,9 @@ void HomingBlast::initialize()
 	
 	std::fill_n(std::back_inserter(ParticlesPositions), 6, _transform->_location);
 	
+
+	ICE_EffectPlay();
+
 }
 
 Event HomingBlast::update(float dt)
@@ -59,7 +62,11 @@ Event HomingBlast::update(float dt)
 	AnimInitTime -= dt;
 
 	if (Duration < 0)
+	{
+		ICE_EffectPlay;
 		return Event::Die;
+	}
+
 	auto sp_Target = _owner.lock();
 	if (!sp_Target)return Event::Die;
 	if (!sp_Target->_transform)return Event::Die;
@@ -114,6 +121,8 @@ void HomingBlast::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	AnimUpdate();
 
+	ICE_EffectPlay();
+
 	
 	for (auto& PastPos : ParticlesPositions)
 	{
@@ -160,4 +169,16 @@ void HomingBlast::AnimUpdate()
 
 	if (AnimInitTime < 0 && Duration > 0.3)
 		CurrentColIdx = 2;
+}
+
+void HomingBlast::ICE_EffectPlay()
+{
+
+
+	if (!_transform)return;
+
+	vec MyLocation = _transform->_location;
+
+	collision_mgr::instance().HitEffectPush(MyLocation + math::RandVec() * math::Rand<int>({ -20,20 }), 0.2f);
+
 }

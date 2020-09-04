@@ -7,6 +7,7 @@
 #include "Effect.h"
 #include "sound_mgr.h"
 
+
 void ICE_Blast::initialize()
 {
 	actor::initialize();
@@ -60,6 +61,10 @@ void ICE_Blast::initialize()
 	sound_mgr::instance().RandSoundKeyPlay("ICE_BLAST", { 1,4 }, 1.f);
 
 	UniqueID = EObjUniqueID::ICEBLAST;
+
+
+	IceEffectPlay();
+
 };
 
 Event ICE_Blast::update(float dt)
@@ -71,14 +76,29 @@ Event ICE_Blast::update(float dt)
 		_render_component->_Anim.EndMotionColIndex = 7;
 	}
 	if (Duration < 0)
+	{
+		IceEffectPlay();
 		_Event = Event::Die;
+	}
+		
 
 	return _Event;
 };
 
+void ICE_Blast::render(HDC hdc, vec camera_pos, vec size_factor)
+{
+	actor::render(hdc, camera_pos, size_factor);
+
+	IceEffectPlay();
+}
+
 void ICE_Blast::IceEffectPlay()
 {
-	
+	if (!_transform)return;
+
+	vec MyLocation =  _transform->_location;
+
+	collision_mgr::instance().HitEffectPush(MyLocation + math::RandVec() * math::Rand<int>({ -20,20 }), 0.2f);
 }
 
 uint32_t ICE_Blast::get_layer_id() const&
