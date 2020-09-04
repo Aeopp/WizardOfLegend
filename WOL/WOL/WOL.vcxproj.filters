@@ -244,6 +244,14 @@
     <ClInclude Include="UIBossName.h" />
     <ClInclude Include="BossCrystal.h" />
     <ClInclude Include="HomingBlast.h" />
+    <ClInclude Include="FMOD32\fmod.h" />
+    <ClInclude Include="FMOD32\fmod.hpp" />
+    <ClInclude Include="FMOD32\fmod_codec.h" />
+    <ClInclude Include="FMOD32\fmod_common.h" />
+    <ClInclude Include="FMOD32\fmod_dsp.h" />
+    <ClInclude Include="FMOD32\fmod_dsp_effects.h" />
+    <ClInclude Include="FMOD32\fmod_errors.h" />
+    <ClInclude Include="FMOD32\fmod_output.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -504,6 +512,11 @@
     <None Include="fmodL.dll">
       <Filter>source\sound\fmod</Filter>
     </None>
+    <None Include="FMOD32\fmod.cs" />
+    <None Include="FMOD32\fmod.dll" />
+    <None Include="FMOD32\fmod_dsp.cs" />
+    <None Include="FMOD32\fmod_errors.cs" />
+    <None Include="FMOD32\fmodL.dll" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="fmod_vc.lib">
@@ -512,5 +525,9 @@
     <Library Include="fmodL_vc.lib">
       <Filter>source\sound\fmod</Filter>
     </Library>
+    <Library Include="FMOD32\fmod_vc.lib" />
+    <Library Include="FMOD32\fmodL_vc.lib" />
+    <Library Include="FMOD32\libfmod.a" />
+    <Library Include="FMOD32\libfmodL.a" />
   </ItemGroup>
 </Project>
