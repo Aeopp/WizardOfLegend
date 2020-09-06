@@ -27,16 +27,16 @@ public:
        // 박스 6개
        ROTBOXATTACK,
        // 부동자세에서 플레이어 방향 기둥 공격
-       PILLARATTACK,
+       PILLARMULTIPLEATTACK,
        // 느린 점프 이후 주변 기둥 소환 공격
-       JUMPPILLARATTACK, 
+       PILLARSPIRALATTACK,
        // 박스를 던지며 기둥 소환하는 공격
-        BOXPILLARATTACK , 
+       BOXDIRECTPILLARATTACK,
         None  ,
     };
-
-    std::unordered_map<int, PatternInfo> PatternMap;
-
+    std::vector<int> PatternTable
+    { 0,1,2,3,4,4,3,2,1,0,2,3,4,0,1,1,2,3,4,0,1,2,3,4,1,0,2,3,4,2,3,1,0,2,3,4,0,1,2,3,4,0,1,2,3,4,1,2,3,0,1,4,2,3 };
+    std::unordered_map<int, std::function<void()>> PatternMap;
 
     void initialize()override;
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
@@ -45,6 +45,17 @@ public:
     void SetUp(std::weak_ptr<class object> AttackTarget, vec Location);
     virtual ~BOSS()noexcept;
 
+    vec RenderCorrection{ 0,0 };
+
+    // 추적을 시작한 이후 점프속도의 가속도 ()
+    static inline const float JumpAcceleration = 500.f;
+    // 점프 공격시에 점프한 이후에 플레이어를 향해 추적하는 속도
+    static inline const float JumpInitTrackSpeed = 400;
+    float CurrentJumpAcceleration = 0;
+    void JumpStart();
+    void JumpTracking();
+    void JumpEnd();
+    void JumpEndAnimPlay();
 
     //left right 스프라이트
     std::pair< std::shared_ptr<class Bmp>, std::shared_ptr<class Bmp> > sp_Bmps;
@@ -53,7 +64,7 @@ public:
 
     std::shared_ptr<class Bmp >CurrentBmp; 
 
-
+    std::weak_ptr<class collision_component> wp_Attackcollision;
     std::weak_ptr<class collision_component> wp_collision;
     std::weak_ptr<class object> wp_AttackTarget;
     std::shared_ptr<class BossInfo> sp_MyInfo{};
@@ -87,9 +98,12 @@ public:
     // Attack 스프라이트 테이블
     std::vector<uint32_t> CurrentAttackAnimColNumTable{ 4,4,4,4 };
     bool bAttackAnimSprite = false;
+    float TargetDistance = 0; 
     void AttackAnimOn();
     void AttackAnimEnd();
     int CurrentAnimColMax = 0;
+
+    static inline const  std::pair<float, float > DefaultShadowWorldSizeCorrection = { 90,85 };
 
     float SoilEffectDuration = -1;
     float SoilEffectRenderTick = 0;
@@ -101,7 +115,6 @@ public:
     void SOIL_EffectEnd();
 
     // 여기에 패턴 세팅
-    std::vector<int> PatternTable{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     int PatternTableNum;
     int CurrentPatternIdx = 0; 
@@ -110,14 +123,14 @@ public:
     int CalcAttackAnimRowIdxFromDir();
     std::shared_ptr<class Bmp> AnimDirSpriteUpdate();
 
-    int CalcAnimRowFromPattern();
     void HitCalc(std::pair<int, int> AttackRange);
     void AttackStart();
     void AnimColUpdate();
     void AnimUpdateFromCurrentState();
     void StateTranslation();
     void UpdateDir();
-    void StateSetUp(EState NewState, float Duration, float StateAnimDelta);
+    void StateSetUp(EState NewState, float Duration, float StateAnimDelta, int SetStartColIdx
+    , bool SetAnimLoop, int AnimColMax);
     EState CurrentState = EState::IDLE;
     
     void DieAction();
@@ -130,19 +143,29 @@ public:
     ///////////////////////////
 
     /// <summary>
+    // 애니메이션 상태지속시간 등등 상태 세팅하고 공격 시작
+    // 패턴 시작용 헬퍼 함수
     void BoxAttackStart();
+    void RotationBoxAttackStart();
+    void BoxDirectPillarAttackStart();
+    void PillarMultipleAttackStart();
+    void PillarSpiralAttackStart(); 
+    // 현재 모션을 Attack 모션으로 변경
+    auto GetAttackAnimPakage();
+    void AttackAnimPlay();
     /// </summary>
     
     void PillarPredictionAttack();
-    
-
-
     void PillarCircle();
-    
-    
-
     // 타겟의 진행방향을 예상해 기둥공격
-    
     void PillarDirectAttack();
+
+    void ShockAttackStart();
+    void ShockAttackEnd();
 };
 
+auto BOSS::GetAttackAnimPakage()
+{
+    static auto AttackAnimPackage = [this] {AttackAnimPlay(); return true; };
+    return AttackAnimPackage;
+}

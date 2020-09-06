@@ -28,7 +28,7 @@ public:
     PlayerState CurrentState{ PlayerState::Idle };
 
     float CurrentInvincibletime;
-    float DefaultInvincibletime = 0.2f;
+    float DefaultInvincibletime;
     bool bInputDiagonal{ false };
 
     std::shared_ptr<class player_info> _player_info;

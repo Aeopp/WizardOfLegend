@@ -142,7 +142,7 @@ void Player::initialize()
 
 	ObjectTag = object::Tag::player;
 
-	CurrentInvincibletime = DefaultInvincibletime = 0.1f;
+	CurrentInvincibletime = DefaultInvincibletime = 0.3f;
 };
 
 Event Player::update(float dt)
@@ -179,7 +179,7 @@ void Player::Hit(std::weak_ptr<object> _target)
 	if (sp_target->ObjectTag == object::Tag::player_attack)return;
 	//if (sp_target->ObjectTag == object::Tag::monster)return;
 
-	if (sp_target->ObjectTag == object::Tag::monster&& sp_target->UniqueID != EObjUniqueID::EWizardBall)return;
+	//if (sp_target->ObjectTag == object::Tag::monster && sp_target->UniqueID != EObjUniqueID::EWizardBall)return;
 
 	if (_player_info->bProtected == true){
 		sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
@@ -198,6 +198,8 @@ void Player::Hit(std::weak_ptr<object> _target)
 
 	if(_player_info->GetHP()>0)
 	{
+		CurrentInvincibletime = DefaultInvincibletime;
+
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_player_info->bHit = true;
 		if (!_player_info->bDash)
@@ -218,13 +220,13 @@ void Player::Hit(std::weak_ptr<object> _target)
 	
 	//	Timer::instance().time_scale = 0.1f;
 		sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
-		_Timer.event_regist(EOnce, 1.f, []() {
-			MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
-				MB_OK);
-			return true;
-			});;
-		_Timer.time_scale = 1.0f;
-		DeltaTime = 0.0f;
+	///*	_Timer.event_regist(EOnce, 1.f, []() {
+	//		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
+	//			MB_OK);
+	//		return true;
+	//		});;
+	//	_Timer.time_scale = 1.0f;*/
+	//	DeltaTime = 0.0f;
 
 		_player_info->SetHp(_player_info->max_hp);
 		_player_info->SetMp(_player_info->max_mp);
@@ -249,7 +251,6 @@ void Player::Hit(std::weak_ptr<object> _target)
 		Atk*0.01);
 
 
-	CurrentInvincibletime = DefaultInvincibletime;
 };
 
 void Player::StateCheck()
@@ -434,7 +435,7 @@ void Player::ICE_BLAST(int Num)
 	_player_info->CurrentAttackDuration = _player_info->DefaultAttackDuration;
 
 	vec Dir{ math::Rand<float>({ 0,0 }), math::Rand<float>({ -10,+10 }) };
-	Camera_Shake(10, Dir, 0.5f);
+	Camera_Shake(1, Dir, 0.1f);
 
 	_player_info->AddMp(-150);
 
@@ -602,7 +603,7 @@ void Player::SkillIceCrystal(uint32_t Num)
 	_render_component->ChangeAnim(AnimTable::attack1, _player_info->SkillICECrystalMotionDuration);
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
-	Camera_Shake(10, dir, 0.5f);
+	Camera_Shake(2, dir, 0.2f);
 
 	_player_info->AddMp(-100);
 
@@ -824,7 +825,7 @@ void Player::MultiRotBoomerang(int Num)
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 
-	Camera_Shake(8, dir, 0.4f);
+	Camera_Shake(4, dir, 0.3f);
 
 	_player_info->AddMp(-50);
 
@@ -931,7 +932,7 @@ void Player::MultiScrewBoomerang(int Num)
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 
-	Camera_Shake(8, dir, 0.4f);
+	Camera_Shake(8, dir, 0.2f);
 
 	_player_info->AddMp(-50);
 
@@ -1114,7 +1115,7 @@ void Player::Dash(float speed)
 	_player_info->AnimDashDuration, AnimTable::idle);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(1, dir, 0.025f);
+	Camera_Shake(1, dir, 0.1f);
 	
 	sound_mgr::instance().RandSoundKeyPlay("DASH", { 1,4 },1.f);
 
@@ -1191,7 +1192,7 @@ void Player::Attack()
 		fDegree);
 
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(1, dir, 0.01f);
+	Camera_Shake(1, dir, 0.1f);
 };
 
 void Player::Player_Move(float dt)

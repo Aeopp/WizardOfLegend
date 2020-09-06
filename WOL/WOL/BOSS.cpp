@@ -18,6 +18,8 @@
 #include "timer.h"
 #include "BOSS_ROTBOX.h"
 #include "BOSS_SKILL.h"
+#include "Camera.h"
+
 
 
 void BOSS::initialize()
@@ -33,11 +35,25 @@ void BOSS::initialize()
 	wp_collision = collision_mgr::instance().
 		insert(_ptr, collision_tag::EMonster, figure_type::ERect);
 
+	wp_Attackcollision = collision_mgr::instance().insert(_ptr, collision_tag::EMonsterAttack, figure_type::ECircle);
+
+	auto sp_Atkcomp = wp_Attackcollision.lock();
+	if (!sp_Atkcomp) return;
+
+	sp_Atkcomp->bCollision = false;
+	sp_Atkcomp->bCollisionSlideAnObject = false;
+	sp_Atkcomp->bCollisionTargetPushFromForce = true;
+	sp_Atkcomp->bHitEffect = true;
+	sp_Atkcomp->bRender = true;
+	sp_Atkcomp->bSlide = true;
+	sp_Atkcomp->PushForce = 10.f;
+	sp_Atkcomp->_size = { 120,120};
+
 	auto sp_collision = wp_collision.lock();
 
 	if (!sp_collision)return;
 
-	this->bAttacking = false;
+	this->bAttacking = true;
 	sp_collision->bCollision = true;
 	sp_collision->bCollisionSlideAnObject = true;
 	sp_collision->bCollisionTargetPushFromForce = false;
@@ -52,7 +68,7 @@ void BOSS::initialize()
 	_Shadow._owner = (_ptr);
 	_Shadow.correction = { 0,125 };
 	_Shadow.bShadow = true;
-	_Shadow.world_size_correction = { 90,85 };
+	_Shadow.world_size_correction = DefaultShadowWorldSizeCorrection;
 
 	PaintSizeX = 220;
 	PaintSizeY = 300;
@@ -87,11 +103,12 @@ void BOSS::initialize()
 	
 	SOILs.resize(36 * 3);
 
-	PatternMap[EPattern::BOXATTACK] = { 0.3f,12,std::bind(&BOSS::BoxDirectPillarAttack,this) };
-	PatternMap[EPattern::ROTBOXATTACK] = { 0.5f,12 };
-	PatternMap[EPattern::PILLARATTACK] = { 0.7f,12 };
-	PatternMap[EPattern::JUMPPILLARATTACK] = { 0.9f,12 };
-	PatternMap[EPattern::BOXPILLARATTACK] = { 1.1f,12 };
+	
+	PatternMap[EPattern::BOXATTACK] = std::bind(&BOSS::BoxAttackStart, this);
+	PatternMap[EPattern::ROTBOXATTACK] = std::bind(&BOSS::RotationBoxAttackStart, this);
+	PatternMap[EPattern::BOXDIRECTPILLARATTACK] = std::bind(&BOSS::BoxDirectPillarAttackStart, this);
+	PatternMap[EPattern::PILLARMULTIPLEATTACK] = std::bind(&BOSS::PillarMultipleAttackStart, this);
+	PatternMap[EPattern::PILLARSPIRALATTACK] = std::bind(&BOSS::PillarSpiralAttackStart, this);
 };
 
 void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -108,6 +125,7 @@ void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
 	vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
+	DestLoc += RenderCorrection;
 
 	// Col 인덱스 업데이트.
 	AnimColUpdate();
@@ -115,7 +133,7 @@ void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 	GdiTransparentBlt(hdc,
 		DestLoc.x, DestLoc.y
 		, DestPaintSize.x, DestPaintSize.y
-		, CurrentBmp->Get_MemDC(),
+		, sp_Bmp->Get_MemDC(),
 		CurrentColIdx * PaintSizeX,
 		CurrentRowIdx * PaintSizeY,
 		PaintSizeX, PaintSizeY,
@@ -155,8 +173,8 @@ void BOSS::Hit(std::weak_ptr<object> _target)
 		if (CurrentState == EState::IDLE || CurrentState == EState::HIT ||
 			CurrentState== EState::Taunt)
 		{
+			CurrentState = EState::HIT;
 			StateDuration += 0.1f;
-			CurrentState = BOSS::EState::HIT;
 			AnimDelta = 0.1f;
 			HitCalc(sp_Target->Attack);
 		}
@@ -192,6 +210,66 @@ BOSS::~BOSS() noexcept
 {
 	DieAction();
 
+}
+void BOSS::JumpStart()
+{
+	CurrentJumpAcceleration = 0;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	/// <summary>
+	/// 정해진 시간동안 그림자 크기를 키우고 낙하한다고 정한 시간동안 크기를 줄여나감
+	/// </summary>
+
+	Timer::instance().event_regist(time_event::ERemaingWhile, 0.5, [this] {
+		RenderCorrection += vec{ 0 ,    -1 }  *3000 * DeltaTime; 
+
+		_Shadow.world_size_correction.first += 1;
+		_Shadow.world_size_correction.second+= 1;
+		return true; });
+
+	Timer::instance().event_regist(time_event::EOnce, 0.5, [this] {
+
+		Timer::instance().event_regist(time_event::ERemaingWhile, 0.5, [this] {
+			RenderCorrection += vec{ 0 ,    1 }  *3000 * DeltaTime;
+
+			_Shadow.CurrentShadowState = EShadowState::NORMAL;
+			_Shadow.world_size_correction.first -= 1;
+			_Shadow.world_size_correction.second -= 1;
+			return true; });
+
+		return true; });
+
+
+	Timer::instance().event_regist(time_event::EOnce, 1.5001, [this] {
+		RenderCorrection = { 0,0 };
+		return true;
+		});
+}
+void BOSS::JumpTracking()
+{
+	if (!_transform)return;
+	
+	float Speed = JumpInitTrackSpeed + CurrentJumpAcceleration;
+	if (TargetDistance >50)
+	_transform->_location += _transform->_dir *DeltaTime * Speed;
+	CurrentJumpAcceleration += JumpAcceleration * DeltaTime;
+}
+void BOSS::JumpEndAnimPlay()
+{
+	CurrentJumpAcceleration = 0;
+	CurrentRowIdx = 3;
+	CurrentColIdx = 2;
+	bAttackAnimSprite = false;
+	bAnimLoop = false;
+	AnimDelta = 0.08f;
+	CurrentAnimColMax = 7;
+}
+
+
+void BOSS::JumpEnd()
+{
+	_Shadow.CurrentShadowState = EShadowState::NORMAL;
+	_Shadow.world_size_correction = DefaultShadowWorldSizeCorrection;
 }
 void BOSS::AttackAnimOn()
 {
@@ -305,41 +383,7 @@ std::shared_ptr<class Bmp> BOSS::AnimDirSpriteUpdate()
 	return _transform->_dir.x < 0 ? sp_Bmps.first : sp_Bmps.second;
 }
 
-int BOSS::CalcAnimRowFromPattern()
-{
-	switch (CurrentPattern)
-	{
-	case BOSS::BOXATTACK:
-		if (bAttackAnimSprite)
-			return CalcAttackAnimRowIdxFromDir();
-		else
-			return 2;
-		break;
-	case BOSS::ROTBOXATTACK:
-		if (bAttackAnimSprite)
-			return CalcAttackAnimRowIdxFromDir();
-		else
-			return 2;
-		break;
-	case BOSS::PILLARATTACK:
-		return 2;
-		break;
-	case BOSS::JUMPPILLARATTACK:
-		return 3;
-		break;
-	case BOSS::BOXPILLARATTACK:
-		if (bAttackAnimSprite)
-			return CalcAttackAnimRowIdxFromDir();
-		else
-			return 2; 
-		break;
-	case BOSS::None:
-		break;
-	default:
-		break;
-	}
-	return INT_MAX;
-}
+
 
 void BOSS::HitCalc(std::pair<int, int> AttackRange)
 {
@@ -410,7 +454,6 @@ void BOSS::AnimUpdateFromCurrentState()
 		CurrentRowIdx = 1;
 		break;
 	case BOSS::EState::ATTACK:
-		CurrentRowIdx  = CalcAnimRowFromPattern();
 		break;
 	case BOSS::EState::HIT:
 		CurrentRowIdx = 4;
@@ -430,22 +473,20 @@ void BOSS::StateTranslation()
 	switch (CurrentState)
 	{
 	case BOSS::EState::IDLE:
-		StateSetUp(EState::Taunt, 3.f, 0.1f);
+ 		StateSetUp(EState::Taunt, math::Rand<float>({ 0,2 }), 0.1f,0,true,8);
 		break;
 	case BOSS::EState::Taunt:
-		//StateSetUp((BOSS::EState)CurrentPatternIdx,
-		//	PatternMap[PatternTable[CurrentPatternIdx]].Duration,
-		//	PatternMap[PatternTable[CurrentPatternIdx]].AnimDelta);
-		//CurrentSKILL = PatternMap[PatternTable[CurrentPatternIdx]].Skill;
-		CurrentSKILL = std::bind(&BOSS::BoxAttackStart, this);
+		CurrentSKILL = PatternMap[PatternTable[CurrentPatternIdx]];
 		if (CurrentSKILL)CurrentSKILL();
-		CurrentPatternIdx++;
+
+		if (++CurrentPatternIdx >= PatternTableNum)
+			CurrentPatternIdx = 0;
 		break;
 	case BOSS::EState::ATTACK:
-		StateSetUp(EState::IDLE, 3.f, 3.f);
+		StateSetUp(EState::IDLE, 1.5f, 1.5f,0,false,0);
 		break;
 	case BOSS::EState::HIT:
-		StateSetUp(EState::IDLE, 0.1f, 0.1f);
+		StateSetUp(EState::Taunt, 0.1f, 0.1f,0,true,8);
 		break;
 	case BOSS::EState::DIE:
 		bDie = true;
@@ -461,16 +502,21 @@ void BOSS::UpdateDir()
 	if (!sp_AttackTarget)return;
 	vec TargetLocation = sp_AttackTarget->_transform->_location;
 	vec Dis = TargetLocation - _transform->_location;
+	TargetDistance = Dis.length();
 	vec Dir = Dis.get_normalize();
 	_transform->_dir = Dir;
 }
 
-void BOSS::StateSetUp(EState NewState, float Duration,float StateAnimDelta)
+void BOSS::StateSetUp(EState NewState, float Duration,float StateAnimDelta,int SetStartColIdx,
+	bool SetAnimLoop,int AnimColMax)
 {
 	CurrentState = NewState;
 	StateDuration = Duration;
 	BOSS::AnimDelta = StateAnimDelta;
-	CurrentColIdx = 0;
+	CurrentAnimDelta = StateAnimDelta; 
+	CurrentColIdx = SetStartColIdx;
+	bAnimLoop = SetAnimLoop; 
+	CurrentAnimColMax = AnimColMax; 
 }
 
 
@@ -494,60 +540,26 @@ void BOSS::BoxAttack()
 	float Duration = 1.5;
 	float DurationIncrement = 0.8f;
 
-	vec down = Loc + vec{ 0 , 1 }  *Distance;
-	vec right = Loc + vec{ 1 , 0 }  *Distance;
-	vec left = Loc + vec{ -1 ,  0 } *Distance;
-	// 위치 지속시간 타겟
-	object_mgr::instance().insert_object<BOSS_BOX>(down,Duration,wp_AttackTarget);
-	Duration += DurationIncrement;
-	object_mgr::instance().insert_object<BOSS_BOX>(left, Duration, wp_AttackTarget);
-	Duration += DurationIncrement;
-	object_mgr::instance().insert_object<BOSS_BOX>(right, Duration, wp_AttackTarget);
-	Duration += DurationIncrement;
+	std::vector<vec> BoxLocTable{
+		Loc + vec{ 0 , 1 }  *Distance,
+		Loc + vec{ 1 , 0 }  *Distance,
+		Loc + vec{ -1 ,  0 } *Distance
+	}; 
 
-	//Timer::instance().event_regist(time_event::EOnce, 1.f, [this]() {
-	//	this->bAttackAnimSprite = true; 
-	//	return true; 
-	//	});
+	for (const auto& BoxSpwanLocation : BoxLocTable)
+	{
+		object_mgr::instance().insert_object<BOSS_BOX>
+		(BoxSpwanLocation, Duration, wp_AttackTarget);
 
-	//Timer::instance().event_regist(time_event::EOnce, 3.f, [this]() {
-	//	this->bAttackAnimSprite = false;
-	//	return true;
-	//	});
+		Timer::instance().event_regist(time_event::EOnce, Duration, GetAttackAnimPakage());
 
-
-
-
-	
+		Duration += DurationIncrement;
+	}
 }
 
 void BOSS::RotationBoxAttack(size_t NUM)
 {
-//vec Loc = _transform->_location;
-//float Distance = 220;
-//float Duration = 1.5;
-//float DurationIncrement = 0.8f;
-//
-//vec down = Loc + vec{ 0 , 1 }  *Distance;
-//vec right = Loc + vec{ 1 , 0 }  *Distance;
-//vec left = Loc + vec{ -1 ,  0 } *Distance;
-//// 위치 지속시간 타겟
-//object_mgr::instance().insert_object<BOSS_ROTBOX>(down, Duration, wp_AttackTarget, _transform->_location, 5.f);
-//Duration += DurationIncrement;
-//object_mgr::instance().insert_object<BOSS_ROTBOX>(left, Duration, wp_AttackTarget, _transform->_location, 5.8f);
-//Duration += DurationIncrement;
-//object_mgr::instance().insert_object<BOSS_ROTBOX>(right, Duration, wp_AttackTarget, _transform->_location, 6.8f);
-//Duration += DurationIncrement;
-//
-//Timer::instance().event_regist(time_event::EOnce, 1.f, [this]() {
-//	this->bAttackAnimSprite = true;
-//	return true;
-//	});
-//
-//Timer::instance().event_regist(time_event::EOnce, 3.f, [this]() {
-//	this->bAttackAnimSprite = false;
-//	return true;
-//	});
+
 	float AngleIncrement = 360 / NUM;
 	float Angle = 0.01;
 	float RotationDurationInit = 5.f;
@@ -563,23 +575,14 @@ void BOSS::RotationBoxAttack(size_t NUM)
 	for (int i = 0; i < NUM; ++i)
 	{
 		vec Dir = math::dir_from_angle(Angle) * Distance;
-		object_mgr::instance().insert_object<BOSS_ROTBOX>(Loc+Dir, Duration, wp_AttackTarget, _transform->_location, RotationDurationInit);
+		object_mgr::instance().insert_object<BOSS_ROTBOX>
+		(Loc+Dir, Duration, wp_AttackTarget, _transform->_location, RotationDurationInit);
 		Duration += DurationIncrement;
 		RotationDurationInit += RotaionDurationIncrement;
 		Angle += AngleIncrement;
+
+		Timer::instance().event_regist(time_event::EOnce, RotationDurationInit- DurationIncrement, GetAttackAnimPakage());
 	}
-
-
-	//Timer::instance().event_regist(time_event::EOnce, 1.f, [this]() {
-	//	this->bAttackAnimSprite = true;
-	//	return true;
-	//	});
-
-	//Timer::instance().event_regist(time_event::EOnce, 3.f, [this]() {
-	//	this->bAttackAnimSprite = false;
-	//	return true;
-	//	});
-
 }
 
 void BOSS::PillarCircle()
@@ -642,24 +645,6 @@ void BOSS::PillarSpiralAttack()
 		});
 
 
-	//for (int i = 0; i < CircleNum; ++i)
-	//{
-	//	
-	//	for (int j = 0; j < AngleNum; ++j)
-	//	{
-	//	    vec InitLocation = MyLocation+  math::dir_from_angle(InitAngle)* InitRadius;
-	//	    object_mgr::instance().insert_object<BOSS_SKILL>(InitLocation);
-
-	//		InitAngle += AngleIncrement;
-	//	}
-
-
-	//	InitRadius += RadiusIncrement;
-	//	if (i % 2 == 1) {
-	//		InitAngle = 0;
-	//	}
-	//	else InitAngle = AngleIncrement / 2;
-	//}
 }
 
 void BOSS::BoxDirectPillarAttack()
@@ -679,6 +664,8 @@ void BOSS::BoxDirectPillarAttack()
 		auto BOX = object_mgr::instance().insert_object<BOSS_BOX>
 			(Loc + InitDir * Distance, Duration, wp_AttackTarget);
 
+		Timer::instance().event_regist(time_event::EOnce, Duration, GetAttackAnimPakage());
+
 		BOX->FlyTimeInAddY = 30;
 		BOX->bLaunchPillar = true;
 		Duration += DurationIncrement;
@@ -688,19 +675,107 @@ void BOSS::BoxDirectPillarAttack()
 
 void BOSS::BoxAttackStart()
 {
-	StateDuration = 12.f;
-	CurrentColIdx = 0;
 	CurrentRowIdx = 2;
 	bAttackAnimSprite = false;
 	bAnimLoop = false;
-	CurrentAnimColMax = 1;
-	AnimDelta = 0.3f;
+	StateSetUp(BOSS::EState::ATTACK, 5.f, 0.2f, 0,false,1);
+	BoxAttack();
+	// 
+	Timer::instance().event_regist(time_event::EOnce, 5.f, [this]() {
+		bAttackAnimSprite = false; 
+		return true; 
+		});
+}
+
+void BOSS::RotationBoxAttackStart()
+{
+	float Duration = 10.f; 
+
+	CurrentRowIdx = 2;
+	bAttackAnimSprite = false;
+	bAnimLoop = false;
+	StateSetUp(BOSS::EState::ATTACK, Duration, 0.2f, 0, false, 1);
+	RotationBoxAttack(6);
+	// 
+
+	Timer::instance().event_regist(time_event::EOnce, Duration-0.3f, [this]() {
+		bAttackAnimSprite = false;
+		return true;
+		});
+}
+
+void BOSS::BoxDirectPillarAttackStart()
+{
+	float Duration = 7;
+	CurrentRowIdx = 2;
+	bAttackAnimSprite = false;
+	bAnimLoop = false;
+	StateSetUp(BOSS::EState::ATTACK, Duration, 0.2f, 0, false, 1);
+	BoxDirectPillarAttack();
+	// 
+
+	Timer::instance().event_regist(time_event::EOnce, Duration, [this]() {
+		bAttackAnimSprite = false;
+		return true;
+		});
+};
+
+void BOSS::PillarMultipleAttackStart()
+{
+	float Duration = 7;
+	CurrentRowIdx = 2;
+	bAttackAnimSprite = false;
+	StateSetUp(BOSS::EState::ATTACK, Duration, 0.2f, 0, true, 1);
+	PillarMultipleAttack();
+
+	Timer::instance().event_regist(time_event::EOnce, 0.2f * 12, [this]() {
+		bAnimLoop= false;
+		return true;
+		});
+}
+
+void BOSS::PillarSpiralAttackStart()
+{
+	float Duration = 10.f;
+	CurrentRowIdx = 3;
+	bAttackAnimSprite = false;
+	StateSetUp(BOSS::EState::ATTACK, Duration, 0.25f, 0, false, 1);
+
+	Timer::instance().event_regist(time_event::EOnce, 0.4,
+		[this]() {JumpStart();  return true; });
+
+	Timer::instance().event_regist(time_event::ERemaingWhile, 1.3,
+		[this]() {JumpTracking(); return true; });
+
+	Timer::instance().event_regist(time_event::EOnce, 1.2, [this]  ()  { 
+		JumpEndAnimPlay(); return true;  });
+
+	Timer::instance().event_regist(time_event::EOnce, 1.3,
+		[this]() {SOIL_EffectSetUp(); JumpEnd();  PillarSpiralAttack(); 
+	ShockAttackStart();
+	auto sp_camera = object_mgr::instance()._Camera.lock();
+	if (!sp_camera)return false ;
+	sp_camera->camera_shake(75, vec{ 0,-1 }, 2);
+	return true; });
+
+	Timer::instance().event_regist(time_event::EOnce, 2,
+		[this]() {ShockAttackEnd(); return true; });
+}
+
+
+void BOSS::AttackAnimPlay()
+{
+	//if (!_transform)return;
+	//vec MyLocation = _transform->_location;
+	//vec TargetLocation = auto TargetLocation = wp_AttackTarget.lock();
+	int RowIdx = CalcAttackAnimRowIdxFromDir();
+	CurrentRowIdx = RowIdx;
+	bAttackAnimSprite = true;
+	bAnimLoop = false;
+	CurrentAnimColMax = 5;
+	BOSS::AnimDelta = 0.1f;
 	CurrentAnimDelta = AnimDelta;
-	CurrentBmp = AnimDirSpriteUpdate();
-
-	Timer::instance().event_regist(time_event::EOnce, 0.6f,
-		[this]() {BoxAttack();   return true;    });
-
+	CurrentColIdx = 0;
 }
 
 void BOSS::PillarPredictionAttack()
@@ -752,5 +827,23 @@ void BOSS::PillarDirectAttack()
 		object_mgr::instance().insert_object<BOSS_SKILL>(InitLocation);
 		(*Inner)++;
 		});
+}
+
+void BOSS::ShockAttackStart()
+{
+	auto sp_Atkcomp = wp_Attackcollision.lock();
+	if (!sp_Atkcomp) return;
+	sp_Atkcomp->bCollision = true;
+	bAttacking = true;
+	
+}
+
+void BOSS::ShockAttackEnd()
+{
+	auto sp_Atkcomp = wp_Attackcollision.lock();
+	if (!sp_Atkcomp) return;
+	sp_Atkcomp->bCollision = false;
+	bAttacking = false;
+
 }
 

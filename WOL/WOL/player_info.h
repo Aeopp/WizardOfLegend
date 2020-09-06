@@ -15,7 +15,7 @@ struct player_info
 	bool bMove{ false };
 	bool bHit{ false };
 	bool bProtected = false;
-	float DashDuration = 0.2;
+	float DashDuration = 0.25;
 	float AnimDashDuration = 0.4f;
 	float AttackCollisionDuration = 0.1f;
 	float DefaultAttackDuration = 0.5;

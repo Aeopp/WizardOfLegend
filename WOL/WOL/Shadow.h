@@ -13,7 +13,7 @@ enum class EShadowState : uint8_t
 class Shadow
 {
 public:
-	static inline std::map<EShadowState, std::tuple<int,int,int,int>> ShadowStates_Size
+	static inline std::map<EShadowState, std::tuple<float, float, float, float>> ShadowStates_Size
 	{ 
 							 // 페인트 사이즈 , 월드 사이즈
 		{EShadowState::MIDDLE, {106,35,75,35} },
@@ -31,8 +31,8 @@ public:
 	void initialize();
 	void render(HDC hdc, vec camera_pos);
 	std::weak_ptr<class object> _owner{};
-	std::pair<int,int> world_size_correction{0,0};
-	std::pair<int, int> correction{ 0,0 };
+	std::pair<float,float> world_size_correction{0,0};
+	std::pair<float, float> correction{ 0,0 };
 	EShadowState CurrentShadowState{EShadowState::NORMAL};
 public:
 	std::weak_ptr<class Bmp> wp_Big_shadow{};

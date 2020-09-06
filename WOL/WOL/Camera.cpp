@@ -24,12 +24,11 @@ Event Camera::update(float dt)
 
 	cp.x -= width;
 	cp.y -= height;
+	Shaking(dt);
 
-	if(bShake)
+	// 카메라흔들림
 	cp += shake;
-
-	if (bRumble)
-	cp += Rumble;
+	shake = { 0,0 };
 
 	return _E;
 }
@@ -45,54 +44,22 @@ void Camera::initialize()
 
 void Camera::camera_shake(float force, vec dir,float duration  =0.05f)
 {
-	_force = force;
-	_dir = dir;
-	bShake = true;
-
-	Timer::instance().event_regist(time_event::ERemaingWhile, duration, &Camera::Shaking, this);
-	Timer::instance().event_regist(time_event::EOnce, duration+0.005f, &Camera::Shaking_End, this);
+	Shake_Infos.push_back({ force, dir, duration });
 }
 
-void Camera::camera_rumbling(float forceX,float forceY, float duration)
+bool Camera::Shaking(float dt)
 {
-	this->RX= forceX;
-	this->RY= forceY;
-	bRumble = true;
-
-	Timer::instance().event_regist(time_event::ERemaingWhile, duration, &Camera::Rumbling, this);
-	Timer::instance().event_regist(time_event::EOnce, duration + 0.005f, &Camera::Rumbling_End, this);
-}
+	std::erase_if(Shake_Infos, [dt](auto& ShakeInfo) {
+		ShakeInfo.duration -= dt;
+	return ShakeInfo.duration < 0; });
 
 
-bool Camera::Shaking()
-{
-	float  rand = math::Rand<float >({ -_force,+_force});
 
-	shake = _dir* rand;
+for (auto& ShakeInfo: Shake_Infos)
+	{	
+		float  rand = math::Rand<float >({ -ShakeInfo.force  ,+ShakeInfo.force });
+		shake +=  ShakeInfo.dir* rand;
+	}
 
 	return true;
 };
-
-bool Camera::Shaking_End()
-{
-	shake = vec{ 0,0 };
-	bShake = false;
-
-	return true;
-}
-bool Camera::Rumbling()
-{
-	Tick += DeltaTime;
-	Rumble.x = std::cosf(Tick) * RX;
-	Rumble.y = std::sinf(Tick) * RY;
-
-	return false;
-}
-bool Camera::Rumbling_End()
-{
-	Rumble = vec{ 0,0 };
-	bRumble = false;
-
-	return false;
-}
-;

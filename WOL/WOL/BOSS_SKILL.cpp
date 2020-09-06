@@ -156,6 +156,7 @@ void BOSS_SKILL::HitTile(RECT rt)
 	bDie = true;
 }
 
+
 void BOSS_SKILL::late_initialize(vec InitLocation)
 {
     if (!_transform)return;
