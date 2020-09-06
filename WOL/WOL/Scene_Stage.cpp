@@ -113,11 +113,11 @@ void Scene_Stage::initialize()
 			/*auto SWORDMAN = object_mgr::instance().insert_object
 			<ARCHER>(_Player,_Player->_transform->_location + vec{ 100,0 });
 */
-			auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
+			/*auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
 
 			Midboss->SetUp(_Player, PlayerSpawnLocation + vec{ 0,-100 });
 
-			manage_objs.push_back(Midboss);
+			manage_objs.push_back(Midboss);*/
 			//auto  ar= object_mgr::instance().insert_object<ARCHER>(_Player, _Player->_transform->_location + vec{ 100,0 });
 
 		/*

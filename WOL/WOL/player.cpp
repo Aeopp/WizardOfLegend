@@ -1102,7 +1102,6 @@ void Player::Dash(float speed)
 	Timer::instance().event_regist(time_event::EOnce, _player_info->DashDuration,
 		[&bDash = _player_info->bDash]()->bool{
 		bDash = false; return true; });
-	_player_info->DashDuration;
 
 	Timer::instance().event_regist(time_event::ERemaingWhile, _player_info->DashDuration,
 		std::move([Transform=this->_transform,speed]()->bool {

@@ -16,7 +16,6 @@ public:
 	class object_mgr* _object_mgr{ nullptr };
 public:
 	void camera_shake(float force, vec dir,float duration);
-	void camera_rumbling(float forceX,float forceY, float duration);
 	std::vector<shake_Info> Shake_Infos{};
 	vec shake{ 0,0 };
 private:

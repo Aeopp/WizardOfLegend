@@ -15,3 +15,7 @@ Font::~Font() noexcept
 {
 	DeleteObject(hFont);
 }
+
+void Font::Draw(HDC hdc, int x, int y, const std::wstring& Str)
+{
+}

@@ -25,17 +25,19 @@ void UIStart::initialize()
 	wp_bmp_option = Bmp_mgr::instance().Insert_Bmp(L"OPTION_MENU.bmp", L"OPTION");
 	wp_bmp_ready= Bmp_mgr::instance().Insert_Bmp(L"READY_MENU.bmp", L"READY_MENU");
 
+	int Width = game::client_rect.right - game::client_rect.left;
+	int Height = game::client_rect.bottom - game::client_rect.top;
+
 	_render_component = std::make_shared<render_component>();
-	_render_component->Default_Src_Paint_Size = vec{ 1280 * x,720* y };
+	_render_component->Default_Src_Paint_Size = vec{Width * x,Height* y };
 	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,1920,1080};
 	_render_component->_RenderDesc = ERender::Transparent;
 
 	_transform->_location = vec{ 0,0 };
-	_transform->_size = vec{ 1600,900 };
+	_transform->_size = vec{ Width,Height };
 
 	eMenu = Ready;
-
 }
 
 void UIStart::render(HDC hdc, vec camera_pos, vec size_factor)

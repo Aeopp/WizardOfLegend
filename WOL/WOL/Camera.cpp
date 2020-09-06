@@ -53,11 +53,9 @@ bool Camera::Shaking(float dt)
 		ShakeInfo.duration -= dt;
 	return ShakeInfo.duration < 0; });
 
-
-
-for (auto& ShakeInfo: Shake_Infos)
+	for (auto& ShakeInfo: Shake_Infos)
 	{	
-		float  rand = math::Rand<float >({ -ShakeInfo.force  ,+ShakeInfo.force });
+		float  rand = math::Rand<float>({ -ShakeInfo.force  ,+ShakeInfo.force });
 		shake +=  ShakeInfo.dir* rand;
 	}
 

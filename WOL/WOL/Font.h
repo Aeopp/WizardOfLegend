@@ -9,6 +9,8 @@ public:
 		template<typename ... Strs>
 		Font(HDC hdc,   COLORREF _color, int x , int y , int fontsize ,
 		Strs&&... text);
+
+		void Draw(HDC hdc, int x, int y, const std::wstring& Str);
 private:
 		HFONT hFont, oldFont;
 };

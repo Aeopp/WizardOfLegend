@@ -1,4 +1,4 @@
-#include "pch.h"
+	#include "pch.h"
 #include "Scene_Edit.h"
 #include "timer.h"
 #include "sound_mgr.h"
@@ -271,14 +271,14 @@ void Scene_Edit::Input_Check_Scroll()
 	//	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
 	//}
 
-	if (_Input.Key_Down(VK_F11))
+	if (_Input.Key_Down(VK_F9))
 	{
 		Tile_mgr::instance().Load_Tile(Tile_mgr::StageFileName);
 	}
 
-	if (_Input.Key_Down(VK_F12))
+	if (_Input.Key_Down(VK_F10))
 	{
-		collision_mgr::instance().load_collision(collision_mgr::BossStageFileName);
+		collision_mgr::instance().load_collision(collision_mgr::StageFileName);
 	}
 
 
