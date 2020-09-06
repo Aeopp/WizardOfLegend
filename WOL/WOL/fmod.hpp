@@ -38,7 +38,6 @@ namespace FMOD
     inline FMOD_RESULT Debug_Initialize     (FMOD_DEBUG_FLAGS flags, FMOD_DEBUG_MODE mode = FMOD_DEBUG_MODE_TTY, FMOD_DEBUG_CALLBACK callback = 0, const char *filename = 0) { return FMOD_Debug_Initialize(flags, mode, callback, filename); }
     inline FMOD_RESULT File_SetDiskBusy     (int busy) { return FMOD_File_SetDiskBusy(busy); }
     inline FMOD_RESULT File_GetDiskBusy     (int *busy) { return FMOD_File_GetDiskBusy(busy); }
-    inline FMOD_RESULT Thread_SetAttributes (FMOD_THREAD_TYPE type, FMOD_THREAD_AFFINITY affinity = FMOD_THREAD_AFFINITY_GROUP_DEFAULT, FMOD_THREAD_PRIORITY priority = FMOD_THREAD_PRIORITY_DEFAULT, FMOD_THREAD_STACK_SIZE stacksize = FMOD_THREAD_STACK_SIZE_DEFAULT) { return FMOD_Thread_SetAttributes(type, affinity, priority, stacksize); }
 
     /*
         FMOD System factory functions.
@@ -64,7 +63,7 @@ namespace FMOD
         FMOD_RESULT F_API setOutput               (FMOD_OUTPUTTYPE output);
         FMOD_RESULT F_API getOutput               (FMOD_OUTPUTTYPE *output);
         FMOD_RESULT F_API getNumDrivers           (int *numdrivers);
-        FMOD_RESULT F_API getDriverInfo           (int ObjectTag, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels);
+        FMOD_RESULT F_API getDriverInfo           (int id, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels);
         FMOD_RESULT F_API setDriver               (int driver);
         FMOD_RESULT F_API getDriver               (int *driver);
         FMOD_RESULT F_API setSoftwareChannels     (int numsoftwarechannels);
@@ -155,11 +154,11 @@ namespace FMOD
 
         // Recording API.
         FMOD_RESULT F_API getRecordNumDrivers     (int *numdrivers, int *numconnected);
-        FMOD_RESULT F_API getRecordDriverInfo     (int ObjectTag, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels, FMOD_DRIVER_STATE *state);
-        FMOD_RESULT F_API getRecordPosition       (int ObjectTag, unsigned int *position);
-        FMOD_RESULT F_API recordStart             (int ObjectTag, Sound *sound, bool loop);
-        FMOD_RESULT F_API recordStop              (int ObjectTag);
-        FMOD_RESULT F_API isRecording             (int ObjectTag, bool *recording);
+        FMOD_RESULT F_API getRecordDriverInfo     (int id, char *name, int namelen, FMOD_GUID *guid, int *systemrate, FMOD_SPEAKERMODE *speakermode, int *speakermodechannels, FMOD_DRIVER_STATE *state);
+        FMOD_RESULT F_API getRecordPosition       (int id, unsigned int *position);
+        FMOD_RESULT F_API recordStart             (int id, Sound *sound, bool loop);
+        FMOD_RESULT F_API recordStop              (int id);
+        FMOD_RESULT F_API isRecording             (int id, bool *recording);
 
         // Geometry API.
         FMOD_RESULT F_API createGeometry          (int maxpolygons, int maxvertices, Geometry **geometry);

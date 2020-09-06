@@ -27,6 +27,7 @@ bool sound_mgr::Play( std::string SoundKey,
 		return false;
 	}
 
+
 	FMOD_RESULT HR;
 	bool isplay = false;
 
@@ -36,7 +37,7 @@ bool sound_mgr::Play( std::string SoundKey,
 		{
 			Channel->isPlaying(&isplay);
 
-			if (isplay == true && IsBgm == true) {
+			if (isplay == true) {
 				Channel->stop();
 			};
 			HR = System->playSound(Sound, nullptr, false,
@@ -46,7 +47,8 @@ bool sound_mgr::Play( std::string SoundKey,
 			if (HR != FMOD_OK) {
 				return  false;
 			}
-			else if (IsBgm == true) {
+
+			if (IsBgm == true) {
 				if (auto iter = Sounds.find(CurrentBgmKey);
 					iter != std::end(Sounds)) {
 					auto& [System, Sound, Channel] = iter->second;
@@ -56,9 +58,6 @@ bool sound_mgr::Play( std::string SoundKey,
 			}
 			return  true;
 		}
-	}
-	else {
-
 	}
 	return false;
 };

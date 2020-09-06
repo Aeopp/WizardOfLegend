@@ -19,7 +19,7 @@ public:
 	float AnimDelta;
 
 	// 프로퍼티들 초기화 해주세요 ===========================================
-	COLORREF ColorKey = COLOR::MEGENTA();
+	COLORREF ColorKey = COLOR::MRGENTA();
 	// 이미지 그릴 위치 (센터기준)
 	int ImgLocationX;
 	int ImgLocationY;

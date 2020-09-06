@@ -37,6 +37,7 @@ public:
     std::shared_ptr<class Bmp> FireImg{};
     std::weak_ptr<class UIBossName> wp_UIBossName{};
 
+
     std::weak_ptr<class UIBossHPBar> wp_UIBossHPBar{};
 
 

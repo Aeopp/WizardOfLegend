@@ -79,7 +79,7 @@ void Scene_Edit::render(HDC hdc, std::pair<float, float> size_factor)
 				, hMemDC
 				, sl.x, sl.y
 				, ss.x, ss.y
-				, COLOR::MEGENTA());
+				, COLOR::MRGENTA());
 		}
 
 		_object_mgr.render(hdc, size_factor);
@@ -219,7 +219,7 @@ void Scene_Edit::Input_Check_Scroll()
 			Tile_mgr::instance().Insert_Tile(CurrentSelectImage,
 				{ CurrentTileWorldSizeX,CurrentTileWorldSizeY }, { CurrentTileImgSizeX,CurrentTileImgSizeY },
 				{ CurrentImageStartPos.first + CurrentTileIndex.first * CurrentTileImgSizeX,CurrentImageStartPos.second + CurrentTileIndex.second * CurrentTileImgSizeY },
-				COLOR::MEGENTA(), world_index, bDeco);
+				COLOR::MRGENTA(), world_index, bDeco);
 		}
 	}
 

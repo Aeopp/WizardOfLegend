@@ -16,7 +16,7 @@ void UI_PlayerBar::initialize()
 
 	_render_component = render_component::LoadRenderComponent_SP(L"UI_PLAYERBAR.bmp", L"UI_PLAYERBAR");
 	_render_component->Default_Src_Paint_Size = vec{ 328/1.5* x,80/1.5* y };
-	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,328,80 };
 	_render_component->_RenderDesc = ERender::Transparent;
 

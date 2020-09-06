@@ -10,6 +10,8 @@ enum class EObjUniqueID : uint32_t
 	ICEBLAST,
 	ICECRYSTAL,
 	Boomerang,
+	BOSS_BOXATTACK,
+	BOSS_Pillar,
 	MIDDLE_BOSS,
 	BOSS,
 	Max,

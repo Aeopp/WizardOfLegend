@@ -1,6 +1,6 @@
 #include "pch.h"
 
-
+#include "BOSS.h"
 #include "MIDDLE_BOSS.h"
 
 #include "ARCHER.h"
@@ -94,14 +94,12 @@ void Scene_Boss::initialize()
 
 		SOUNDPLAY("BOSS_BGM", 1.f, true );
 
-		for (int i = 0; i < 1; ++i)
-		{
+			auto Midboss = object_mgr::instance().insert_object<BOSS>();
 
-			auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
-			Midboss->SetUp(_Player, PlayerSpawnLocation + math::RandVec() * math::Rand<int>({ 500,1000 }));
+			Midboss->SetUp(_Player, PlayerSpawnLocation + vec{ 0,-500 });
 
 			manage_objs.push_back(Midboss);
-		}
+		
 
 	/*	for (int i = 0; i < 100; ++i)
 		{

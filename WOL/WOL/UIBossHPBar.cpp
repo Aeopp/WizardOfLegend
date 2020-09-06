@@ -13,17 +13,22 @@ void UIBossHPBar::initialize()
 	// 해상도 변경시 비율 조정을 위해서
 	_render_component = render_component::LoadRenderComponent_SP(L"BOSS_HPBAR.bmp", L"BOSS_HPBAR");
 	_render_component->Default_Src_Paint_Size = vec{ 356 ,28 };
-	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,356,28 };
 	_render_component->_RenderDesc = ERender::Transparent;
 
-	_transform->_location = vec{ 500,92 };
+	_transform->_location = vec{ 800,92 };
 
 	this->goal_time = 1.f;
 };
 
 Event UIBossHPBar::update(float dt)
 {
+
+	if (bDie)
+	{
+		return Event::Die;
+	}
 
 	return UIBar::update(dt);;
 }

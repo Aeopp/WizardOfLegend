@@ -5,6 +5,9 @@ class BossCrystal :
 {
 public :
 public:
+
+	float SoundTick = 0.1f;
+
 	void initialize()override;
 	void late_initialize(vec RotationCenter,float RotationDuration, 
 						std::weak_ptr<class object> wp_AttackTarget, float AttackSpeed);

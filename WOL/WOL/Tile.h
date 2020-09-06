@@ -41,7 +41,7 @@ public:
 
     // 이미지의 키입니다.
     ETileSelect Imagekey;
-    COLORREF _ColorKey{ COLOR::MEGENTA() };
+    COLORREF _ColorKey{ COLOR::MRGENTA() };
     // 이미지 에서의 인덱스입니다.
     int RowIndex;
     int ColIndex;

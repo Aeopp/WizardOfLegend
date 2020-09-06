@@ -81,7 +81,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\\..\\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -164,6 +163,10 @@
     <ClInclude Include="BOSS.h" />
     <ClInclude Include="BossCrystal.h" />
     <ClInclude Include="BossInfo.h" />
+    <ClInclude Include="BOSS_BOX.h" />
+    <ClInclude Include="BOSS_ROTBOX.h" />
+    <ClInclude Include="BOSS_SKILL.h" />
+    <ClInclude Include="BOTTOM_HOLE.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="collision_component.h" />
     <ClInclude Include="collision_mgr.h" />
@@ -229,6 +232,7 @@
     <ClInclude Include="Shadow.h" />
     <ClInclude Include="shield.h" />
     <ClInclude Include="singleton_interface.h" />
+    <ClInclude Include="SOIL.h" />
     <ClInclude Include="sound_mgr.h" />
     <ClInclude Include="SwordMan.h" />
     <ClInclude Include="SwordManAttack.h" />
@@ -267,6 +271,10 @@
     <ClCompile Include="BOSS.cpp" />
     <ClCompile Include="BossCrystal.cpp" />
     <ClCompile Include="BossInfo.cpp" />
+    <ClCompile Include="BOSS_BOX.cpp" />
+    <ClCompile Include="BOSS_ROTBOX.cpp" />
+    <ClCompile Include="BOSS_SKILL.cpp" />
+    <ClCompile Include="BOTTOM_HOLE.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="collision_component.cpp" />
     <ClCompile Include="collision_mgr.cpp" />
@@ -313,6 +321,7 @@
     <ClCompile Include="Shadow.cpp" />
     <ClCompile Include="shield.cpp" />
     <ClCompile Include="singleton_interface.cpp" />
+    <ClCompile Include="SOIL.cpp" />
     <ClCompile Include="sound_mgr.cpp" />
     <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="SwordManAttack.cpp" />

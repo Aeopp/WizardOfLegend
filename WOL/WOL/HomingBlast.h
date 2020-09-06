@@ -1,5 +1,4 @@
 #pragma once
-#include "ICE_Blast.h"
 #include "object.h"
 #include <deque>
 // 생성시 반드시 타겟 지정
@@ -31,11 +30,12 @@ public :
 	// 인잇 타임이 끝나면 얼음기둥 으로 스프라이트 고정
 	float AnimInitTime = 0.5f;
 	int CurrentColIdx = 0;
-	float Duration = 10.f;
+	float Duration = 8;
 	 // 디그리 기준 현재 목표방향으로의 회전 스피드 이 값은 틱마다 증가함
 	float CurrentAngleSpeed;
 	float HomingRotationAddSpeed;
-	
+	float ICE_EffectTick = 0.2f;
+
 	float Speed;
 
 

@@ -14,7 +14,7 @@ void UISkillIBarIcon::late_initialize(vec pos,std::wstring FileName)
 
 	_render_component = render_component::LoadRenderComponent_SP(FileName.c_str(), FileName.c_str());
 	_render_component->Default_Src_Paint_Size = vec{ 40 * x,40 * y };
-	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,54,54 };
 	_render_component->_RenderDesc = ERender::Transparent;
 

@@ -27,7 +27,7 @@ void UIStart::initialize()
 
 	_render_component = std::make_shared<render_component>();
 	_render_component->Default_Src_Paint_Size = vec{ 1280 * x,720* y };
-	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,1920,1080};
 	_render_component->_RenderDesc = ERender::Transparent;
 
@@ -92,6 +92,8 @@ void UIStart::Click(vec hit_pos)
 
 Event UIStart::update(float dt)
 {
+	SoundTick -= dt;
+
 	UIInteraction::update(dt);
 
 	switch (eMenu)
@@ -125,20 +127,43 @@ Event UIStart::update(float dt)
 		if (PtInRect(&main, pt))
 		{
 			if (eMenu != EMenu::Main)
-			sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
-			eMenu = EMenu::Main;
+			{
+				if (SoundTick < 0)
+				{
+					SoundTick = 0.1f;
+					sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
+				}
+				eMenu = EMenu::Main;
+			}
+			
 		}
 		if (PtInRect(&opt, pt))
 		{
 			if (eMenu != EMenu::Option)
-			sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
-			eMenu = EMenu::Option;
+			{
+				if (SoundTick < 0)
+				{
+					sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
+					SoundTick = 0.1f;
+				}
+				
+				eMenu = EMenu::Option;
+			}
+			
 		}
 		if (PtInRect(&quit, pt))
 		{
-			if(eMenu != EMenu::Quit)
-				sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
-			eMenu = EMenu::Quit;
+			if (eMenu != EMenu::Quit)
+			{
+				if (SoundTick < 0)
+				{
+					sound_mgr::instance().Play("SELECT_MENU", false, 1.f);
+				}
+				
+				eMenu = EMenu::Quit;
+			}
+				
+			
 		}
 
 

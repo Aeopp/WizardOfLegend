@@ -19,7 +19,7 @@ void HomingBlast::initialize()
 	sp_collision->bCollisionTargetPushFromForce = true;
 	sp_collision->PushForce = 50.f;
 
-	sp_collision->_size = { 60.f ,60.f};
+	sp_collision->_size = { 40.f ,40.f};
 	sp_collision->bRender = true;
 	sp_collision->bSlide = false;
 	sp_collision->bSlide = true;
@@ -28,8 +28,8 @@ void HomingBlast::initialize()
 
 	PaintSizeX = 200;
 	PaintSizeY = 250;
-	ScaleX = 0.45f;
-	ScaleY = 0.45f;
+	ScaleX = 0.6;
+	ScaleY = 0.6;
 
 	sp_Bmp = Bmp_mgr::instance().Find_Image_SP(L"ICE_BLAST");
 	if (!sp_Bmp)return;
@@ -60,10 +60,11 @@ Event HomingBlast::update(float dt)
 	Duration -= dt;
 	CurrentAnimRemainTime -= dt;
 	AnimInitTime -= dt;
+	ICE_EffectTick -= dt;
 
 	if (Duration < 0)
 	{
-		ICE_EffectPlay;
+		ICE_EffectPlay();
 		return Event::Die;
 	}
 
@@ -121,7 +122,12 @@ void HomingBlast::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	AnimUpdate();
 
-	ICE_EffectPlay();
+	if (ICE_EffectTick < 0)
+	{
+		ICE_EffectPlay();
+		ICE_EffectTick = 0.9f;
+	}
+	
 
 	
 	for (auto& PastPos : ParticlesPositions)
@@ -140,7 +146,7 @@ void HomingBlast::render(HDC hdc, vec camera_pos, vec size_factor)
 			//CurrentColIdx* PaintSizeX, 0
 			CurrentColIdx * PaintSizeX, 0
 			, PaintSizeX, PaintSizeY
-			, COLOR::MEGENTA());
+			, COLOR::MRGENTA());
 		
 	}
 }
@@ -173,12 +179,8 @@ void HomingBlast::AnimUpdate()
 
 void HomingBlast::ICE_EffectPlay()
 {
-
-
 	if (!_transform)return;
 
 	vec MyLocation = _transform->_location;
-
-	collision_mgr::instance().HitEffectPush(MyLocation + math::RandVec() * math::Rand<int>({ -20,20 }), 0.2f);
-
+	collision_mgr::instance().HitEffectPush(MyLocation + math::RandVec() * math::Rand<int>({ -65,65 }), 0.1f);
 }

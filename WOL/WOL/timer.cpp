@@ -122,6 +122,6 @@ float Timer::delta()
 	//return 0.016f;
 
 	if (bDebugTimeScale)
-		return (float)dt / 1000.f * 0.3f;
+		return (float)dt / 1000.f * 0.1f;
 	else  return (float)dt /1000.f * (float)time_scale;
 }

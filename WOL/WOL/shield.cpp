@@ -167,7 +167,7 @@ void shield::late_initialize(Transform _Transform)
 	_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(L"GAIA_ARMOR");
 	_render_component->Default_Src_Paint_Size = vec{ PaintSizeX,PaintSizeY };
 	_render_component->Dest_Paint_Size = vec{ PaintSizeX * Scale,PaintSizeY * Scale };
-	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 	_render_component->_Anim.SetAnimationClip(
 		{ 12 }, 99999999.f);

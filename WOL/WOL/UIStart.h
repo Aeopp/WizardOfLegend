@@ -9,6 +9,7 @@ public:
 	 void OnMouse(const vec hit_pos)override;
 	 void Click(const vec hit_pos)override;
 	Event update(float dt)override;
+	float SoundTick = 0.1f;
 
 	uint32_t get_layer_id() const&;
 

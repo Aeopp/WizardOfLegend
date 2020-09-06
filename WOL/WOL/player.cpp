@@ -30,7 +30,7 @@
 #include "sound_mgr.h"
 #include "ScrewBoomerang.h"
 #include "helper.h"
-
+#include "BOTTOM_HOLE.h"
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
@@ -92,7 +92,7 @@ void Player::initialize()
 		// 174 182
 		_render_component->Default_Src_Paint_Size = vec{ PaintSizeX,PaintSizeY };
 		_render_component->Dest_Paint_Size = vec{ PaintSizeX * Scale,PaintSizeY * Scale };
-		_render_component->_ColorKey = COLOR::MEGENTA();
+		_render_component->_ColorKey = COLOR::MRGENTA();
 		_render_component->_Img_src = RECT{ 0,0,PaintSizeX,PaintSizeY };
 		_render_component->_Anim.SetAnimationClip(
 			{ 1 ,10,8,8,8,2,7 }, 0.1f);
@@ -183,7 +183,8 @@ void Player::Hit(std::weak_ptr<object> _target)
 
 	if (_player_info->bProtected == true){
 		sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
-		return;}
+		return;
+	}
 
 	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
 
@@ -353,10 +354,10 @@ void Player::ICE_BLAST(int Num)
 
 	Timer& _Timer = Timer::instance();
 
-	float BlastDistanceBetween = 75.f;
+	float BlastDistanceBetween = 80.f;
 	float BlastSpawnCycle = 0.05f;
-	int    IcePilarNum = 3;
-	float IcePilarDuration = 5.f;
+	int    IcePilarNum = 2;
+	float IcePilarDuration = 4.f;
 	int IcePilarDistribution = 300;
 	float IcePilarBeetWeen = 100.f;
 
@@ -464,7 +465,7 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('Q'))
 	{
 
-		ICE_BLAST(10);
+		ICE_BLAST(8);
 	}
 
 	if (_Input.Key_Down(VK_LBUTTON))
@@ -486,7 +487,7 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down('E'))
 	{
 		
-		SkillIceCrystal(8);
+		SkillIceCrystal(6);
 	}
 
 	if (_Input.Key_Down('Z')) {
@@ -500,7 +501,7 @@ void Player::player_check(float dt)
 		SkillBoomerang();
 	}
 	if (_Input.Key_Down('V')) {
-		MultiRotBoomerang(8);
+		MultiRotBoomerang(6);
 	}
 	if (_Input.Key_Down('B')) {
 		SkillScrewBoomerang();
@@ -605,10 +606,10 @@ void Player::SkillIceCrystal(uint32_t Num)
 
 	_player_info->AddMp(-100);
 
-	Timer::instance().time_scale = 0.5f;
+	//Timer::instance().time_scale = 0.5f;
 
-	Timer::instance().event_regist(time_event::EOnce, 0.2f, []() {
-		Timer::instance().time_scale = 1.f; return true; });
+	//Timer::instance().event_regist(time_event::EOnce, 0.2f, []() {
+	//	Timer::instance().time_scale = 1.f; return true; });
 
 	SOUNDPLAY("ULT_USE", 1.f, false);
 }
@@ -1116,6 +1117,7 @@ void Player::Dash(float speed)
 	Camera_Shake(1, dir, 0.025f);
 	
 	sound_mgr::instance().RandSoundKeyPlay("DASH", { 1,4 },1.f);
+
 }
 
 void Player::Attack()
@@ -1292,7 +1294,6 @@ void Player::Player_Move(float dt)
 	if (_player_info->bMove = true)
 	{
 		sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
-
 	}
 }
 

@@ -251,7 +251,7 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 
 				vec _loc = _owner->_transform->_location;
 				vec _size = collision->_size;
-				_loc -= collision->correction;
+				_loc += collision->correction;
 
 				RECT _rt;
 

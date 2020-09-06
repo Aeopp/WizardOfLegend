@@ -15,7 +15,7 @@ void UIGold::initialize()
 
 	_render_component = render_component::LoadRenderComponent_SP(L"UI_MONEY.bmp", L"UI_MONEY");
 	_render_component->Default_Src_Paint_Size = vec{ 31 * x,31 * y };
-	_render_component->_ColorKey = COLOR::MEGENTA();
+	_render_component->_ColorKey = COLOR::MRGENTA();
 	_render_component->_Img_src = RECT{ 0,0,31,31 };
 	_render_component->_RenderDesc = ERender::Transparent;
 

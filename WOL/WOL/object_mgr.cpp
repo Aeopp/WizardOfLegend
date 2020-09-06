@@ -57,7 +57,7 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 		if (!obj->_transform)continue;
 
 		vec culling_obj_pos = obj->_transform->_location - camera_pos;
-		if (math::RectInPoint(game::client_rect, culling_obj_pos))
+		if (math::RectInPoint(CullingRect, culling_obj_pos))
 		{
 			RenderObjCount++;
 

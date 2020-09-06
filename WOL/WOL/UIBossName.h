@@ -9,7 +9,5 @@ public:
     Event update(float dt)override;
 
     void late_initialize(const std::wstring& UIFileName, const std::wstring& UIKey);
-
-    std::weak_ptr<class      player_info > _player_info;
 };
 

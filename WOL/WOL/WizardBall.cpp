@@ -69,7 +69,7 @@ void WizardBall::render(HDC hdc, vec camera_pos, vec size_factor)
 			  CurrentColIdx * PaintSizeX,
 			   CurrentRowIdx*PaintSizeY ,
 			  PaintSizeX, PaintSizeY, 
-			COLOR::MEGENTA());
+			COLOR::MRGENTA());
 }
 
 Event WizardBall::update(float dt)

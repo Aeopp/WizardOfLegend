@@ -44,13 +44,19 @@ void ICE_Crystal::initialize()
 	bAttacking = true;
 	TickScale = 1.f;
 	sp_collision->bSlide = false;
+	sp_collision->bCollisionSlideAnObject = false;
 	ObjectTag = object::Tag::player_attack;
 	sp_collision->bCollisionTargetPushFromForce= true;
 	sp_collision->PushForce = 10.f;
 	sp_collision->bCollision = true;
 	sp_collision->bHitEffect = true;
 
-	sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
+	if (SoundTick < 0)
+	{
+		SoundTick = 0.1f; 
+		sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
+	}
+	
 	
 	UniqueID = EObjUniqueID::ICECRYSTAL;
 
@@ -60,14 +66,15 @@ void ICE_Crystal::initialize()
 
 Event ICE_Crystal::update(float dt)
 {
+	ICE_Crystal::SoundTick -= dt;
+
 	Event _event = actor::update(dt);
 
-	CurrentSoundTick -= dt;
 
-	if (CurrentSoundTick < 0)
+	if (ICE_Crystal::SoundTick < 0)
 	{
-		CurrentSoundTick = SoundTick; 
-		//sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);
+	/*	ICE_Crystal::SoundTick = 0.1f;
+		sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);*/
 	}
 
 	Duration -= dt;

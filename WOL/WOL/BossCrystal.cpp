@@ -40,7 +40,12 @@ void BossCrystal::initialize()
     sp_collision->bCollision = true;
     sp_collision->bHitEffect = true;
 
-    sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
+    if (SoundTick < 0)
+    {
+        SoundTick = 0.1f; 
+        sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
+    }
+    
 
     UniqueID = EObjUniqueID::ICECRYSTAL;
     Duration = 15.f;
@@ -73,6 +78,8 @@ void BossCrystal::Hit(std::weak_ptr<class object> wp_Target)
 Event BossCrystal::update(float dt)
 {
     Event _Event =actor::update(dt);
+
+    SoundTick -= dt;
 
     if (Duration < 0)return Event::Die;
     

@@ -80,7 +80,7 @@ void MIDDLE_BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 3000;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 2000;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
@@ -89,10 +89,10 @@ void MIDDLE_BOSS::initialize()
 	L"MIDDLEBOSS_NAMEBAR.bmp",L"MIDDLEBOSS_NAMEBAR");
 	if (!UI)return;
 	UI->_owner = _ptr;
+	wp_UIBossName = UI;
 
 	PatternTableNum = PatternTable.size();
 	CurrentPatternIdx = 0;
-
 };
 
 void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -118,7 +118,7 @@ void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 		CurrentColIdx * PaintSizeX,
 		CurrentRowIdx * PaintSizeY,
 		PaintSizeX, PaintSizeY,
-		COLOR::MEGENTA());
+		COLOR::MRGENTA());
 }
 
 Event MIDDLE_BOSS::update(float dt)
@@ -428,7 +428,7 @@ void MIDDLE_BOSS::IdleAction()
 
 void MIDDLE_BOSS::BOSS_Skill_Fire()
 {
-	Timer::instance().event_regist_ReWhileDelta(10.f, 0.1f, &MIDDLE_BOSS::FireSpawn, this);
+	Timer::instance().event_regist_ReWhileDelta(8.f, 0.1f, &MIDDLE_BOSS::FireSpawn, this);
 }
 
 
@@ -439,12 +439,12 @@ void MIDDLE_BOSS::BOSS_SKill_BallSpawn()
 	if (!sp_Target)return;
 	TargetLocation = sp_Target->_transform->_location;
 
-	Timer::instance().event_regist_ReWhileDelta(2.f, 2.f/10.f,&MIDDLE_BOSS::BallSpawn,this,10);
+	Timer::instance().event_regist_ReWhileDelta(2.f, 2.f/7,&MIDDLE_BOSS::BallSpawn,this,7);
 }
 
 void MIDDLE_BOSS::BOSS_SKill_ICEBlast()
 {
-	BlastSpawn(6);
+	BlastSpawn(4);
 }
 
 void MIDDLE_BOSS::FireSpawn()

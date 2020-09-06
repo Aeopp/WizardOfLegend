@@ -46,7 +46,7 @@ vec collision_component::make_center()
 	if (!_ptr)return vec{};;
 	if (!_ptr->_transform)return vec{};
 
-	return _ptr->_transform->_location - correction;;
+	return _ptr->_transform->_location + correction;;
 }
 
 

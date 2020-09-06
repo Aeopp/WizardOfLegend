@@ -19,7 +19,7 @@ void ICE_Blast::initialize()
 		PaintSizeX = 200;
 		PaintSizeY = 250;
 		ScaleY = ScaleX = 0.6f;
-		constexpr COLORREF _ColorRef = COLOR::MEGENTA();
+		constexpr COLORREF _ColorRef = COLOR::MRGENTA();
 		float AnimDuration = 0.7f;
 
 		_render_component = std::make_shared<render_component>();
@@ -71,6 +71,8 @@ Event ICE_Blast::update(float dt)
 {
 	Event _Event = actor::update(dt);
 	Duration -= dt;
+	ICE_EffectTick -= dt;
+
 	if (Duration < 0.3f)
 	{
 		_render_component->_Anim.EndMotionColIndex = 7;
@@ -89,16 +91,21 @@ void ICE_Blast::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	actor::render(hdc, camera_pos, size_factor);
 
-	IceEffectPlay();
+	if (ICE_EffectTick < 0)
+	{
+		IceEffectPlay();
+		ICE_EffectTick = 0.9;
+	}
+	
 }
 
 void ICE_Blast::IceEffectPlay()
 {
 	if (!_transform)return;
+	
 
 	vec MyLocation =  _transform->_location;
-
-	collision_mgr::instance().HitEffectPush(MyLocation + math::RandVec() * math::Rand<int>({ -20,20 }), 0.2f);
+	collision_mgr::instance().HitEffectPush(MyLocation + math::RandVec() * math::Rand<int>({ -65,65 }), 0.1f);
 }
 
 uint32_t ICE_Blast::get_layer_id() const&

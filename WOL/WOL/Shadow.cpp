@@ -103,5 +103,5 @@ void Shadow::render(HDC hdc, vec camera_pos)
 	HDC ShadowDC= Img->Get_MemDC();
 
 	GdiTransparentBlt(hdc, loc.x, loc.y, wscx + wsx, wscy + wsy, ShadowDC
-		, 0, 0, px, py, COLOR::MEGENTA());
+		, 0, 0, px, py, COLOR::MRGENTA());
 }
