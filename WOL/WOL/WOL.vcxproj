@@ -108,7 +108,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\\FMOD32</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -181,14 +182,6 @@
     <ClInclude Include="FireDragon.h" />
     <ClInclude Include="fmod.h" />
     <ClInclude Include="fmod.hpp" />
-    <ClInclude Include="FMOD32\fmod.h" />
-    <ClInclude Include="FMOD32\fmod.hpp" />
-    <ClInclude Include="FMOD32\fmod_codec.h" />
-    <ClInclude Include="FMOD32\fmod_common.h" />
-    <ClInclude Include="FMOD32\fmod_dsp.h" />
-    <ClInclude Include="FMOD32\fmod_dsp_effects.h" />
-    <ClInclude Include="FMOD32\fmod_errors.h" />
-    <ClInclude Include="FMOD32\fmod_output.h" />
     <ClInclude Include="fmod_codec.h" />
     <ClInclude Include="fmod_common.h" />
     <ClInclude Include="fmod_dsp.h" />
@@ -355,24 +348,19 @@
     <Image Include="WOL.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fmod.cs" />
-    <None Include="fmod.dll" />
-    <None Include="FMOD32\fmod.cs" />
-    <None Include="FMOD32\fmod.dll" />
-    <None Include="FMOD32\fmodL.dll" />
-    <None Include="FMOD32\fmod_dsp.cs" />
-    <None Include="FMOD32\fmod_errors.cs" />
-    <None Include="fmodL.dll" />
-    <None Include="fmod_dsp.cs" />
-    <None Include="fmod_errors.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="FMOD32\fmodL_vc.lib" />
-    <Library Include="FMOD32\fmod_vc.lib" />
     <Library Include="FMOD32\libfmod.a" />
     <Library Include="FMOD32\libfmodL.a" />
     <Library Include="fmodL_vc.lib" />
     <Library Include="fmod_vc.lib" />
+    <Library Include="libfmod.a" />
+    <Library Include="libfmodL.a" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fmod.cs" />
+    <None Include="fmod.dll" />
+    <None Include="fmodL.dll" />
+    <None Include="fmod_dsp.cs" />
+    <None Include="fmod_errors.cs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

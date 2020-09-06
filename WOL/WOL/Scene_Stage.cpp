@@ -107,6 +107,37 @@ void Scene_Stage::initialize()
 		float Angle = 360.f / 16.f;
 		float s = 0.f;
 		float Distance = 400.f;
+		Timer::instance().event_regist_ReWhileDelta(100000000000.f, 10.f, [=]() {
+			auto archer = object_mgr::instance().insert_object<ARCHER>(_Player, _Player->_transform->_location +
+				math::RandVec() * math::Rand<int>({ -300,300 }));
+
+			auto swordman = object_mgr::instance().insert_object<SwordMan>(_Player, _Player->_transform->_location +
+				math::RandVec() * math::Rand<int>({ -300,300 }));
+
+			auto wizard = object_mgr::instance().insert_object<WIZARD>(_Player, _Player->_transform->_location +
+				math::RandVec() * math::Rand<int>({ -300,300 }));
+
+			manage_objs.push_back(archer);
+			manage_objs.push_back(swordman);
+
+			manage_objs.push_back(wizard);
+			});
+
+
+		Timer::instance().event_regist_ReWhileDelta(100000000000.f, 100.f, [=]() {
+			auto MBOSS = object_mgr::instance().insert_object<MIDDLE_BOSS>();
+
+			MBOSS->SetUp(_Player, _Player->_transform->_location +
+				math::RandVec() * math::Rand<int>({ -300,300 }));
+
+			auto boss = object_mgr::instance().insert_object<BOSS>();
+			boss->SetUp(_Player, _Player->_transform->_location +
+				math::RandVec() * math::Rand<int>({ -300,300 }));
+			manage_objs.push_back(boss);
+			manage_objs.push_back(MBOSS);
+
+			});
+
 
 		for (int i = 0; i < 1; ++i)
 		{

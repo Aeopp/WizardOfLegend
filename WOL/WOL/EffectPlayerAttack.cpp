@@ -132,7 +132,7 @@ void EffectPlayerAttack::initialize()
 		sp_collision->bCollisionTargetPushFromForce = true;
 		sp_collision->PushForce = 20.f;
 
-		sp_collision->_size = { 45.f,45.0f };
+		sp_collision->_size = { 60 ,60};
 		sp_collision->bRender = true;
 		sp_collision->bSlide = false;
 		sp_collision->bCollision = true;

@@ -11,7 +11,6 @@
 #include "Bmp_mgr.h"
 #include "Bmp.h"
 #include "helper.h"
-
 #include "Font.h"
 
 
