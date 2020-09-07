@@ -233,6 +233,14 @@
     <ClInclude Include="fmod_dsp_effects.h" />
     <ClInclude Include="fmod_errors.h" />
     <ClInclude Include="fmod_output.h" />
+    <ClInclude Include="FMOD32\fmod.h" />
+    <ClInclude Include="FMOD32\fmod.hpp" />
+    <ClInclude Include="FMOD32\fmod_codec.h" />
+    <ClInclude Include="FMOD32\fmod_common.h" />
+    <ClInclude Include="FMOD32\fmod_dsp.h" />
+    <ClInclude Include="FMOD32\fmod_dsp_effects.h" />
+    <ClInclude Include="FMOD32\fmod_errors.h" />
+    <ClInclude Include="FMOD32\fmod_output.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -499,6 +507,8 @@
     <Library Include="fmodL_vc.lib" />
     <Library Include="libfmod.a" />
     <Library Include="libfmodL.a" />
+    <Library Include="FMOD32\fmod_vc.lib" />
+    <Library Include="FMOD32\fmodL_vc.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fmod.cs" />
@@ -506,5 +516,10 @@
     <None Include="fmod_dsp.cs" />
     <None Include="fmod_errors.cs" />
     <None Include="fmodL.dll" />
+    <None Include="FMOD32\fmod.cs" />
+    <None Include="FMOD32\fmod.dll" />
+    <None Include="FMOD32\fmod_dsp.cs" />
+    <None Include="FMOD32\fmod_errors.cs" />
+    <None Include="FMOD32\fmodL.dll" />
   </ItemGroup>
 </Project>

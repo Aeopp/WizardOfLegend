@@ -100,8 +100,6 @@ Event ARCHER::update(float dt)
 	float distance = dis.length();
 	float Attack_distance = _EnemyInfo.AttackStartDistance;
 
-	bArrowLineRender = false;
-
 	NormalAttack->_transform->_dir = dir;
 	if (distance < Attack_distance  && !_EnemyInfo.bAttack)
 	{
@@ -184,6 +182,8 @@ Event ARCHER::update(float dt)
 
 void ARCHER::Hit(std::weak_ptr<object> _target)
 {
+	if (InitTime > 0)return;
+
 	Monster::Hit(_target);
 	if (bInvincible)return;
 	if (bDying)return;

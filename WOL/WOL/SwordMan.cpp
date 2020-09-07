@@ -163,7 +163,7 @@ Event SwordMan::update(float dt)
 		_transform->_location += _transform->_dir * dt * _speed;
 		if (SoundTick < 0)
 		{
-			SoundTick = 0.4f;
+			SoundTick = 0.8f;
 			RAND_SOUNDPLAY("SWORDMAN_RUN", { 1,2 }, 1.f, false);
 		}
 		

@@ -8,33 +8,33 @@ void player_info::AddGold(int Gold)
 	gold += Gold;
 }
 
-void player_info::AddHp(int32_t HP)
+void player_info::AddHp(float HP)
 {
-	hp = std::clamp<>(hp + HP, 0, max_hp);
+	hp = std::clamp<>(hp + HP, 0.f, max_hp);
 }
 
-void player_info::AddMp(int32_t MP)
+void player_info::AddMp(float MP)
 {
-	mp = std::clamp<>(mp + MP, 0, max_mp);
+	mp = std::clamp<>(mp + MP, 0.f, max_mp);
 };
 
-void player_info::SetHp(int32_t HP)
+void player_info::SetHp(float HP)
 {
 	hp = HP;
 }
 
-void player_info::SetMp(int32_t MP)
+void player_info::SetMp(float MP)
 {
 	mp = MP;
 }
 
-int32_t player_info::GetHP()
+float player_info::GetHP()
 {
 
 	return hp;
 }
 
-int32_t player_info::GetMP()
+float player_info::GetMP()
 {
 	return mp;
 }

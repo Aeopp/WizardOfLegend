@@ -198,6 +198,8 @@ Event WIZARD::update(float dt)
 
 void WIZARD::Hit(std::weak_ptr<object> _target)
 {
+
+	if (InitTime > 0)return;
 	Monster::Hit(_target);
 	if (bInvincible)return;
 	if (bDying)return;
