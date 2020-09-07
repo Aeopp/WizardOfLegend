@@ -87,6 +87,13 @@ Event ICE_Blast::update(float dt)
 	return _Event;
 };
 
+void ICE_Blast::HitTile(RECT _rt)
+{
+	actor::HitTile(_rt);
+	IceEffectPlay();
+	bDie = true;
+}
+
 void ICE_Blast::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	actor::render(hdc, camera_pos, size_factor);

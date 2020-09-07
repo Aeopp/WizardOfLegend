@@ -23,10 +23,9 @@ bool sound_mgr::Play( std::string SoundKey,
 
 	namespace fs = std::filesystem;
 
-	if (Sounds.empty() || (IsBgm == true && CurrentBgmKey == SoundKey)) {
+	if (Sounds.empty()){
 		return false;
 	}
-
 
 	FMOD_RESULT HR;
 	bool isplay = false;
@@ -47,19 +46,19 @@ bool sound_mgr::Play( std::string SoundKey,
 			if (HR != FMOD_OK) {
 				return  false;
 			}
-
-			if (IsBgm == true) {
-				if (auto iter = Sounds.find(CurrentBgmKey);
-					iter != std::end(Sounds)) {
-					auto& [System, Sound, Channel] = iter->second;
-					Channel->stop();
-				}
-				CurrentBgmKey = SoundKey;
 			}
 			return  true;
 		}
-	}
-	return false;
+	
+}
+void sound_mgr::Stop(std::string SoundKey)
+{
+	auto iter = Sounds.find(SoundKey);
+	if (iter == std::end(Sounds))
+		return;
+
+	auto& Channel = std::get<2>(iter->second);
+	Channel->stop();
 };
 
 bool sound_mgr::Load(std::string FullPath, std::string Key) {
@@ -82,10 +81,6 @@ bool sound_mgr::Load(std::string FullPath, std::string Key) {
 
 		Channel->setVolume(DefaultVolume);
 		Sounds.insert(iter, { std::move(Key)  , InsertSound });
-	}
-	// 이미 사운드가 있을때
-	else {
-
 	}
 	return true;
 };
@@ -136,7 +131,7 @@ bool sound_mgr::Init()
 		// FMOD 시스템 로딩 실패
 		if (F_Result != FMOD_OK)
 			return false;
-		F_Result = FMOD_System->init(32, FMOD_INIT_NORMAL, 0);
+		F_Result = FMOD_System->init(250, FMOD_INIT_NORMAL, 0);
 		if (F_Result != FMOD_OK)
 			return false;
 	}

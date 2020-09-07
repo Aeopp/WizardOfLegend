@@ -31,8 +31,8 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 
 	RECT CullingRect = game::client_rect;
 
-	int width = (game::client_rect.right - game::client_rect.left )/ 2;
-	int height = (game::client_rect.bottom - game::client_rect.top) / 2;
+	int width = 180;
+	int height = 150;
 	CullingRect.left -= width;
 	CullingRect.right += width;
 	CullingRect.top -= height;
@@ -71,13 +71,13 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 		for (auto TEffect= std::begin(TEffects);TEffect!= std::end(TEffects);)
 		{
 			vec v = TEffect->pos - camera_pos;
-
-			Font FontOn = Font(hdc, _Color, v.x, v.y,
-				TEffect->size, TEffect->Text/*, TEffect->Text, TEffect->Text, TEffect->Text*/
-			);
-
 			TEffect->pos -= TEffect->dir;
 			TEffect->duration -= DeltaTime;
+
+			if (math::RectInPoint(CullingRect, v))
+			{
+				Font FontOn = Font(hdc, _Color, v.x, v.y, TEffect->size, TEffect->Text);
+			}
 
 			if (TEffect->duration < 0)
 			{
@@ -115,13 +115,6 @@ void object_mgr::update()
 
 	float dt = Timer::instance().delta();
 
-	RECT ObjUpdateCullingRange = game::client_rect;
-
-	ObjUpdateCullingRange.left -= ObjectUpdateRangeX;
-	ObjUpdateCullingRange.top -= ObjectUpdateRangeY;
-	ObjUpdateCullingRange.right += ObjectUpdateRangeX; 
-	ObjUpdateCullingRange.bottom += ObjectUpdateRangeY;
-
 	for (auto& [f, obj_list] : object_map)
 	{
 		for (auto obj = begin(obj_list); obj != end(obj_list);)
@@ -130,7 +123,6 @@ void object_mgr::update()
 			if (!sp_Transform)continue;
 			vec obj_location = sp_Transform->_location;
 
-			//if (!math::RectInPoint(ObjUpdateCullingRange, obj_location ))continue;
 
 			Event _event = (*obj)->update(dt);
 
@@ -155,8 +147,6 @@ void object_mgr::initialize()
 {
 	RECT rt = game::client_rect;
 
-	ObjectUpdateRangeX = rt.right - rt.left;
-	ObjectUpdateRangeY = rt.bottom - rt.top;
 }
 
 void object_mgr::release()
@@ -166,11 +156,27 @@ void object_mgr::release()
 
 void object_mgr::UIEffectRender(HDC hdc, vec camera_pos, std::pair<float, float> size_factor)
 {
+	RECT CullingRect = game::client_rect;
+
+	int width = 180;
+	int height = 150;
+	CullingRect.left -= width;
+	CullingRect.right += width;
+	CullingRect.top -= height;
+	CullingRect.bottom += height;
+
 	for (int i = layer_type::EEffect; i <= layer_type::ENone; ++i)
 	{
 		for (auto& obj : object_map[i])
 		{
 			if (!obj->_transform)continue;
+
+			if (obj->get_layer_id() == layer_type::EEffect)
+			{
+				vec culling_pos = obj->_transform->_location - camera_pos;
+				if (!math::RectInPoint(CullingRect, culling_pos))continue;
+			}
+
 			obj->render(hdc, camera_pos, vec{ size_factor.first,size_factor.second });
 		}
 	}

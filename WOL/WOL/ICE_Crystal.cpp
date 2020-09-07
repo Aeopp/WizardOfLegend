@@ -73,8 +73,8 @@ Event ICE_Crystal::update(float dt)
 
 	if (ICE_Crystal::SoundTick < 0)
 	{
-	/*	ICE_Crystal::SoundTick = 0.1f;
-		sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);*/
+		ICE_Crystal::SoundTick = 0.1f;
+		sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);
 	}
 
 	Duration -= dt;

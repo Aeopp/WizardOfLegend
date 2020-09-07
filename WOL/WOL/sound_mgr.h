@@ -15,6 +15,7 @@ public:
 
 	// 확장자없이 파일이름만 입력해주세요.
 	bool Play(std::string SoundKey, bool IsBgm = false, const float Volume = DefaultVolume);
+	void Stop(std::string SoundKey);
 	bool Load(std::string FullPath,std::string Key);
 	bool Init();
 	bool Frame(const float DeltaTime);
@@ -24,7 +25,6 @@ public:
 	void RandSoundKeyPlay(const std::string& SoundKey,
 		std::pair<uint8_t, uint8_t> Range, float Volume);
 private:
-	std::string CurrentBgmKey;
 };
 
 void SOUNDPLAY(const std::string& Key, float Volume = 1.f, bool IsBgm = false);

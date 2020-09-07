@@ -25,7 +25,7 @@ Event UIInteraction::update(float dt)
 		bOnMouse = true;
 		if (bClick)
 		{
-			SOUNDPLAY("CLICK_MENU", 1.f, false);
+		//	SOUNDPLAY("CLICK_MENU", 1.f, false);
 			Click(*pos);
 		}
 		else

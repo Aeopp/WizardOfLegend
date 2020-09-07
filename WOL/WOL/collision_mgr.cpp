@@ -24,12 +24,6 @@ void collision_mgr::collision_tile(collision_tag rhs)
 {
 	auto& rhs_list = _collision_map[rhs];
 
-	// 임의의 범위내에서만 충돌검사를 수행한다.
-	RECT CameraRange = game::client_rect;
-	CameraRange.left -= CollisionRangeX;
-	CameraRange.top -= CollisionRangeY;
-	CameraRange.right += CollisionRangeX;
-	CameraRange.bottom += CollisionRangeY;
 
 	vec cp =object_mgr::instance().camera_pos;
 	
@@ -41,7 +35,6 @@ void collision_mgr::collision_tile(collision_tag rhs)
 	for (auto& _Tile_Col : _Tile_Collision_List)
 	{
 		vec TileCenter = { _Tile_Col.first + x,_Tile_Col.second + y };
-		if (!math::RectInPoint(CameraRange, TileCenter - cp))continue;
 		++CollisionTileNum;
 
 		for (auto& rhs_obj : rhs_list)
@@ -51,7 +44,6 @@ void collision_mgr::collision_tile(collision_tag rhs)
 			if (!rhs_obj->bSlide)continue;
 
 			vec collision_pos = rhs_obj->make_center();
-			if(!math::RectInPoint(CameraRange, collision_pos - cp))continue;
 
 			auto rhs_figure = rhs_obj->_figure_type;
 
@@ -381,28 +373,16 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 	auto& lhs_list = _collision_map[lhs];
 	auto& rhs_list= _collision_map[rhs];
 
-	RECT CameraRange = game::client_rect;
-	CameraRange.left -= CollisionRangeX;
-	CameraRange.top -= CollisionRangeY;
-	CameraRange.right += CollisionRangeX;
-	CameraRange.bottom += CollisionRangeY;
-
-	vec cp = object_mgr::instance().camera_pos;
-
-	int x = game::TileWorldX / 2;
-	int y = game::TileWorldY / 2;
 
 	for (auto&   lhs_obj : lhs_list)
 	{
 		if (!lhs_obj->bCollision)continue;
-		if (!math::RectInPoint(CameraRange, lhs_obj->make_center()- cp))continue;
 		lhs_obj->CurrentCoolTime -= DeltaTime;
 
 		for (auto& rhs_obj : rhs_list)
 		{
 			if (!rhs_obj->bCollision)continue;
 			if (&lhs_obj == &rhs_obj)continue;
-			if (!math::RectInPoint(CameraRange, rhs_obj->make_center() - cp))continue;
 			rhs_obj->CurrentCoolTime -= DeltaTime;
 
 			++CollisionObjNum;

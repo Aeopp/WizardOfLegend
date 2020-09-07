@@ -83,10 +83,16 @@ void Scene_Stage::initialize()
 	auto Effect_SUMMON = object_mgr::instance().insert_object<Effect>
 		(PlayerSpawnLocation.x,+100,
 			L"SUMMON", layer_type::EEffect, 8, 0, 1.0f, 1.0f, 225, 730,
-			1.f, 1.6f);
+			1.f, 1.6f);		
+
+	//sound_mgr::instance().Play("MAIN_MENU_BGM", true, 1.f);
+
+
+	//sound_mgr::instance().Play("DUNGEON_BGM", true, 1.f);
 
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
 		SOUNDPLAY("teleport", 1.f, false);
+
 
 	/*late_initialize(int ImgLocationX, int ImgLocationY,
 		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
