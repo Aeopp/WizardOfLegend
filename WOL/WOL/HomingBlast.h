@@ -24,6 +24,7 @@ public :
 	float CurrentParticlePosUpdateDelta = ParticlePosUpdateCycle;
 	float HomingRotationCurrentSpeed;
 
+	float SoundTick = 0.1f;
 
 	float ParticlesIdxPopTick = 0.2f;
 	float CurrentAnimRemainTime = AnimDelta;

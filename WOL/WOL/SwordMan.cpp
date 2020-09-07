@@ -72,10 +72,11 @@ void SwordMan::initialize()
 
 Event SwordMan::update(float dt)
 {
-	RunSoundTick -= dt;
 	InitTime -= dt;
 	AttackEndRemainTime -= dt;
 	AttackStartTime -= dt;
+	SoundTick -= dt;
+
 
 	if (InitTime > 0)return Event::None;
 	if (bDie)return Event::Die;
@@ -147,6 +148,7 @@ Event SwordMan::update(float dt)
 		_transform->_dir = dir;
 		AttackStartTime = 0.7f;
 	}
+
 	else if (Attack_distance<distance && !_EnemyInfo.bAttack && !_EnemyInfo.bHit)
 	{
 		vec rand_dir = dir;
@@ -159,11 +161,13 @@ Event SwordMan::update(float dt)
 		}
 
 		_transform->_location += _transform->_dir * dt * _speed;
-		_render_component->ChangeAnim(EAnimState::Walk, 1.f);
-		if (RunSoundTick < 0)
+		if (SoundTick < 0)
 		{
-			RunSoundTick = 0.3f;
+			SoundTick = 0.4f;
+			RAND_SOUNDPLAY("SWORDMAN_RUN", { 1,2 }, 1.f, false);
 		}
+		
+		_render_component->ChangeAnim(EAnimState::Walk, 1.f);
 		
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	}
@@ -175,7 +179,8 @@ Event SwordMan::update(float dt)
 	return  Event::None;
 
 };
-void SwordMan::Hit(std::weak_ptr<object> _target)
+void SwordMan::Hit(std::weak_ptr<object>
+	_target)
 {
 	if (InitTime > 0)return;
 	
@@ -270,6 +275,11 @@ void SwordMan::AttackReadyCheck()
 		}
 
 	}
+}
+
+std::wstring SwordMan::GetSummonKey()
+{
+	return SwordMan::SummonCardImgKey;
 }
 
 

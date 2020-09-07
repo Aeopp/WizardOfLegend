@@ -17,22 +17,23 @@ struct player_info
 	bool bProtected = false;
 	float DashDuration = 0.3;
 	float AnimDashDuration = 0.3;
+	float PlayerAttackMoveSpeed = 3500;
 	float AttackCollisionDuration = 0.1f;
 	float DefaultAttackDuration = 0.4;
 	float AttackAnimDuration = 0.4;
 	float CurrentAttackDuration = DefaultAttackDuration;
-	
-	
+
+
 	float SkillBoomerangMotionDuration = 0.35f;
-	float SkillICECrystalMotionDuration = 0.9f;
-	float SkillICEBlastMotionDuration = 0.9f;
-	float SkillShieldMotionDuration = 0.9f;
+	float SkillICECrystalMotionDuration = 0.5f;
+	float SkillICEBlastMotionDuration = 0.5f;
+	float SkillShieldMotionDuration = 0.5f;
 
 
 	const float SkillBoomerangMaxNum = 8; 
-	const float SkillICECrystalCoolTime = 15.f;
-	const float SkillICEBlastCoolTime = 5.f;
-	const float SkillShieldCoolTime = 10.f;
+	const float SkillICECrystalCoolTime = 6.5f;
+	const float SkillICEBlastCoolTime = 3.5f;
+	const float SkillShieldCoolTime = 13.f;
 
 	float SkillCurrentICECrystalCoolTime = SkillICECrystalCoolTime;
 	float SkillCurrentICEBlastCoolTime = SkillICEBlastCoolTime;
@@ -57,10 +58,10 @@ public :
 	void AddGold(int Gold);
 	void AddHp(int32_t HP); 
 	void AddMp(int32_t MP);
-	void SetHp(uint32_t HP);
-	void SetMp(uint32_t MP);
-	uint32_t GetHP();
-	uint32_t GetMP();
+	void SetHp(int32_t HP);
+	void SetMp(int32_t MP);
+	int32_t GetHP();
+	int32_t GetMP();
 private:
 	int32_t  hp{ max_hp };
 	int32_t mp{ max_mp };

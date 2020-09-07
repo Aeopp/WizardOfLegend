@@ -20,8 +20,6 @@
 #include "BOSS_SKILL.h"
 #include "Camera.h"
 
-
-
 void BOSS::initialize()
 {
 	object::initialize();
@@ -92,6 +90,8 @@ void BOSS::initialize()
 
 
 
+
+
 	auto UI = object_mgr::instance().insert_object<UIBossName>(
 		L"BOSS_NAMEBAR.bmp", L"BOSS_NAMEBAR");
 	if (!UI)return;
@@ -150,12 +150,59 @@ Event BOSS::update(float dt)
 	CurrentHitCoolTime -= dt;
 	SoilEffectDuration -= dt;
 
+
+
+	JumpAttackAlarm();
 	UpdateDir();
 	StateTranslation();
 
 	return _Event;
 }
 
+void CheckHitSoundPlay(EObjUniqueID _ID)
+{
+	switch (_ID)
+	{
+	case EObjUniqueID::None:
+		break;
+	case EObjUniqueID::NormalAttack:
+		break;
+	case EObjUniqueID::EWizardBall:
+		break;
+	case EObjUniqueID::ICEBLAST:
+		sound_mgr::instance().RandSoundKeyPlay
+		("BOSS_ICE_HIT", { 1,3 }, 1);
+		break;
+	case EObjUniqueID::ICECRYSTAL:	
+		sound_mgr::instance().RandSoundKeyPlay
+	 ("BOSS_WIND_HIT", { 1,4 }, 1);
+		break;
+	case EObjUniqueID::FIREDRAGON:
+		sound_mgr::instance().RandSoundKeyPlay
+		("BOSS_FIRE_HIT", { 1,3 }, 1);
+		break;
+	case EObjUniqueID::Boomerang:
+		break;
+	case EObjUniqueID::BOSS_BOXATTACK:
+		break;
+	case EObjUniqueID::BOSS_Pillar:
+		break;
+	case EObjUniqueID::MIDDLE_BOSS:
+		break;
+	case EObjUniqueID::BOSS:
+		break;
+	case EObjUniqueID::Max:
+		break;
+	case EObjUniqueID::GAIR_ARMOR:
+		SOUNDPLAY("BOSS_SOIL_HIT_1", 1.f, false);
+		break;
+	default:
+		break;
+	}
+
+	sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1);
+	return;
+}
 void BOSS::Hit(std::weak_ptr<object> _target)
 {
 	object::Hit(_target);
@@ -166,9 +213,10 @@ void BOSS::Hit(std::weak_ptr<object> _target)
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime < 0)
 	{
 		CurrentHitCoolTime = DefaultHitCoolTime;
-		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1);
-		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 
+		
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+		CheckHitSoundPlay(sp_Target->UniqueID);
 		// 공격 준비 , 공격 중에는 슈퍼아머 이므로 상태전이 하기전 체크
 		if (CurrentState == EState::IDLE || CurrentState == EState::HIT ||
 			CurrentState== EState::Taunt)
@@ -215,7 +263,7 @@ void BOSS::JumpStart()
 {
 	CurrentJumpAcceleration = 0;
 	_Shadow.CurrentShadowState = EShadowState::BIG;
-
+	SOUNDPLAY("BOSS_JUMP", 1.f, false);
 	/// <summary>
 	/// 정해진 시간동안 그림자 크기를 키우고 낙하한다고 정한 시간동안 크기를 줄여나감
 	/// </summary>
@@ -343,6 +391,15 @@ void BOSS::SOIL_EffectEnd()
 {
 	SoilEffectRenderRowAdd = 0;
 	SoilEffectRenderTick = 0;
+}
+void BOSS::JumpAttackAlarm()
+{
+	if (StateDuration < 1.f && CurrentPatternIdx == EPattern::PILLARSPIRALATTACK)
+	{
+		SOUNDPLAY("BOSS_READYJUMP", 1.f, false);
+
+	}
+	
 }
 /// <summary>
 /// 공격 방향으로 공격 애니메이션 스프라이트 기준 Row 인덱스 반환
@@ -474,6 +531,7 @@ void BOSS::StateTranslation()
 	{
 	case BOSS::EState::IDLE:
  		StateSetUp(EState::Taunt, math::Rand<float>({ 0,2 }), 0.1f,0,true,8);
+		SOUNDPLAY("BOSS_POSE", 1.f, false);
 		break;
 	case BOSS::EState::Taunt:
 		CurrentSKILL = PatternMap[PatternTable[CurrentPatternIdx]];
@@ -486,6 +544,7 @@ void BOSS::StateTranslation()
 		StateSetUp(EState::IDLE, 1.5f, 1.5f,0,false,0);
 		break;
 	case BOSS::EState::HIT:
+		SOUNDPLAY("BOSS_POSE", 1.f, false);
 		StateSetUp(EState::Taunt, 0.1f, 0.1f,0,true,8);
 		break;
 	case BOSS::EState::DIE:
@@ -530,6 +589,9 @@ void BOSS::DieAction()
 	auto sp_wp_UIBossName = wp_UIBossName.lock();
 	if (!sp_wp_UIBossName)return;
 	sp_wp_UIBossName->bDie = true;
+
+	SOUNDPLAY("WIN", 1.f, false);
+
 }
 
 
@@ -604,7 +666,9 @@ void BOSS::PillarCircle()
 
 void BOSS::PillarMultipleAttack()
 {
-	Timer::instance().event_regist_ReWhileDelta(3, 0.25f, &BOSS::PillarPredictionAttack, this);
+	Timer::instance().event_regist_ReWhileDelta(3, 0.25f,
+		[this]() {	PillarPredictionAttack(); SOUNDPLAY("BOSS_DROP", 1.f, false);
+	return true;  });
 }
 
 void BOSS::PillarSpiralAttack()
@@ -679,6 +743,7 @@ void BOSS::BoxAttackStart()
 	bAttackAnimSprite = false;
 	bAnimLoop = false;
 	StateSetUp(BOSS::EState::ATTACK, 5.f, 0.2f, 0,false,1);
+	SOUNDPLAY("BOSS_DROP", 1.f, false);
 	BoxAttack();
 	// 
 	Timer::instance().event_regist(time_event::EOnce, 5.f, [this]() {
@@ -696,7 +761,8 @@ void BOSS::RotationBoxAttackStart()
 	bAnimLoop = false;
 	StateSetUp(BOSS::EState::ATTACK, Duration, 0.2f, 0, false, 1);
 	RotationBoxAttack(6);
-	// 
+	SOUNDPLAY("BOSS_DROP", 1.f, false);
+
 
 	Timer::instance().event_regist(time_event::EOnce, Duration-0.3f, [this]() {
 		bAttackAnimSprite = false;
@@ -711,6 +777,7 @@ void BOSS::BoxDirectPillarAttackStart()
 	bAttackAnimSprite = false;
 	bAnimLoop = false;
 	StateSetUp(BOSS::EState::ATTACK, Duration, 0.2f, 0, false, 1);
+	SOUNDPLAY("BOSS_DROP", 1.f, false);
 	BoxDirectPillarAttack();
 	// 
 
@@ -740,7 +807,7 @@ void BOSS::PillarSpiralAttackStart()
 	CurrentRowIdx = 3;
 	bAttackAnimSprite = false;
 	StateSetUp(BOSS::EState::ATTACK, Duration, 0.25f, 0, false, 1);
-
+	
 	Timer::instance().event_regist(time_event::EOnce, 0.4,
 		[this]() {JumpStart();  return true; });
 
@@ -751,7 +818,8 @@ void BOSS::PillarSpiralAttackStart()
 		JumpEndAnimPlay(); return true;  });
 
 	Timer::instance().event_regist(time_event::EOnce, 1.3,
-		[this]() {SOIL_EffectSetUp(); JumpEnd();  PillarSpiralAttack(); 
+		[this]() {	SOUNDPLAY("BOSS_DROP", 1.f, false);
+	SOIL_EffectSetUp(); JumpEnd();  PillarSpiralAttack();
 	ShockAttackStart();
 	auto sp_camera = object_mgr::instance()._Camera.lock();
 	if (!sp_camera)return false ;

@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "sound_mgr.h"
+
 #include "BOSS_SKILL.h"
 #include "object_mgr.h"
 #include "collision_component.h"
@@ -98,6 +100,13 @@ Event BOSS_SKILL::update(float dt)
 	{
 		CurrentPillarAnimDelta = PillarAnimDelta;
 		CurrentPillarColIdx = min(CurrentPillarColIdx + 1, 2);
+
+		if (CurrentPillarColIdx == 2 && !bSoundPlay)
+		{
+			bSoundPlay = true;
+			RAND_SOUNDPLAY("COLUMN"
+				, { 1,3 }, 1.f, false);
+		}
 	}
 
 	return Event::None;

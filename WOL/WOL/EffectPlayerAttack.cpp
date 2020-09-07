@@ -1,8 +1,12 @@
 #include "pch.h"
+#include "sound_mgr.h"
+
 #include "EffectPlayerAttack.h"
 #include "Bmp_mgr.h"
 #include "Bmp.h"
 #include "collision_mgr.h"
+
+
 
 void EffectPlayerAttack::AttackReady(float Duration, float AnimDuration
 ,float PushForce, vec InitLocation, AttackNumber Num, float AnimAngle)
@@ -49,7 +53,7 @@ Event EffectPlayerAttack::update(float dt)
 {
 	if (!bRender)return Event::None;
 	Event _event = object::update(dt);
-
+	SoundTick -= dt;
 	Duration -= dt;
 	AnimDelta -= dt;
 	AnimT -= dt;
@@ -138,4 +142,16 @@ void EffectPlayerAttack::initialize()
 		sp_collision->bCollision = true;
 		bRender = false; 
 	};
+}
+
+void EffectPlayerAttack::Hit(std::weak_ptr<class object> wp_Target)
+{
+	Effect::Hit(wp_Target);
+
+	if (SoundTick < 0)
+	{
+		//SOUNDPLAY("HIT_SOUND_NORMAL", 1.f, false);
+		SoundTick = 0.05f;
+	}
+	
 }

@@ -25,7 +25,8 @@ public:
 	float CurrentSOIL_AnimDelta = SOIL_AnimDelta; 
 	uint32_t get_layer_id()const& override;
 
-	static inline const float PillarAnimDelta = 0.1f;
+	static inline const float PillarAnimDelta = 0.23f;
+	bool bSoundPlay = false;
 	float CurrentPillarAnimDelta = PillarAnimDelta; 
 	int CurrentPillarColIdx = 0;
 	// 이펙트 컬럼 처음에 랜덤하게 지정해 생성

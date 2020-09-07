@@ -64,6 +64,8 @@ void Monster::initialize()
 	_Shadow.correction = shadow_correction;
 	_Shadow.world_size_correction = ShadowWorldSizeCorrection;
 	ObjectTag = object::Tag::monster;
+
+	
 };
 
 Event Monster::update(float dt)
@@ -87,6 +89,8 @@ void Monster::late_initialize(std::weak_ptr<class object> SetTarget, vec SetLoca
 	_AttackTarget = (SetTarget);
 	if(_transform)
 	_transform->_location = (SetLocation); 
+
+	CardEffect(SetLocation,GetSummonKey());
 }
 
 void Monster::HitSoundPlayBackByTag(EObjUniqueID CheckID , object::Tag CheckTag)
@@ -99,12 +103,12 @@ void Monster::HitSoundPlayBackByTag(EObjUniqueID CheckID , object::Tag CheckTag)
 		WINDHitSoundPlay();
 	else if (CheckID == EObjUniqueID::Boomerang)
 		BoomerangSoundPlay();
-	else
+	else if (CheckID == EObjUniqueID::FIREDRAGON)
+		BoomerangSoundPlay();
+	else 
 		NormalHitSoundPlay();
 
-	if (CheckID == EObjUniqueID::NormalAttack)
-		HitSoundPlay();
-	
+	RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
 }
 
 void Monster::DieSoundPlay()
@@ -137,10 +141,7 @@ void Monster::MonsterDie()
 	sp_col->bDie = true;
 }
 
-void Monster::HitSoundPlay()
-{
-	sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1.f);
-}
+
 
 void Monster::ICEHitSoundPlay()
 {

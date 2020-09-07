@@ -14,7 +14,7 @@ public:
 	void IceEffectPlay();
 
 	float ICE_EffectTick = 0.2f;
-
+	float SoundTick = 0.5f;
 	uint32_t get_layer_id()const& override;
 
 	

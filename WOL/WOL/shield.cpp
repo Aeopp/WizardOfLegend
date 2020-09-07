@@ -37,7 +37,9 @@ void shield::initialize()
 	ObjectTag = object::Tag::player_shield;
 
 	bAttacking = true;
-	Attack = { 0,0 };
+	Attack = { 0,10 };
+
+	UniqueID = EObjUniqueID::GAIR_ARMOR;
 }
 
 Event shield::update(float dt)
@@ -176,4 +178,7 @@ void shield::late_initialize(Transform _Transform)
 
 	// 쉴드 이니셜 방향에 따라 시작 각도 이미지 인덱스만 초기화때 구해놓는다 .
 	CalcIdx();
+
+	duration = 10.f;
+
 };

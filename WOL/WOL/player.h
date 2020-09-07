@@ -29,6 +29,7 @@ public:
 
     float CurrentInvincibletime;
     float DefaultInvincibletime;
+    float IceCrystalTick = 0;
     bool bInputDiagonal{ false };
 
     std::shared_ptr<class player_info> _player_info;
@@ -67,6 +68,7 @@ private:
     void MakeShield();
     void ICE_BLAST(int Num);
     void SkillIceCrystal(uint32_t Num);
+    void SkillUlti();
     void SkillFireDragon();
 
     void SkillBoomerang();

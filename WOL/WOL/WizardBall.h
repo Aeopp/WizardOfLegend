@@ -14,7 +14,7 @@ public:
         AttackEnd,
         HIT,
     };
-
+    static std::shared_ptr<WizardBall> SpawnWithSummonCard(vec location,std::weak_ptr<class object> wp_AttackTarget);
     void initialize()override;
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
     Event update(float dt)override;

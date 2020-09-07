@@ -18,8 +18,6 @@ void ARCHER::initialize()
 	collision_lower_correction = { 0,+40 };
 
 	lower_size = { 25,50 };
-	
-
 
 	LeftAnimKey = L"ARCHER_LEFT";
 	RightAnimKey = L"ARCHER_RIGHT";
@@ -55,6 +53,8 @@ void ARCHER::initialize()
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
+
+
 }
 
 Event ARCHER::update(float dt)
@@ -100,12 +100,14 @@ Event ARCHER::update(float dt)
 	float distance = dis.length();
 	float Attack_distance = _EnemyInfo.AttackStartDistance;
 
+	bArrowLineRender = false;
 
 	NormalAttack->_transform->_dir = dir;
 	if (distance < Attack_distance  && !_EnemyInfo.bAttack)
 	{
 		_EnemyInfo.bAttack = true;
 		NormalAttack->Preparation(true);
+		bArrowLineRender = true;
 
 		_render_component->ChangeAnim(EAnimState::Attack, 2.3f,EAnimState::Attack);
 
@@ -117,19 +119,20 @@ Event ARCHER::update(float dt)
 		// 여기서 공격
 		if (CurrentFireCoolTime < 0)
 		{
-			bArrowLineRender = false; 
 			Timer::instance().event_regist(time_event::EOnce, 2.3f,
 				[&bParticle = NormalAttack,
 				&TargetLoc = sp_Target->_transform->_location,
 				loc = _transform->_location,
 				&_Shadow = _Shadow, &_Info = _EnemyInfo,
 				&render = _render_component,
-				&_NormalAttack = NormalAttack,
+				&_NormalAttack = NormalAttack, 
+				&bArrowLineRender = bArrowLineRender,
 				&_CoolTime = this->CurrentFireCoolTime](){
 
 				if (!bParticle)return true;
 				if (_Info.bHit)return true;
 				if (!_Info.bAttack)return true;
+				bArrowLineRender = false;
 
 				_NormalAttack->Preparation(false);
 				vec dir = (TargetLoc - loc).get_normalize();
@@ -146,7 +149,9 @@ Event ARCHER::update(float dt)
 		else if (CurrentFireCoolTime > 0)
 		{
 			_render_component->ChangeAnim(EAnimState::Attack, 0.3f);
-			_Shadow.CurrentShadowState = EShadowState::NORMAL;
+			_Shadow.CurrentShadowState = EShadowState::NORMAL; 		
+			bArrowLineRender = false;
+
 			NormalAttack->Preparation(false);
 		}
 	}
@@ -154,6 +159,7 @@ Event ARCHER::update(float dt)
 	{
 		NormalAttack->Preparation(false);
 		_EnemyInfo.bAttack = false;
+		bArrowLineRender = false;
 
 		StalkerPosReTargetDuration -= dt;
 		if (StalkerPosReTargetDuration < 0)
@@ -161,7 +167,6 @@ Event ARCHER::update(float dt)
 			_transform->_dir = math::rotation_dir_to_add_angle(dir, math::Rand<float>({ -89,89 }));
 			StalkerPosReTargetDuration = 1.5f;
 		}
-
 		_transform->_location += _transform->_dir * dt * _speed;
 		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
@@ -170,7 +175,8 @@ Event ARCHER::update(float dt)
 	{
 		_render_component->ChangeAnim(EAnimState::Walk, 0.3f);
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		NormalAttack->Preparation(false);
+		NormalAttack->Preparation(false);		
+		bArrowLineRender = false;
 	}
 
 	return _E;
@@ -194,7 +200,7 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	NormalAttack->Preparation(false);
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
-
+	bArrowLineRender = false;
 	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
 	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
@@ -228,6 +234,7 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	}
 	else
 	{
+		bArrowLineRender = false;
 		NormalAttack->Preparation(false);
 		EscapeVec = math::RandVec();
 		EscapeRamainTick = EscapeDuration;
@@ -238,9 +245,31 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	if (InitTime > 0)return;
-
-
+	if (!_transform)return;
+	
 	Monster::render(hdc, camera_pos, size_factor);
+
+	
+
+	if (bArrowLineRender)
+	{
+		auto sp_Target = _AttackTarget.lock();
+		if (!sp_Target)return;
+
+		vec MyLocation = _transform->_location - camera_pos;
+		vec TargetLocation = sp_Target->_transform->_location - camera_pos;
+
+		HPEN MyPen, OldPen;
+		MyPen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+		OldPen = (HPEN)SelectObject(hdc, MyPen);
+
+		MoveToEx(hdc, MyLocation.x, MyLocation.y, nullptr);
+		LineTo(hdc, TargetLocation.x, TargetLocation.y);
+
+		SelectObject(hdc, OldPen);
+		DeleteObject(MyPen);
+	}
+	
 }
 void ARCHER::DirCheckAnimFileChange()
 {
@@ -257,4 +286,9 @@ void ARCHER::DirCheckAnimFileChange()
 		_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(
 			RightAnimKey);
 	}
-};
+}
+std::wstring ARCHER::GetSummonKey()
+{
+	return ARCHER::SummonCardImgKey;
+}
+;

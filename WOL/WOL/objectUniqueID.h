@@ -9,10 +9,12 @@ enum class EObjUniqueID : uint32_t
 	EWizardBall,
 	ICEBLAST,
 	ICECRYSTAL,
+	FIREDRAGON,
 	Boomerang,
 	BOSS_BOXATTACK,
 	BOSS_Pillar,
 	MIDDLE_BOSS,
+	GAIR_ARMOR,
 	BOSS,
 	Max,
 };

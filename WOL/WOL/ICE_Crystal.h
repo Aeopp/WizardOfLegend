@@ -8,8 +8,8 @@ class ICE_Crystal :
     public actor
 {
 public:
-	static inline float SoundTick = 0.1f;
-	 
+	float SoundTick = 0.2f;
+
 	void initialize()override;
 	Event update(float dt)override;
 	std::weak_ptr<class collision_component>  _collision_component;

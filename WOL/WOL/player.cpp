@@ -83,7 +83,7 @@ void Player::initialize()
 	PaintSizeX = 180;
 	PaintSizeY = 182;
 
-	float Scale = 0.7f;
+	float Scale = 0.85f;
 
 	//Anim SetUp
 	{
@@ -149,6 +149,7 @@ Event Player::update(float dt)
 {
 	Event _E = object::update(dt);
 	CurrentInvincibletime -= dt;
+	IceCrystalTick -= dt;
 
 	player_check(dt);
 	if (!_player_info) return Event::Die;
@@ -167,6 +168,12 @@ Event Player::update(float dt)
 
 	_player_info->SkillCurrentShieldCoolTime = 
 	min(_player_info->SkillCurrentShieldCoolTime + dt, _player_info->SkillShieldCoolTime);
+
+	if (_player_info->GetMP() >= _player_info->max_mp)
+	{
+		SOUNDPLAY("ULT_ON", 1.f, false);
+	}
+	
 
 	return _E;
 }
@@ -187,6 +194,7 @@ void Player::Hit(std::weak_ptr<object> _target)
 	}
 
 	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
+	RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
 
 	int Dice = math::Rand<int>(_player_info->MissRange);
 	if (Dice == 0)
@@ -335,7 +343,7 @@ void Player::MakeShield()
 
 	vec dir{ math::Rand<float>({ -10,+10 }), math::Rand<float>({ -0,+0 }) };
 	Camera_Shake(15, dir, 0.5f);
-	_player_info->AddMp(-200);
+	//_player_info->AddMp(-200);
 
 	sound_mgr::instance().Play("GAIA_ARMOR_START", false, 1.f);
 }
@@ -437,7 +445,7 @@ void Player::ICE_BLAST(int Num)
 	vec Dir{ math::Rand<float>({ 0,0 }), math::Rand<float>({ -10,+10 }) };
 	Camera_Shake(1, Dir, 0.1f);
 
-	_player_info->AddMp(-150);
+	//_player_info->AddMp(-150);
 
 }
 void Player::Camera_Shake(float force,vec dir,float duration)
@@ -487,32 +495,42 @@ void Player::player_check(float dt)
 
 	if (_Input.Key_Down('E'))
 	{
-		
-		SkillIceCrystal(6);
+
+		if (_player_info->GetMP() >= _player_info->max_mp)
+			
+		{
+			SkillUlti();
+		}
+		else
+		{
+			SkillIceCrystal(3);
+		}
 	}
 
-	if (_Input.Key_Down('Z')) {
-		SkillBoomerang();
-	}
-	if (_Input.Key_Down('X')) {
-		MultiBoomerang(8);
-	}
+	//if (_Input.Key_Down('Z')) {
+	//	SkillBoomerang();
+	//}
+	//if (_Input.Key_Down('X')) {
+	//	MultiBoomerang(8);
+	//}
 
-	if (_Input.Key_Down('C')) {
-		SkillBoomerang();
-	}
-	if (_Input.Key_Down('V')) {
-		MultiRotBoomerang(6);
-	}
-	if (_Input.Key_Down('B')) {
-		SkillScrewBoomerang();
-	}
-	if (_Input.Key_Down('N')) {
-		MultiScrewBoomerang(8);
-	}
+	//if (_Input.Key_Down('C')) {
+	//	SkillBoomerang();
+	//}
+	//if (_Input.Key_Down('V')) {
+	//	MultiRotBoomerang(6);
+	//}
+	//if (_Input.Key_Down('B')) {
+	//	SkillScrewBoomerang();
+	//}
+	//if (_Input.Key_Down('N')) {
+	//	MultiScrewBoomerang(8);
+	//}
+
 	if (_Input.Key_Down(VK_SPACE))
 	{
 		Dash(_player_info->dash_speed);
+		
 	}
 
 	if (_player_info->bIdle && !_player_info->bAttack && !_player_info->bDash)
@@ -570,7 +588,7 @@ void Player::SkillBoomerang()
 
 	Camera_Shake(1, dir, 0.2f);
 
-	_player_info->AddMp(-50);
+	//_player_info->AddMp(-50);
 
 }
 
@@ -585,7 +603,7 @@ void Player::SkillIceCrystal(uint32_t Num)
 
 	float degree = 360.0f / Num;
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < Num; ++i)
 	{
 		auto _Ice = _object_mgr.insert_object<ICE_Crystal>();
 
@@ -605,15 +623,49 @@ void Player::SkillIceCrystal(uint32_t Num)
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 	Camera_Shake(2, dir, 0.2f);
 
-	_player_info->AddMp(-100);
+	//_player_info->AddMp(-100);
+}
 
-	//Timer::instance().time_scale = 0.5f;
+void Player::SkillUlti()
+{
+	if (!_player_info)return;
+	if (_player_info->bDash)return;
+	if (_player_info->SkillCurrentICECrystalCoolTime < _player_info->SkillICECrystalCoolTime)return;
+	_player_info->SkillCurrentICECrystalCoolTime = 0;
 
-	//Timer::instance().event_regist(time_event::EOnce, 0.2f, []() {
-	//	Timer::instance().time_scale = 1.f; return true; });
+	object_mgr& _object_mgr = object_mgr::instance();
+
+	float degree = 360.0f / 6;
+
+	for (int i = 0; i < 6; ++i)
+	{
+		auto _Ice = _object_mgr.insert_object<ICE_Crystal>();
+
+		if (!_Ice)return;
+		_Ice->_owner = _ptr;
+		_Ice->_transform->_dir = math::dir_from_angle(degree * i);
+		_Ice->RotationSpeedDegree = 720.f;
+		_Ice->_speed = 720.f;
+		_Ice->Duration = 10.f; 
+	}
+	_player_info->bIdle = false;
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+
+	Anim& MyAnim = _render_component->_Anim;
+	_player_info->bAttack = true;
+	_player_info->CurrentAttackDuration = _player_info->SkillICECrystalMotionDuration;
+
+	_render_component->ChangeAnim(AnimTable::attack1, _player_info->SkillICECrystalMotionDuration);
+
+	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
+	Camera_Shake(2, dir, 0.2f);
+
+	_player_info->AddMp(-_player_info->max_mp);
 
 	SOUNDPLAY("ULT_USE", 1.f, false);
 }
+
+
 void Player::SkillFireDragon()
 {
 	if (!_player_info)return;
@@ -727,7 +779,7 @@ void Player::MultiBoomerang(int Num)
 
 	Camera_Shake(8, dir, 0.4f);
 
-	_player_info->AddMp(-50);
+	//_player_info->AddMp(-50);
 }
 void Player::SkillRotBoomerang()
 {
@@ -777,7 +829,7 @@ void Player::SkillRotBoomerang()
 
 	Camera_Shake(1, dir, 0.2f);
 
-	_player_info->AddMp(-50);
+//	_player_info->AddMp(-50);
 }
 void Player::MultiRotBoomerang(int Num)
 {
@@ -827,7 +879,7 @@ void Player::MultiRotBoomerang(int Num)
 
 	Camera_Shake(4, dir, 0.3f);
 
-	_player_info->AddMp(-50);
+	//_player_info->AddMp(-50);
 
 	sound_mgr::instance().Play("ULT_USE", false, 1.f);
 	SkillInCastSlowTime(0.25f, 0.5f);
@@ -882,7 +934,7 @@ void Player::SkillScrewBoomerang()
 
 	Camera_Shake(1, dir, 0.2f);
 
-	_player_info->AddMp(-50);
+//	_player_info->AddMp(-50);
 }
 
 void Player::MultiScrewBoomerang(int Num)
@@ -934,7 +986,7 @@ void Player::MultiScrewBoomerang(int Num)
 
 	Camera_Shake(8, dir, 0.2f);
 
-	_player_info->AddMp(-50);
+//	_player_info->AddMp(-50);
 
 	sound_mgr::instance().Play("ULT_USE", false, 1.f);
 	SkillInCastSlowTime(0.25f, 0.3f);
@@ -1094,8 +1146,8 @@ void Player::Dash(float speed)
 	if (_player_info->bHit) return;
 
 	_player_info->bDash = true;
-	// 대쉬전에 방향 다시금 설정
 	CheckDirInput();
+	InputDirSpriteChange(_transform->_dir);
 	_player_info->bIdle = false;
 	_Shadow.CurrentShadowState = EShadowState::BIG;
 
@@ -1110,6 +1162,8 @@ void Player::Dash(float speed)
 		Transform->_location += Transform->_dir *(speed*DeltaTime);
 		return true;
 	}));
+
+
 	_render_component->ChangeUnstoppableAnim(AnimTable::dash,
 	_player_info->AnimDashDuration, AnimTable::idle);
 
@@ -1147,7 +1201,7 @@ void Player::Attack()
 	Dir.y *= -1;
 
 	_transform->_dir = Dir;
-	_transform->Move(_transform->_dir, 25.f);
+	_transform->Move(_transform->_dir,_player_info->PlayerAttackMoveSpeed*DeltaTime);
 
 	math::EDir _Dir = math::checkDir(attack_dir);
 
@@ -1190,8 +1244,8 @@ void Player::Attack()
 		_transform->_location + _transform->_dir * _player_info->NormalAttackRich, _ANum,
 		fDegree);
 
-	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
-	Camera_Shake(1, dir, 0.1f);
+	/*vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
+	Camera_Shake(1, dir, 0.1f);*/
 };
 
 void Player::Player_Move(float dt)
@@ -1293,7 +1347,7 @@ void Player::Player_Move(float dt)
 
 	if (_player_info->bMove = true)
 	{
-		sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
+		//sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
 	}
 }
 

@@ -42,7 +42,7 @@ void ICE_Blast::initialize()
 
 		sp_collision->_size = { 30.f,30.0f };
 		sp_collision->bRender = true;
-		sp_collision->bSlide = false;
+		sp_collision->bSlide = true;
 		sp_collision->bCollision = true;
 	};
 
@@ -70,8 +70,16 @@ void ICE_Blast::initialize()
 Event ICE_Blast::update(float dt)
 {
 	Event _Event = actor::update(dt);
+	SoundTick -= dt;
 	Duration -= dt;
 	ICE_EffectTick -= dt;
+
+	if (SoundTick < 0)
+	{
+		sound_mgr::instance().RandSoundKeyPlay("ICE_BLAST", { 1,4 }, 1.f);
+		SoundTick = 1.f;
+	}
+	
 
 	if (Duration < 0.3f)
 	{

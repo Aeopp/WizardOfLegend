@@ -28,6 +28,8 @@ public:
 	Event update(float dt)override;
 	void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	void initialize()override;
+	void Hit(std::weak_ptr<class object> wp_Target)override;
+	float SoundTick = 0.05f;
 private:
 	void AttackEnd();
 };

@@ -85,11 +85,8 @@ void Scene_Stage::initialize()
 			L"SUMMON", layer_type::EEffect, 8, 0, 1.0f, 1.0f, 225, 730,
 			1.f, 1.6f);		
 
-	//sound_mgr::instance().Play("MAIN_MENU_BGM", true, 1.f);
 
-
-	//sound_mgr::instance().Play("DUNGEON_BGM", true, 1.f);
-
+		sound_mgr::instance().Stop("MAIN_MENU_BGM");
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
 		SOUNDPLAY("teleport", 1.f, false);
 
@@ -130,7 +127,7 @@ void Scene_Stage::initialize()
 			});
 
 
-		Timer::instance().event_regist_ReWhileDelta(100000000000.f, 100.f, [=]() {
+	/*	Timer::instance().event_regist_ReWhileDelta(100000000000.f, 100.f, [=]() {
 			auto MBOSS = object_mgr::instance().insert_object<MIDDLE_BOSS>();
 
 			MBOSS->SetUp(_Player, _Player->_transform->_location +
@@ -142,47 +139,8 @@ void Scene_Stage::initialize()
 			manage_objs.push_back(boss);
 			manage_objs.push_back(MBOSS);
 
-			});
+			});*/
 
-
-		for (int i = 0; i < 1; ++i)
-		{
-			/*auto SWORDMAN = object_mgr::instance().insert_object
-			<ARCHER>(_Player,_Player->_transform->_location + vec{ 100,0 });
-*/
-			/*auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
-
-			Midboss->SetUp(_Player, PlayerSpawnLocation + vec{ 0,-100 });
-
-			manage_objs.push_back(Midboss);*/
-			//auto  ar= object_mgr::instance().insert_object<ARCHER>(_Player, _Player->_transform->_location + vec{ 100,0 });
-
-		/*
-			auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
-			Midboss->SetUp(_Player, PlayerSpawnLocation + math::RandVec() * math::Rand<int>({ 500,1000 }));
-
-			manage_objs.push_back(Midboss);*/
-		/*	s += Angle;
-			vec v = PlayerSpawnLocation;
-			vec w{ Distance * std::cosf(s),
-			Distance * std::sinf(s) };
-			v += w;
-
-
-			vec InitPos = v +
-				math::RandVec() * math::Rand<float>({ -100,100 });
-			Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
-			auto sp_WizBall = WizardBall::BallCast();
-			sp_WizBall->_transform->_location = InitPos;
-			sp_WizBall->wp_AttackTarget = _Player;
-
-			manage_objs.push_back(sp_WizBall);
-
-			auto qwe = object_mgr::instance().insert_object<ARCHER>(_Player, v);
-			
-			manage_objs.push_back(qwe);*/
-		}
-		
 		manage_objs.push_back(_camera);
 		manage_objs.push_back(_Player);
 	}

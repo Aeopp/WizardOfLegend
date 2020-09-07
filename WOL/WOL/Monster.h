@@ -30,11 +30,12 @@ public:
 	void HitSoundPlayBackByTag(EObjUniqueID CheckID, object::Tag CheckTag);
 	void DieSoundPlay();
 	void MonsterDie();
-	void HitSoundPlay();
 	void ICEHitSoundPlay();
 	void WINDHitSoundPlay();
 	void NormalHitSoundPlay();
 	void BoomerangSoundPlay();
+
+	virtual std::wstring GetSummonKey()abstract;
 public:
 	std::weak_ptr<collision_component>  _collision_component{};
 
@@ -60,5 +61,6 @@ protected:
 	float MyAnimDuration;
 	std::pair<int,int> ShadowWorldSizeCorrection;
 	float InitTime;
+	
 };
 

@@ -62,6 +62,12 @@ Event HomingBlast::update(float dt)
 	AnimInitTime -= dt;
 	ICE_EffectTick -= dt;
 
+	if (SoundTick < 0)
+	{
+		sound_mgr::instance().RandSoundKeyPlay("ICE_BLAST", { 1,4 }, 1.f);
+		SoundTick = 0.1f;
+	}
+
 	if (Duration < 0)
 	{
 		ICE_EffectPlay();
@@ -125,7 +131,7 @@ void HomingBlast::render(HDC hdc, vec camera_pos, vec size_factor)
 	if (ICE_EffectTick < 0)
 	{
 		ICE_EffectPlay();
-		ICE_EffectTick = 0.9f;
+		ICE_EffectTick = 0.7f;
 	}
 	
 

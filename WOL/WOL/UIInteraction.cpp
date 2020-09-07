@@ -6,6 +6,7 @@
 Event UIInteraction::update(float dt)
 {
 	UI::update(dt);
+	SoundTick -= dt;
 
 	Input_mgr& _Input_mgr = Input_mgr::instance();
 	auto pos = _Input_mgr.GetWindowMousePos();
@@ -25,7 +26,11 @@ Event UIInteraction::update(float dt)
 		bOnMouse = true;
 		if (bClick)
 		{
-		//	SOUNDPLAY("CLICK_MENU", 1.f, false);
+			if (SoundTick < 0)
+			{
+				SoundTick = 0.2f;
+				SOUNDPLAY("CLICK_MENU", 1.f, false);
+			}
 			Click(*pos);
 		}
 		else

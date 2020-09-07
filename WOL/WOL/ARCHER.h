@@ -34,5 +34,8 @@ private:
         Hit,
         Dead,
     };
+
+    // Monster을(를) 통해 상속됨
+    virtual std::wstring GetSummonKey() override;
 };
 

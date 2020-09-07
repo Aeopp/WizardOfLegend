@@ -29,6 +29,10 @@ public:
 	void Hit(std::weak_ptr<class object> _target)override;
 	void HitTile(RECT rt)override;
 public:
+	void LaunchSoundPlay();
+	void DieSoundPlay();
+	void WallHitSoundPlay();
+
 	// 직선의 중심점
 	vec rotation_center{};
 	// 직선 방향

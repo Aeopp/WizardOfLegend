@@ -49,7 +49,7 @@ bool sound_mgr::Play( std::string SoundKey,
 			}
 			return  true;
 		}
-	
+	return true; 
 }
 void sound_mgr::Stop(std::string SoundKey)
 {
@@ -131,7 +131,7 @@ bool sound_mgr::Init()
 		// FMOD 시스템 로딩 실패
 		if (F_Result != FMOD_OK)
 			return false;
-		F_Result = FMOD_System->init(250, FMOD_INIT_NORMAL, 0);
+		F_Result = FMOD_System->init(255, FMOD_INIT_NORMAL, 0);
 		if (F_Result != FMOD_OK)
 			return false;
 	}

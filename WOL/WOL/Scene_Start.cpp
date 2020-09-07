@@ -55,7 +55,7 @@ void Scene_Start::initialize()
 
 	// TOOD :: Scene Dependent Init 
 	{
-		//sound_mgr::instance().Play("DUNGEON_BGM", true, 1.f);
+		sound_mgr::instance().Play("MAIN_MENU_BGM", true, 1.f);
 		
 
 		auto EMouse = object_mgr::instance().insert_object<Mouse>();

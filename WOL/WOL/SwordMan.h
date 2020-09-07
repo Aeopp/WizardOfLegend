@@ -13,20 +13,12 @@ public:
     float StalkerPosReTargetDuration;
     float AttackEndRemainTime;
     float AttackStartTime;
-    float RunSoundTick = 0.1;
     static inline const std::wstring SummonCardImgKey = L"SUMMON_CARD_SWORDMAN";
 
     std::weak_ptr<class SwordManAttack> NormalAttack{};
 
     void AttackReadyCheck();
-    /*static const inline std::unordered_map<EMonsterState, uint32_t> AnimRowIdxTable
-    {
-        { EMonsterState::Attack, 2},
-        {EMonsterState::Dead,4},
-        {EMonsterState::Hit,3},
-        {EMonsterState::Idle,0},
-        {EMonsterState::Walk,1}
-    };*/
+    float SoundTick = 0.1f;
 private:
     enum class EAnimState : uint8_t
     {
@@ -36,5 +28,8 @@ private:
         Hit,
         Dead,
     };
+
+    // Monster을(를) 통해 상속됨
+    virtual std::wstring GetSummonKey() override;
 };
 

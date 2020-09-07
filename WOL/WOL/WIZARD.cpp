@@ -152,7 +152,9 @@ Event WIZARD::update(float dt)
 
 			vec InitPos = _transform->_location +
 				math::RandVec() * math::Rand<float>({ -100,100 });
+
 			Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
+
 			auto sp_WizBall = WizardBall::BallCast();
 			sp_WizBall->_transform->_location = InitPos;
 			sp_WizBall->wp_AttackTarget = _AttackTarget;
@@ -277,4 +279,9 @@ void WIZARD::DirCheckAnimFileChange()
 		_render_component->wp_Image = Bmp_mgr::instance().Find_Image_WP(
 			RightAnimKey);
 	}
-};
+}
+std::wstring WIZARD::GetSummonKey()
+{
+	return WIZARD::SummonCardImgKey;
+}
+;

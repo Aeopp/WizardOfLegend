@@ -555,6 +555,8 @@ void MIDDLE_BOSS::SummonMonster()
 
 void MIDDLE_BOSS::DieAction()
 {
+	sound_mgr::instance().RandSoundKeyPlay("ENEMY_DIED", { 0,3 }, 1.f);
+
 	auto sp_UIBOSSHPBar = wp_UIBossHPBar.lock();
 	if (!sp_UIBOSSHPBar)return;
 	sp_UIBOSSHPBar->bDie = true;

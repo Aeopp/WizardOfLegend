@@ -9,7 +9,18 @@
 #include "object_mgr.h"
 #include "shield.h"
 #include "sound_mgr.h"
+#include "Monster.h"
 
+
+std::shared_ptr<WizardBall> WizardBall::SpawnWithSummonCard(vec location, std::weak_ptr<class object> wp_AttackTarget)
+{
+	Monster::CardEffect(location, WizardBall::SummonCardImgKey);
+
+	auto sp_WizBall = WizardBall::BallCast();
+	sp_WizBall->_transform->_location = location;
+	sp_WizBall->wp_AttackTarget = wp_AttackTarget;
+	return sp_WizBall;
+}
 
 void WizardBall::initialize()
 {
@@ -111,7 +122,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 			push_back({ v ,vec{0,1}*3,
 			1.f,int(Atk),std::to_wstring((int)Atk) });
 
-		sound_mgr::instance().RandSoundKeyPlay("HIT_SOUND_NORMAL", { 1,2 }, 1);
+		RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
 
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
@@ -128,6 +139,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 		CurrentState = WizardBall::EState::HIT;
 		StateDuration = 0.2f;
 		CurrentHitCoolTime = 0.3f;
+		RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
 		if(bAttacking)
 		shield::DefenseMsg(_transform->_location);
 	}

@@ -18,23 +18,23 @@ void player_info::AddMp(int32_t MP)
 	mp = std::clamp<>(mp + MP, 0, max_mp);
 };
 
-void player_info::SetHp(uint32_t HP)
+void player_info::SetHp(int32_t HP)
 {
 	hp = HP;
 }
 
-void player_info::SetMp(uint32_t MP)
+void player_info::SetMp(int32_t MP)
 {
 	mp = MP;
 }
 
-uint32_t player_info::GetHP()
+int32_t player_info::GetHP()
 {
 
 	return hp;
 }
 
-uint32_t player_info::GetMP()
+int32_t player_info::GetMP()
 {
 	return mp;
 }

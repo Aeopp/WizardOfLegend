@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "FireDragon.h"
+#include "sound_mgr.h"
 #include "collision_mgr.h"
 #include "render_component.h"
 #include "Color.h"
@@ -61,8 +62,12 @@ void FireDragon::initialize()
 			RowNum = 0;
 	}	
 	
+	UniqueID = EObjUniqueID::FIREDRAGON;
+
 	ObjectTag = object::Tag::player_attack;
 	bAttacking = true;
+	LaunchSoundPlay();
+
 }
 
 void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -166,6 +171,8 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 
 Event FireDragon::update(float dt)
 {
+	// 지속시간다되면 
+	// DieSoundPlay();
 	Event _Event = actor::update(dt);
 	if (!_transform)return Event::Die;
 
@@ -196,6 +203,24 @@ void FireDragon::Hit(std::weak_ptr<class object> _target)
 void FireDragon::HitTile(RECT rt)
 {
 	object::HitTile(rt);
-
+	WallHitSoundPlay();
 	bDie = true;
+}
+
+void FireDragon::LaunchSoundPlay()
+{
+	RAND_SOUNDPLAY("FIRE_DRAGON", { 1,3 }, 1.f, false);
+
+}
+
+void FireDragon::DieSoundPlay()
+{
+	RAND_SOUNDPLAY("FIRE_DRAGON_DIE", { 0,3 }, 1.f, false);
+
+}
+
+void FireDragon::WallHitSoundPlay()
+{
+	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,3 }, 1.f, false);
+
 }

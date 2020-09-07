@@ -21,14 +21,14 @@ void ICE_Crystal::initialize()
 
 	sp_collision->_size = { 25.f,25.0f };
 	
-	Duration = 30.f;
+	Duration = 6.f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 200;
 	float Scale = 0.8f;
 	// 자기자신의 회전속도임
 	_speed = 360.f;
-	RotationSpeedDegree = 240.f;
+	RotationSpeedDegree = 360.f;
 	DistancefromCenter = 100.f;
 
 	_render_component = std::make_shared<render_component>();
@@ -50,14 +50,9 @@ void ICE_Crystal::initialize()
 	sp_collision->PushForce = 10.f;
 	sp_collision->bCollision = true;
 	sp_collision->bHitEffect = true;
+	
+	sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
 
-	if (SoundTick < 0)
-	{
-		SoundTick = 0.1f; 
-		sound_mgr::instance().Play("ICE_KRYSTAL_START", false, 1.f);
-	}
-	
-	
 	UniqueID = EObjUniqueID::ICECRYSTAL;
 
 	//_Shadow.bShadow = true;
@@ -66,14 +61,15 @@ void ICE_Crystal::initialize()
 
 Event ICE_Crystal::update(float dt)
 {
-	ICE_Crystal::SoundTick -= dt;
+	
+	SoundTick -= dt;
 
 	Event _event = actor::update(dt);
 
 
-	if (ICE_Crystal::SoundTick < 0)
+	if (SoundTick< 0)
 	{
-		ICE_Crystal::SoundTick = 0.1f;
+		SoundTick = 0.5f;
 		sound_mgr::instance().Play("ICE_KRYSTAL", false, 1.f);
 	}
 
