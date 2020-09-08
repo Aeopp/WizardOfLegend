@@ -94,7 +94,6 @@ void Scene_Boss::initialize()
 
 		sound_mgr::instance().Stop("DUNGEON_BGM");
 		SOUNDPLAY("BOSS_BGM", 1.f, true );
-		SOUNDPLAY("teleport", 1.f, false);
 
 			auto Midboss = object_mgr::instance().insert_object<BOSS>();
 

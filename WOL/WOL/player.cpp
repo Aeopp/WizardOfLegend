@@ -32,6 +32,9 @@
 #include "helper.h"
 #include "BOTTOM_HOLE.h"
 #include "UIInventory.h"
+#include "Teleport.h"
+
+#include "Scene_mgr.h"
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
@@ -181,14 +184,14 @@ Event Player::update(float dt)
 }
 void Player::Hit(std::weak_ptr<object> _target)
 {
-	if (CurrentInvincibletime > 0)return;
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
+	EnterBossStage(sp_target);
+
+	if (CurrentInvincibletime > 0)return;
 	if (!sp_target->bAttacking)return;
 	if (sp_target->ObjectTag == object::Tag::player_attack)return;
-	//if (sp_target->ObjectTag == object::Tag::monster)return;
 
-	//if (sp_target->ObjectTag == object::Tag::monster && sp_target->UniqueID != EObjUniqueID::EWizardBall)return;
 
 	if (_player_info->bProtected == true){
 		sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
@@ -1044,6 +1047,20 @@ void Player::MultiScrewBoomerang(int Num)
 void Player::GetSkill()
 {
 	sound_mgr::instance().Play("GET_SKILL", false, 1.f);
+}
+
+void Player::EnterBossStage(std::shared_ptr<class object> IsPortal)
+{
+	if (IsPortal->UniqueID == EObjUniqueID::Portal)
+	{
+		auto sp_Teleport = std::dynamic_pointer_cast<Teleport>(IsPortal);
+		if (!sp_Teleport) return;
+		
+		if ( (GetAsyncKeyState('F') & 0x8000) && sp_Teleport->bEnding)
+		{
+			Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
+		}
+	}
 }
 
 void Player::SkillInCastSlowTime(float Duration,float SlowTimeScale)

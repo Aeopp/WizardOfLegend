@@ -130,6 +130,7 @@ void Bmp_mgr::initialize()
 	Insert_Bmp(DefaultPath + L"ITEMSHOP_NPC.bmp", L"ITEMSHOP_NPC");
 	Insert_Bmp(DefaultPath + L"POTION.bmp", L"POTION");
 
+	Insert_Bmp(DefaultPath + L"TELEPORT.bmp", L"TELEPORT");
 
 };
 

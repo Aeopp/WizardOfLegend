@@ -28,6 +28,7 @@
 #include "UIItem.h"
 #include "player_info.h"
 #include "UIInventory.h"
+#include "Teleport.h"
 
 
 
@@ -92,14 +93,14 @@ void Scene_Stage::initialize()
 	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
 
 	auto Effect_SUMMON = object_mgr::instance().insert_object<Effect>
-		(PlayerSpawnLocation.x,+100,
+		(PlayerSpawnLocation.x, PlayerSpawnLocation.y -400,
 			L"SUMMON", layer_type::EEffect, 8, 0, 1.0f, 1.0f, 225, 730,
 			1.f, 1.6f);		
 
 
 		sound_mgr::instance().Stop("MAIN_MENU_BGM");
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
-		SOUNDPLAY("teleport", 1.f, false);
+
 
 
 	/*late_initialize(int ImgLocationX, int ImgLocationY,
@@ -117,7 +118,9 @@ void Scene_Stage::initialize()
 		_camera->_owner = _Player;
 
 		obj_mgr._Camera = _camera;
-
+		
+		auto _Teleport = obj_mgr.insert_object<Teleport>();
+		_Teleport->SetUp(PlayerSpawnLocation, false);
 
 		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
 			+ vec{ 200,0 }, ESkill::BLAST, L"ICE_BLAST_CARD");
@@ -217,7 +220,7 @@ void Scene_Stage::initialize()
 		//	manage_objs.push_back(wizard);
 		//	});
 
-
+		manage_objs.push_back(_Teleport);
 		manage_objs.push_back(_camera);
 		manage_objs.push_back(_Player);
 	}

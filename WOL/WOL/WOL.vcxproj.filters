@@ -248,6 +248,7 @@
     <ClInclude Include="ArcanaCard.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="UIItem.h" />
+    <ClInclude Include="Teleport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -512,6 +513,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="UIItem.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Teleport.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -84,6 +84,8 @@ private:
 
     void GetSkill();
 
+    void EnterBossStage(std::shared_ptr<class object> IsPortal);
+
     void SkillInCastSlowTime(float Duration,float SlowTimeScale);
     void CheckDirInput();
     void make_gold_UI();

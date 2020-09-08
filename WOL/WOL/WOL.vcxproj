@@ -241,6 +241,7 @@
     <ClInclude Include="SwordMan.h" />
     <ClInclude Include="SwordManAttack.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Teleport.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Tile_mgr.h" />
     <ClInclude Include="timer.h" />
@@ -336,6 +337,7 @@
     <ClCompile Include="sound_mgr.cpp" />
     <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="SwordManAttack.cpp" />
+    <ClCompile Include="Teleport.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Tile_mgr.cpp" />
     <ClCompile Include="timer.cpp" />
