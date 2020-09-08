@@ -97,7 +97,8 @@ void Bmp_mgr::initialize()
 	Insert_Bmp(DefaultPath + L"SOIL_EFFECT.bmp", L"SOIL_EFFECT");
 	Insert_Bmp(DefaultPath + L"BOSS_BOXATTACK.bmp", L"BOSS_BOXATTACK");
 
-	
+	Insert_Bmp(DefaultPath + L"PRISON_VER.bmp", L"PRISON_VER");
+	Insert_Bmp(DefaultPath + L"PRISON_HOR.bmp", L"PRISON_HOR");
 };
 
 

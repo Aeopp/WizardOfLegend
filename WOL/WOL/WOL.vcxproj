@@ -219,6 +219,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="player_info.h" />
+    <ClInclude Include="Prison.h" />
     <ClInclude Include="render_component.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RotationBoomerang.h" />
@@ -242,6 +243,7 @@
     <ClInclude Include="Tile_mgr.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="transform.h" />
+    <ClInclude Include="Trigger.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="UIBar.h" />
     <ClInclude Include="UIBossHPBar.h" />
@@ -309,6 +311,7 @@
     </ClCompile>
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_info.cpp" />
+    <ClCompile Include="Prison.cpp" />
     <ClCompile Include="render_component.cpp" />
     <ClCompile Include="RotationBoomerang.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -330,6 +333,7 @@
     <ClCompile Include="Tile_mgr.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="transform.cpp" />
+    <ClCompile Include="Trigger.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="UIBar.cpp" />
     <ClCompile Include="UIBossHPBar.cpp" />

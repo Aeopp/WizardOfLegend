@@ -241,6 +241,8 @@
     <ClInclude Include="FMOD32\fmod_dsp_effects.h" />
     <ClInclude Include="FMOD32\fmod_errors.h" />
     <ClInclude Include="FMOD32\fmod_output.h" />
+    <ClInclude Include="Trigger.h" />
+    <ClInclude Include="Prison.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -484,6 +486,12 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="BOSS_ROTBOX.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Trigger.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Prison.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

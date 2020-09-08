@@ -27,12 +27,20 @@ void Mouse::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	if (bDebug)
 	{
-		Rectangle(hdc, loc.x - s.x, loc.y - s.y, loc.x + s.x, loc.y + s.y);
+		{
+			std::wstringstream wss;
+			wss << L"Screen Pos : " << loc;
+			RECT _rt{ loc.x,loc.y,loc.x + 600,loc.y + 50 };
+			DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
+		}
 
-		std::wstringstream wss;
-		wss << loc;
-		RECT _rt{ loc.x,loc.y,loc.x + 200,loc.y + 100 };
-		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
+		{
+			std::wstringstream wss;
+			wss << L"Game Pos : " << loc + camera_pos;
+			RECT _rt{ loc.x,loc.y+ 50,loc.x + 700,loc.y + 100 };
+			DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_CENTER);
+		}
+
 	}
 }
 

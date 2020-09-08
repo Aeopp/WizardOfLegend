@@ -54,16 +54,7 @@ void Tile_mgr::render(HDC hdc, vec camera_pos , std::pair<float,float> size_fact
 	};
 
 
-	if (bDebug)
-	{
-		auto [sx, sy] = size_factor;
 
-		std::wstringstream wss;
-		wss << L"드로우 타일 개수 : " << RenderObjCount << std::endl;
-		//RECT _rt{ 900 *sx,100*sy,  1200*sx, 200*sy }; 
-		Font(hdc, RGB(111, 111, 111), 600, 200, 30, wss.str());
-		//DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
-	}
 }
 
 void Tile_mgr::DecoRender(HDC hdc,vec camera_pos)

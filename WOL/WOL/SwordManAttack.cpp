@@ -129,7 +129,7 @@ void SwordManAttack::initialize()
 	sp_comp->bSlide = false;
 	sp_comp->HitColor = RGB(123, 123, 123);
 	sp_comp->PushForce = 0.01f;
-	sp_comp->_size = { 80.f,80.f };
+	sp_comp->_size = { 90.f,90.f};
 	sp_comp->bRender = true;
 	bAttacking = true;
 	CurrentAttackDuration = DefaultAttackDuration = 0.2f;

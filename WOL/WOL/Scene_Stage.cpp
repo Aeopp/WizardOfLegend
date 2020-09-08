@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Trigger.h"
 #include "Scene_Stage.h"
 #include "collision_mgr.h"
 #include "Scene_mgr.h"
@@ -21,6 +22,7 @@
 #include "ARCHER.h"
 #include "sound_mgr.h"
 #include "WizardBall.h"
+#include "Prison.h"
 
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
@@ -107,9 +109,12 @@ void Scene_Stage::initialize()
 
 		obj_mgr._Camera = _camera;
 	
-		auto archer = object_mgr::instance().insert_object<ARCHER>(_Player, _Player->_transform->_location +
-			math::RandVec() * math::Rand<int>({ -300,300 }));
 
+
+		TriggerSetUp(_Player);
+
+		//auto archer = object_mgr::instance().insert_object<WizardBall>
+		//	(_Player, vec{ 100,100 });
 
 		//float Angle = 360.f / 16.f;
 		//float s = 0.f;
@@ -131,7 +136,6 @@ void Scene_Stage::initialize()
 		//	});
 
 
-
 		manage_objs.push_back(_camera);
 		manage_objs.push_back(_Player);
 	}
@@ -149,4 +153,80 @@ void Scene_Stage::release()
 Scene_Stage::~Scene_Stage() noexcept
 {
 	release();
+}
+
+void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
+{
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	auto StartEvent = [_Trigger,_Player]() {
+
+		std::vector< std::weak_ptr<class object>  > ReturnObjects;
+
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1.f, Prison::EType::Hor,
+			_Trigger, { 100,100 }, vec{ 1350,2450 });
+
+		auto _Archer = object_mgr::instance().insert_object<ARCHER>(_Player,
+			vec{ 1000,2000 });
+
+		auto _Swordman= object_mgr::instance().insert_object<SwordMan>(_Player,
+			vec{ 1000,2500 });
+
+		auto _Wizard = object_mgr::instance().insert_object<WIZARD>(_Player,
+			vec{ 1000,3000 });
+		
+		ReturnObjects.push_back(_Archer);
+		ReturnObjects.push_back(_Wizard);
+		ReturnObjects.push_back(_Swordman);
+		return ReturnObjects;
+	};
+
+	auto Event_1 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>  > ReturnObjects;
+
+		auto _Archer = object_mgr::instance().insert_object<ARCHER>(_Player,
+			vec{ 1000,2000 });
+
+		auto _Swordman = object_mgr::instance().insert_object<SwordMan>(_Player,
+			vec{ 1000,2500 });
+
+		auto _Wizard = object_mgr::instance().insert_object<WIZARD>(_Player,
+			vec{ 1000,3000 });
+
+		ReturnObjects.push_back(_Archer);
+		ReturnObjects.push_back(_Wizard);
+		ReturnObjects.push_back(_Swordman);
+		return ReturnObjects;
+	};
+
+	auto Event_2 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>  > ReturnObjects;
+
+		auto _Archer = object_mgr::instance().insert_object<ARCHER>(_Player,
+			vec{ 1000,2000 });
+
+		auto _Swordman = object_mgr::instance().insert_object<SwordMan>(_Player,
+			vec{ 1000,2500 });
+
+		auto _Wizard = object_mgr::instance().insert_object<WIZARD>(_Player,
+			vec{ 1000,3000 });
+
+		ReturnObjects.push_back(_Archer);
+		ReturnObjects.push_back(_Wizard);
+		ReturnObjects.push_back(_Swordman);
+		return ReturnObjects;
+	};
+
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	EventQ.push(std::move(Event_1));
+	EventQ.push(std::move(Event_2 ));
+
+	_Trigger->SetUp({ 200,200 }, vec{ 1350,2450}, std::move(StartEvent),
+		[]() {}, std::move(EventQ  ) );
+
+
+	manage_objs.push_back(_Trigger);
 }

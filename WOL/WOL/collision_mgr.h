@@ -16,7 +16,8 @@ public:
 	void save_collision(std::wstring filename);
 	void load_collision(std::wstring filename );
 
-	std::map<collision_tag, std::list<std::shared_ptr<collision_component>>> _collision_map;
+	std::map<collision_tag, std::list<std::shared_ptr<collision_component>>> 
+	_collision_map;
 
 	std::weak_ptr< collision_component> insert(std::weak_ptr<class object> _owner,collision_tag _tag,
 		figure_type _type = ERect);

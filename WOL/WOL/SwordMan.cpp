@@ -108,7 +108,7 @@ Event SwordMan::update(float dt)
 		{
 			sound_mgr::instance().Play("SWORDMAN_ATTACK", false, 1.f);
 
-			sp_Particle->EffectStart(_transform->_dir, _transform->_location + _transform->_dir * 45.f);
+			sp_Particle->EffectStart(_transform->_dir, _transform->_location + _transform->_dir * 55.f);
 			AttackEndRemainTime = 0.3f;
 		}
 

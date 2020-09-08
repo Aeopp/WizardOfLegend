@@ -48,11 +48,10 @@ void ARCHER::initialize()
 
 	DefaultHitDuration = 0.15f;
 	EscapeRamainTick = EscapeDuration = 1.3f;
-	_speed = 200.f;
+	_speed = 400.f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
-
 
 }
 
@@ -171,7 +170,7 @@ Event ARCHER::update(float dt)
 	}
 	else if (!_EnemyInfo.bHit && !_EnemyInfo.bAttack)
 	{
-		_render_component->ChangeAnim(EAnimState::Walk, 0.3f);
+		_render_component->ChangeAnim(EAnimState::Idle, 0.3f);
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		NormalAttack->Preparation(false);		
 		bArrowLineRender = false;

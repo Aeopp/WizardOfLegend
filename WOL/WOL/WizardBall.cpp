@@ -12,15 +12,6 @@
 #include "Monster.h"
 
 
-std::shared_ptr<WizardBall> WizardBall::SpawnWithSummonCard(vec location, std::weak_ptr<class object> wp_AttackTarget)
-{
-	Monster::CardEffect(location, WizardBall::SummonCardImgKey);
-
-	auto sp_WizBall = WizardBall::BallCast();
-	sp_WizBall->_transform->_location = location;
-	sp_WizBall->wp_AttackTarget = wp_AttackTarget;
-	return sp_WizBall;
-}
 
 void WizardBall::initialize()
 {
@@ -41,9 +32,9 @@ void WizardBall::initialize()
 	sp_collision->bCollisionTargetPushFromForce = false;
 	sp_collision->bHitEffect = true;
 	sp_collision->bRender = true;
-	sp_collision->bSlide= false;
+	sp_collision->bSlide= true;
 	sp_collision->PushForce = 1.f;
-	sp_collision->_size = {20.f,20.f};
+	sp_collision->_size = {30.f,30.f};
 
 	_Shadow.initialize();
 	_Shadow._owner = (_ptr);
@@ -60,6 +51,16 @@ void WizardBall::initialize()
 	AttackStartDistance = 750.f;
 	UniqueID = EObjUniqueID::EWizardBall;
 	ObjectTag = Tag::monster_attack; 
+
+
+}
+
+void WizardBall::late_initialize(std::weak_ptr<class object> wp_AttackTarget, vec location)
+{
+	this->_transform->_location = std::move(location);
+	this->wp_AttackTarget = std::move(wp_AttackTarget);
+
+	Monster::CardEffect(location, WizardBall::SummonCardImgKey);
 }
 
 void WizardBall::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -111,7 +112,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
-		CurrentHitCoolTime = 0.3f;
+		CurrentHitCoolTime = 0.1f;
 		vec randvec = math::RandVec();
 		randvec.y = (abs(randvec.y));
 		vec v = _transform->_location;
@@ -138,10 +139,13 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
 		StateDuration = 0.2f;
-		CurrentHitCoolTime = 0.3f;
+		CurrentHitCoolTime = 0.1f;
 		RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
-		if(bAttacking)
-		shield::DefenseMsg(_transform->_location);
+		if (bAttacking && !bDef)
+		{
+			bDef = true;
+			shield::DefenseMsg(_transform->_location);
+		}
 	}
 }
 
@@ -307,6 +311,7 @@ bool WizardBall::AttackEnd()
 
 void WizardBall::AttackReady()
 {
+	bDef = false;
 	sound_mgr::instance().Play("BALL_ATTACKMODE",false ,1.f);
 	CurrentColIdx = 0;
 }
@@ -329,9 +334,4 @@ void WizardBall::IdleAction()
 		_transform->Move(_transform->_dir, Speed * DeltaTime);
 		StateDuration += DeltaTime;
 	}
-}
-
-std::shared_ptr<WizardBall> WizardBall::BallCast()
-{
-	return object_mgr::instance().insert_object<WizardBall>();
 }

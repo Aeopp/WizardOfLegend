@@ -13,5 +13,6 @@ public:
 
 	~Scene_Stage()noexcept override;
 private:
+	void TriggerSetUp(std::weak_ptr<class Player> _Player);
 };
 

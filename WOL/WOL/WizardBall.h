@@ -14,8 +14,8 @@ public:
         AttackEnd,
         HIT,
     };
-    static std::shared_ptr<WizardBall> SpawnWithSummonCard(vec location,std::weak_ptr<class object> wp_AttackTarget);
     void initialize()override;
+    void late_initialize(std::weak_ptr<class object> wp_AttackTarget, vec location);
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
     Event update(float dt)override;
     void Hit(std::weak_ptr<object> _target)override;
@@ -35,6 +35,7 @@ public:
     float AttackSpeed;
     float Speed;
     float InitTime = 3.5f;
+    bool bDef = false;
     static inline float AnimDelta = 0.15f;
     vec AttackDir{};
 
@@ -59,6 +60,5 @@ public:
     bool bAttackEnd = false;
     int HP = 200;
 
-    static std::shared_ptr<WizardBall> BallCast();
 };
 

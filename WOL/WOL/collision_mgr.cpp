@@ -272,28 +272,6 @@ void collision_mgr::render(HDC hdc, std::pair<float, float> size_factor)
 					});
 			}
 		}
-		auto DBG = Debuger(hdc, [&]() {std::wstringstream wss;
-		wss << L"렌더링 되는 충돌체 : " << render_object_count << std::endl;
-		RECT _rt{ 1200,300,1600,400 };
-		DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
-		std::wstring wstr = L" 충돌체의 개수 :" + std::to_wstring(comp_count);
-		TextOut(hdc, 1400, 100, wstr.c_str(), wstr.size());
-			});
-
-		if (bDebug)
-		{
-			{
-				std::wstringstream wss;
-				wss << L"충돌검사 범위 안 타일 개수 : " << CollisionTileNum << std::endl;
-				Font(game::hDC, RGB(111, 111, 111), 0, 400, 30, wss.str());
-			}
-			
-			std::wstringstream wss;
-
-			wss << L"충돌검사 범위 안 오브젝트 개수 : " << CollisionObjNum << std::endl;
-			Font(game::hDC, RGB(111, 111, 111), 0, 200, 30, wss.str());
-
-		}
 };
 void collision_mgr::update()
 {
@@ -310,8 +288,9 @@ void collision_mgr::update()
 	collision(EMonsterAttack, EPlayer);
 	collision(EShield, EMonster);
 	collision(EShield,EMonsterAttack);
-
-
+	collision(ETrigger, EPlayer);
+	collision(EPrison, EPlayer);
+	collision(EPrison, EMonster);
 
 	collision_tile(EPlayer);
 	collision_tile(EMonster);

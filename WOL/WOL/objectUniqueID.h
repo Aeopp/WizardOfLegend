@@ -15,6 +15,7 @@ enum class EObjUniqueID : uint32_t
 	BOSS_Pillar,
 	MIDDLE_BOSS,
 	GAIR_ARMOR,
+	Prison,
 	BOSS,
 	Max,
 };

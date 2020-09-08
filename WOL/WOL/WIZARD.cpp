@@ -100,11 +100,9 @@ Event WIZARD::update(float dt)
 
 	if (distance < Attack_distance && !_EnemyInfo.bAttack)
 	{
-		//NormalAttack->Preparation(true);
 
 		_render_component->ChangeAnim(EAnimState::Attack, 2.3f, EAnimState::Attack);
 
-		//sound_mgr::instance().Play("ARCHER_AIM", false, 1.f);
 
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 		// 여기서 공격
@@ -125,10 +123,7 @@ Event WIZARD::update(float dt)
 				_Shadow.CurrentShadowState = EShadowState::BIG;
 				_EnemyInfo.bAttack = false;
 
-				SOUNDPLAY("GET_SKILL", 1.f, false);
 
-				// 사운드 터뜨리기
-				//sound_mgr::instance().Play("WIZARD_CAST", false, 1.f);
 				return true;
 			});
 			
@@ -149,16 +144,12 @@ Event WIZARD::update(float dt)
 			_EnemyInfo.bAttack = true;
 			CurrentBallCoolTime = BallCoolTime;
 
-			vec InitPos = _transform->_location +
-				math::RandVec() * math::Rand<float>({ -100,100 });
-
-			Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
-
-			auto sp_WizBall = WizardBall::BallCast();
-			sp_WizBall->_transform->_location = InitPos;
-			sp_WizBall->wp_AttackTarget = _AttackTarget;
-
-			SOUNDPLAY("GET_SKILL", 1.f, false);
+			for (int i = 0; i < 3; ++i)
+			{
+				vec InitPos = _transform->_location +
+					math::RandVec() * math::Rand<float>({ -400,400});
+				object_mgr::instance().insert_object<WizardBall>(_AttackTarget, InitPos);
+			}
 
 			Timer::instance().event_regist(time_event::EOnce, 2.3f,
 				[&EInfo = _EnemyInfo]() {
@@ -243,6 +234,8 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 
 	if (_EnemyInfo.HP < 0)
 	{
+
+
 		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.8f, EAnimState::Dead);
 		MonsterDie();
 	}

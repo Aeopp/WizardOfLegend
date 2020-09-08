@@ -129,13 +129,27 @@ std::optional<vec> math::rectVSrect(RECT lhs, RECT rhs)
 		if (h < w)
 		{
 			float dir = rhs.bottom - lhs.bottom;
-			dir = dir / abs(dir);
 
+			if (dir == 0)
+			{
+
+				int i = 0;
+			}
+			if(dir!=0)
+			dir = dir / abs(dir);
+			
 			return vec{ 0,h*dir };
 		}
 		if (w < h)
 		{
 			float dir = rhs.right-lhs.right;
+			if (dir == 0)
+			{
+
+				int i = 0;
+			}
+
+			if(dir!=0)
 			dir = dir / abs(dir);
 
 			return vec{ w*dir,0 };

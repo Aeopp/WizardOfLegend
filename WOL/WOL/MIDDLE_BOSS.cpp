@@ -471,28 +471,18 @@ void MIDDLE_BOSS::FireSpawn()
 void MIDDLE_BOSS::BallSpawn(size_t NUM)
 {
 	vec InitDir = math::dir_from_angle(BallSpawnSkillCurrentAngle);
-	        
-
 	vec InitPos = TargetLocation+InitDir * 500.f;
 
-	Monster::CardEffect(InitPos, WizardBall::SummonCardImgKey);
-	auto sp_WizBall = WizardBall::BallCast();
-	sp_WizBall->_transform->_location = InitPos;
-	sp_WizBall->wp_AttackTarget = wp_AttackTarget;
-	sp_WizBall->HP = 50;
+	auto sp_WizBall = object_mgr::instance().insert_object<WizardBall>(wp_AttackTarget , InitPos );
+	if (!sp_WizBall)return;
 
+	sp_WizBall->HP = 50;
 	BallSpawnSkillCurrentAngle += 360.f/NUM;
 }
 
 void MIDDLE_BOSS::BOSS_Skill_ICECrystal(size_t NUM)
 {
 	object_mgr& _object_mgr = object_mgr::instance();
-
-	/*vec TopRight,TopLeft,BottomLeft,BottomRight;
-	TopRight = TopLeft = BottomLeft = BottomRight = vec::unit_diagonal_vec();
-	TopLeft.x *= -1;
-	BottomLeft *= -1;
-	BottomRight.y *= -1;*/
 
 	vec OuterTopRight = vec::unit_diagonal_vec();
 	vec InnerTopRight = OuterTopRight;
@@ -505,10 +495,6 @@ void MIDDLE_BOSS::BOSS_Skill_ICECrystal(size_t NUM)
 	float AttackSpeed = 2000.f;
 
 	float RotationDuration = RotationDurationMin;
-
-	//(vec RotationCenter, float RotationDuration,
-	//	std::weak_ptr<class object> wp_AttackTarget/*Owner*/, float AttackSpeed
-	
 
 	for (int i = 0; i < NUM; ++i)
 	{

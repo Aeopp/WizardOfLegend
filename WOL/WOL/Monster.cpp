@@ -120,11 +120,11 @@ void Monster::MonsterDie()
 {
 
 	bDying = true;
-	
+
 	Timer::instance().event_regist(time_event::EOnce, 0.8,
 		[this]()
 	{
-		bDie = true;
+		this->bDie = true;
 		DieSoundPlay();
 		auto _gold = GoldEffect::MakeGold(_transform->_location.x, 
 										  _transform->_location.y,

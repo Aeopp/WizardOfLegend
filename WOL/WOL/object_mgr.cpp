@@ -91,22 +91,6 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 	}
 
 
-	if (bDebug)
-	{
-		auto [sx, sy] = size_factor;
-
-		std::wstringstream wss;
-		wss << L"드로우 오브젝트 개수 : " << RenderObjCount << std::endl;
-		//RECT _rt{ 900 *sx,100*sy,  1200*sx, 200*sy }; 
-		Font(hdc, RGB(111, 111, 111), 900, 200, 30, wss.str());
-		//DrawText(hdc, wss.str().c_str(), wss.str().size(), &_rt, DT_LEFT);
-		int count = 0;
-		for (auto& [Tag, Object_List] : object_map)
-		{
-			count+=Object_List.size();
-		}
-		helper::TEXTOUT(hdc, 900, 100, L"오브젝트 개수 : ", count);
-	}
 };
 
 void object_mgr::update()

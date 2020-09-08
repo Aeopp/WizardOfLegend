@@ -479,8 +479,6 @@ void Player::player_check(float dt)
 
 	if (_Input.Key_Down(VK_LBUTTON))
 	{
-		SOUNDPLAY("ULT_ON", 1.f, false);
-
 
 		Attack();
 	}

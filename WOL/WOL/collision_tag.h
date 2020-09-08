@@ -16,4 +16,6 @@ enum collision_tag
 	EFireDragon,
 	EPlayerAttack,
 	EMonsterAttack,
+	ETrigger,
+	EPrison,
 };
