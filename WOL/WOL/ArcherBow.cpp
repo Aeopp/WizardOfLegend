@@ -73,7 +73,7 @@ Event ArcherBow::update(float dt)
 void ArcherBow::HitTile(RECT rt)
 {
 	object::HitTile(rt);
-	end();
+	//end();
 };
 
 uint32_t ArcherBow::get_layer_id() const&

@@ -89,6 +89,7 @@ Event BOSS_BOX::update(float dt)
 		vec Dir = Dis.get_normalize();
 		_transform->_dir = Dir;
 		bLaunch = true;
+		RAND_SOUNDPLAY("ROCK_THROW", { 1,2 }, 1.f, false);   
 		auto sp_collision = _collision_component.lock();
 		if (!sp_collision)return Event::None;
 		sp_collision->bCollision = true;

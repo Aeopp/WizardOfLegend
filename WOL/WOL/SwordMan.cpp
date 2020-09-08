@@ -54,7 +54,6 @@ void SwordMan::initialize()
 
 	
 	Attack = { 40,50 };
-	InitTime = 4.7f;
 	
 	InvincibleTime = 0.3f;
 

@@ -49,7 +49,6 @@ void ARCHER::initialize()
 	DefaultHitDuration = 0.15f;
 	EscapeRamainTick = EscapeDuration = 1.3f;
 	_speed = 200.f;
-	InitTime = 4.5f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
@@ -107,7 +106,7 @@ Event ARCHER::update(float dt)
 		NormalAttack->Preparation(true);
 		bArrowLineRender = true;
 
-		_render_component->ChangeAnim(EAnimState::Attack, 2.3f,EAnimState::Attack);
+		_render_component->ChangeAnim(EAnimState::Attack, 1.8f,EAnimState::Attack);
 
 		sound_mgr::instance().Play("ARCHER_AIM", false, 1.f);
 		
@@ -117,7 +116,7 @@ Event ARCHER::update(float dt)
 		// 여기서 공격
 		if (CurrentFireCoolTime < 0)
 		{
-			Timer::instance().event_regist(time_event::EOnce, 2.3f,
+			Timer::instance().event_regist(time_event::EOnce, 1.8f,
 				[&bParticle = NormalAttack,
 				&TargetLoc = sp_Target->_transform->_location,
 				loc = _transform->_location,
@@ -141,7 +140,7 @@ Event ARCHER::update(float dt)
 				return true;
 			});				
 
-			CurrentFireCoolTime = 2.3f;
+			CurrentFireCoolTime = 1.8f;
 
 		}
 		else if (CurrentFireCoolTime > 0)
@@ -165,6 +164,7 @@ Event ARCHER::update(float dt)
 			_transform->_dir = math::rotation_dir_to_add_angle(dir, math::Rand<float>({ -89,89 }));
 			StalkerPosReTargetDuration = 1.5f;
 		}
+
 		_transform->_location += _transform->_dir * dt * _speed;
 		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;

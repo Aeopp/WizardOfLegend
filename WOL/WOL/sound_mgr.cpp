@@ -16,8 +16,6 @@ void sound_mgr::initialize()
 	}
 }
 
-
-
 bool sound_mgr::Play( std::string SoundKey,
 	bool IsBgm, const float Volume) {
 
@@ -34,11 +32,11 @@ bool sound_mgr::Play( std::string SoundKey,
 		iter != std::end(Sounds)) {
 		auto& [System, Sound, Channel] = iter->second;
 		{
-			/*Channel->isPlaying(&isplay);
+			Channel->isPlaying(&isplay);
 
 			if (isplay == true) {
 				Channel->stop();
-			};*/
+			};
 			HR = System->playSound(Sound, nullptr, false,
 				&Channel);
 			Channel->setVolume(Volume == DefaultVolume ? DefaultVolume : Volume);
@@ -131,7 +129,7 @@ bool sound_mgr::Init()
 		// FMOD 시스템 로딩 실패
 		if (F_Result != FMOD_OK)
 			return false;
-		F_Result = FMOD_System->init(100, FMOD_INIT_NORMAL, 0);
+		F_Result = FMOD_System->init(255, FMOD_INIT_NORMAL, 0);
 		if (F_Result != FMOD_OK)
 			return false;
 	}
@@ -141,7 +139,7 @@ bool sound_mgr::Init()
 
 void SOUNDPLAY(const std::string& Key, float Volume, bool IsBgm)
 {
-	sound_mgr::instance().Play(Key, Volume, IsBgm);
+	sound_mgr::instance().Play(Key, IsBgm,Volume);
 }
 
 void RAND_SOUNDPLAY(const std::string& Key, std::pair<uint8_t, uint8_t> Range, float Volume, bool IsBgm)

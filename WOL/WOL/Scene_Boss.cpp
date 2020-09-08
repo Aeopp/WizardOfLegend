@@ -98,7 +98,7 @@ void Scene_Boss::initialize()
 
 			auto Midboss = object_mgr::instance().insert_object<BOSS>();
 
-			Midboss->SetUp(_Player, PlayerSpawnLocation + vec{ 0,-500 });
+			Midboss->SetUp(_Player, PlayerSpawnLocation + vec{ -1000,0 });
 
 			manage_objs.push_back(Midboss);
 		

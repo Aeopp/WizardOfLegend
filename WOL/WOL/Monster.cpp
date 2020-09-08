@@ -65,7 +65,7 @@ void Monster::initialize()
 	_Shadow.world_size_correction = ShadowWorldSizeCorrection;
 	ObjectTag = object::Tag::monster;
 
-	
+	InitTime = 3.5f;
 };
 
 Event Monster::update(float dt)

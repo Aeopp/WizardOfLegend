@@ -48,7 +48,6 @@ void WIZARD::initialize()
 	DefaultHitDuration = 0.15f;
 	EscapeRamainTick = EscapeDuration = 1.3f;
 	_speed = 200.f;
-	InitTime = 4.5f;
 
 	FireImg = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_FIRE");
 

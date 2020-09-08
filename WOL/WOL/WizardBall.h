@@ -34,7 +34,7 @@ public:
     int CurrentColIdx = 0;
     float AttackSpeed;
     float Speed;
-    float InitTime = 4.0f;
+    float InitTime = 3.5f;
     static inline float AnimDelta = 0.15f;
     vec AttackDir{};
 
