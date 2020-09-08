@@ -71,6 +71,7 @@ void SwordMan::initialize()
 
 Event SwordMan::update(float dt)
 {
+	
 	InitTime -= dt;
 	AttackEndRemainTime -= dt;
 	AttackStartTime -= dt;

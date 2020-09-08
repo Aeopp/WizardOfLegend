@@ -352,6 +352,11 @@ bool vec::operator>=(const vec& _rhs) const
 	return vec{ 0.7071067811865475 ,0.7071067811865475 };
 }
 
+ bool vec::isnan(vec Target)
+ {
+	 return std::isnan(Target.x) || std::isnan(Target.y);
+ }
+
 
 std::wostream& operator<<(std::wostream& os, vec _lhs)
 {

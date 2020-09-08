@@ -62,7 +62,7 @@ struct vec
 	static vec unit_diagonal_vec();
 
 
-
+	static bool isnan(vec Target);
 	
 };
 std::wostream& operator<<(std::wostream& os, vec _lhs);
@@ -137,6 +137,8 @@ public:
 static 	float Angle360conversion(float degree);
 
 	static bool RectInPoint(RECT rt, vec p);
+
+	
 public:
 	static float my_lerp(float start, float goal, float goal_time,float dt);
 

@@ -106,9 +106,10 @@ void object_mgr::update()
 			auto sp_Transform = (*obj)->_transform;
 			if (!sp_Transform)continue;
 			vec obj_location = sp_Transform->_location;
-
-
 			Event _event = (*obj)->update(dt);
+
+			//좌표값이 비정상적인 오브젝트 삭제
+			if (vec::isnan(obj_location)) _event = Event::Die;
 
 			switch (_event)
 			{
