@@ -4,9 +4,12 @@ using uint8_t = unsigned char;
 
 enum class ESkill :uint8_t
 {
-	BLAST,
-	ARMOR,
+	Normal,
+	Dash, 
 	FIRE,
+	BLAST,
 	CRYSTAL,
+	ARMOR,
+	BOOMERANG,
 };
 

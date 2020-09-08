@@ -243,6 +243,8 @@
     <ClInclude Include="FMOD32\fmod_output.h" />
     <ClInclude Include="Trigger.h" />
     <ClInclude Include="Prison.h" />
+    <ClInclude Include="UIInventory.h" />
+    <ClInclude Include="UISlot.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -492,6 +494,12 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Prison.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UIInventory.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UISlot.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

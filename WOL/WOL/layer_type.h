@@ -12,6 +12,7 @@ enum layer_type : uint32_t
 	EUI ,
 	EUIButton,
 	EUIInfo,
+	EUIIcon,
 	EUIMouse ,
 	ENone,
 };

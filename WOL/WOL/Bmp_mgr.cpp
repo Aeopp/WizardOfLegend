@@ -99,6 +99,27 @@ void Bmp_mgr::initialize()
 
 	Insert_Bmp(DefaultPath + L"PRISON_VER.bmp", L"PRISON_VER");
 	Insert_Bmp(DefaultPath + L"PRISON_HOR.bmp", L"PRISON_HOR");
+
+	Insert_Bmp(DefaultPath + L"INVENTORY.bmp", L"INVENTORY");
+
+	Insert_Bmp(DefaultPath + L"INVENTORY.bmp", L"INVENTORY");
+
+	Insert_Bmp(DefaultPath + L"ICE_KRYSTAL_ICON.bmp", L"ICE_KRYSTAL_ICON");
+	Insert_Bmp(DefaultPath + L"ICE_BLAST_ICON.bmp", L"ICE_BLAST_ICON");
+	Insert_Bmp(DefaultPath + L"GAIA_ARMOR_ICON.bmp", L"GAIA_ARMOR_ICON");
+	Insert_Bmp(DefaultPath + L"FIRE_DRAGON_ICON.bmp", L"FIRE_DRAGON_ICON");
+
+	Insert_Bmp(DefaultPath + L"NORMAL_ATTACK_EX.bmp", L"NORMAL_ATTACK_EX");
+	Insert_Bmp(DefaultPath + L"ICE_KRYSTAL_EX.bmp", L"ICE_KRYSTAL_EX");
+	Insert_Bmp(DefaultPath + L"ICE_BLAST_EX.bmp", L"ICE_BLAST_EX");
+	Insert_Bmp(DefaultPath + L"GAIA_ARMOR_EX.bmp", L"GAIA_ARMOR_EX");
+	Insert_Bmp(DefaultPath + L"FIRE_DRAGON_EX.bmp", L"FIRE_DRAGON_EX");
+	Insert_Bmp(DefaultPath + L"DASH_EX.bmp", L"DASH_EX");
+
+	Insert_Bmp(DefaultPath + L"SELECT_ICON.bmp", L"SELECT_ICON");
+
+
+	Insert_Bmp(DefaultPath + L"BOOMERANG_SKILLBAR.bmp", L"BOOMERANG_SKILLBAR");
 };
 
 

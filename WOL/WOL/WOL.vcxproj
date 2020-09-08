@@ -251,10 +251,12 @@
     <ClInclude Include="UIGold.h" />
     <ClInclude Include="UIHPBar.h" />
     <ClInclude Include="UIInteraction.h" />
+    <ClInclude Include="UIInventory.h" />
     <ClInclude Include="UISkillIBarIcon.h" />
     <ClInclude Include="UIInfo.h" />
     <ClInclude Include="UIMpBar.h" />
     <ClInclude Include="UISkillBar.h" />
+    <ClInclude Include="UISlot.h" />
     <ClInclude Include="UIStart.h" />
     <ClInclude Include="UI_PlayerBar.h" />
     <ClInclude Include="WIZARD.h" />
@@ -341,10 +343,12 @@
     <ClCompile Include="UIGold.cpp" />
     <ClCompile Include="UIHPBar.cpp" />
     <ClCompile Include="UIInteraction.cpp" />
+    <ClCompile Include="UIInventory.cpp" />
     <ClCompile Include="UISkillIBarIcon.cpp" />
     <ClCompile Include="UIInfo.cpp" />
     <ClCompile Include="UIMpBar.cpp" />
     <ClCompile Include="UISkillBar.cpp" />
+    <ClCompile Include="UISlot.cpp" />
     <ClCompile Include="UIStart.cpp" />
     <ClCompile Include="UI_PlayerBar.cpp" />
     <ClCompile Include="WIZARD.cpp" />

@@ -18,6 +18,9 @@ public:
     std::weak_ptr<collision_component> _collision_component;
     std::weak_ptr<class Camera> _Camera;
     std::weak_ptr<class EffectPlayerAttack> NormalAttack{};
+    std::weak_ptr<class UIInventory> wp_Inventory{};
+
+    bool bInvenControl = false;
 
     void render(HDC hdc, vec camera_pos, vec size_factor)override;
     void initialize()override;
@@ -63,6 +66,7 @@ private:
     void temp(float temp);
     void InputDirSpriteChange(vec Dir);
 
+    void BindingSkillCheckCast(int SlotIdx);
     void player_check(float dt);
 
     void MakeShield();

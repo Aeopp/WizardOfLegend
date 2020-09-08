@@ -31,11 +31,10 @@
 #include "ScrewBoomerang.h"
 #include "helper.h"
 #include "BOTTOM_HOLE.h"
+#include "UIInventory.h"
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-
-
 
 	actor::render(hdc, camera_pos, size_factor);
 	
@@ -143,6 +142,9 @@ void Player::initialize()
 	ObjectTag = object::Tag::player;
 
 	CurrentInvincibletime = DefaultInvincibletime = 0.3f;
+
+
+	wp_Inventory = object_mgr::instance().insert_object<UIInventory>();
 };
 
 Event Player::update(float dt)
@@ -461,9 +463,59 @@ void Player::Camera_Shake(float force,vec dir,float duration)
 	Cam->camera_shake(force, dir ,duration);
 };
 
+void Player::BindingSkillCheckCast(int SlotIdx)
+{
+	if (!UIInventory::SlotInfoMap[SlotIdx].bAcquire)return;
+
+	ESkill _Skill = UIInventory::SlotInfoMap[SlotIdx]._Skill;
+
+	switch (_Skill)
+	{
+	case ESkill::Normal:
+		break;
+	case ESkill::Dash:
+		break;
+	case ESkill::FIRE:
+		SkillRotBoomerang();
+
+		break;
+	case ESkill::BLAST:
+		ICE_BLAST(8);
+		break;
+	case ESkill::CRYSTAL:
+		if (_player_info->GetMP() >= _player_info->max_mp){
+			SkillUlti();
+		}
+		else{
+			SkillIceCrystal(3);
+		}
+		break;
+	case ESkill::ARMOR:
+		MakeShield();
+		break;
+	case ESkill::BOOMERANG:
+		break;
+	default:
+		break;
+	}
+}
+
 void Player::player_check(float dt)
 {
 	Input_mgr& _Input = Input_mgr::instance();
+	auto sp_Inven = wp_Inventory.lock();
+
+	if (_Input.Key_Down('I'))
+	{
+		if (sp_Inven)
+		{
+			bInvenControl = sp_Inven->bInventoryOpen = !sp_Inven->bInventoryOpen;
+		}
+	}
+
+	if (bInvenControl)return;
+
+	
 
 	_player_info->bIdle = true;
 
@@ -471,41 +523,32 @@ void Player::player_check(float dt)
 
 	Player_Move(dt);
 
+
 	if (_Input.Key_Down('Q'))
 	{
-
-		ICE_BLAST(8);
+		BindingSkillCheckCast(3);
 	}
 
 	if (_Input.Key_Down(VK_LBUTTON))
 	{
 
-		Attack();
+	   Attack();
 	}
 
 	if (_Input.Key_Down(VK_RBUTTON)) 
 	{
-		SkillRotBoomerang();
+		BindingSkillCheckCast(2);
+
 	}
 
 	if (_Input.Key_Down('R'))
 	{
-
-		MakeShield();
+		BindingSkillCheckCast(5);
 	}
 
 	if (_Input.Key_Down('E'))
 	{
-
-		if (_player_info->GetMP() >= _player_info->max_mp)
-			
-		{
-			SkillUlti();
-		}
-		else
-		{
-			SkillIceCrystal(3);
-		}
+		BindingSkillCheckCast(4);
 	}
 
 	//if (_Input.Key_Down('Z')) {
@@ -1110,30 +1153,31 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 	std::shared_ptr< UISkillIBarIcon> USBI{};
 
 	switch (_eSkill)
+
 	{
 	case ESkill::FIRE:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 202,838 }, L"FIRE_DRAGON_SKILLBAR.bmp");
-		USBI->Current = &_player_info->SkillCurrentBoomerangNum;
-		USBI->Max = &_player_info->SkillBoomerangMaxNum;
+		USBI->wp_PlayerInfo = _player_info;
+		USBI->CurrentSlotIdx = 2;
 		break;
 	case ESkill::BLAST:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 259,838 }, L"ICE_BLAST_SKILLBAR.bmp");
-		USBI->Current = &_player_info->SkillCurrentICEBlastCoolTime;
-		USBI->Max = &_player_info->SkillICEBlastCoolTime;
+		USBI->wp_PlayerInfo = _player_info;
+		USBI->CurrentSlotIdx = 3;
 		break;
 	case ESkill::CRYSTAL:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 315,838 }, L"ICE_KRYSTAL_SKILLBAR.bmp");
-		USBI->Current = &_player_info->SkillCurrentICECrystalCoolTime;
-		USBI->Max = &_player_info->SkillICECrystalCoolTime;
+		USBI->wp_PlayerInfo = _player_info;
+		USBI->CurrentSlotIdx = 4;
 		break;
 	case ESkill::ARMOR:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
 			vec{ 315 + 57,838 }, L"GAIA_ARMOR_SKILLBAR.bmp");
-		USBI->Current = &_player_info->SkillCurrentShieldCoolTime;
-		USBI->Max     =	&_player_info->SkillShieldCoolTime;
+		USBI->wp_PlayerInfo = _player_info;
+		USBI->CurrentSlotIdx = 5;
 		break;
 	default:
 		break;

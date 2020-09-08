@@ -31,6 +31,7 @@ Event UIInteraction::update(float dt)
 				SoundTick = 0.2f;
 				SOUNDPLAY("CLICK_MENU", 1.f, false);
 			}
+
 			Click(*pos);
 		}
 		else

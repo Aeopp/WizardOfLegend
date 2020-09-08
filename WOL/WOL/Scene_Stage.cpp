@@ -159,13 +159,15 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 {
 	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
 
-	auto StartEvent = [_Trigger,_Player]() {
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	auto StartEvent = [wp_Trigger,_Player]() {
 
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 1.f, Prison::EType::Hor,
-			_Trigger, { 100,100 }, vec{ 1350,2450 });
+			wp_Trigger, { 100,100 }, vec{ 1350,2450 });
 
 		auto _Archer = object_mgr::instance().insert_object<ARCHER>(_Player,
 			vec{ 1000,2000 });
@@ -184,7 +186,7 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 
 	auto Event_1 = [_Player]()
 	{
-		std::vector< std::weak_ptr<class object>  > ReturnObjects;
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
 
 		auto _Archer = object_mgr::instance().insert_object<ARCHER>(_Player,
 			vec{ 1000,2000 });
@@ -226,7 +228,6 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 
 	_Trigger->SetUp({ 200,200 }, vec{ 1350,2450}, std::move(StartEvent),
 		[]() {}, std::move(EventQ  ) );
-
 
 	manage_objs.push_back(_Trigger);
 }

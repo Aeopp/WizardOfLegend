@@ -157,6 +157,11 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //        이 함수를 통해 인스턴스 핸들을 전역 변수에 저장하고
 //        주 프로그램 창을 만든 다음 표시합니다.
 //
+#ifdef _DEBUG
+#define new new(_CLIENT_BLOCK,__FILE__,__LINE__)
+#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK,__FILE__,__LINE__)
+#endif  // _DEBUG
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.

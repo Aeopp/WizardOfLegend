@@ -57,8 +57,6 @@ void UIStart::render(HDC hdc, vec camera_pos, vec size_factor)
 	auto omv = _Input.GetWindowMousePos();
 
 	POINT pt = make_pt(omv->x, omv->y);
-	
-	std::wstringstream wss;
 }
 
 void UIStart::OnMouse(const vec hit_pos)

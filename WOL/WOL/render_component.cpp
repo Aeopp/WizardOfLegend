@@ -3,6 +3,7 @@
 #include "Bmp.h"
 #include "Bmp_mgr.h"
 #include "game.h"
+#include <algorithm>
 
 render_component::~render_component() noexcept
 {
@@ -23,6 +24,7 @@ std::shared_ptr<render_component> render_component::LoadRenderComponent_SP(const
 
 void render_component::LoadBmp(const std::wstring& _filename, const std::wstring& ImageKey)
 {
+	
 	wp_Image = Bmp_mgr::instance().Insert_Bmp(_filename, ImageKey);
 };
 

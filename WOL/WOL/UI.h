@@ -10,6 +10,7 @@ public :
     uint32_t get_layer_id()const& override;
     
     bool bOnMouse = false;
+    float Scale = 1;
 
     std::shared_ptr<class render_component> _render_component;
 };
