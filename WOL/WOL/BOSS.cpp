@@ -83,7 +83,7 @@ void BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 2000;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 1800;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
@@ -591,7 +591,6 @@ void BOSS::DieAction()
 	sp_wp_UIBossName->bDie = true;
 
 	SOUNDPLAY("WIN", 1.f, false);
-
 }
 
 

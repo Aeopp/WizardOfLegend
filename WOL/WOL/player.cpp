@@ -110,7 +110,7 @@ void Player::initialize()
 
 	_speed = 400.f;
 
-	_Shadow.correction = { +3,(PaintSizeY * 0.47) /2.f };
+	_Shadow.correction = { +0,(PaintSizeY * 0.55) /2.f };
 	_Shadow.world_size_correction = { 10,0 };
 
 
@@ -510,6 +510,10 @@ void Player::player_check(float dt)
 		if (sp_Inven)
 		{
 			bInvenControl = sp_Inven->bInventoryOpen = !sp_Inven->bInventoryOpen;
+			if (bInvenControl)
+				SOUNDPLAY("OPEN_INVENTORY");
+			else
+				SOUNDPLAY("CLOSE_INVENTORY");
 		}
 	}
 
@@ -1390,9 +1394,9 @@ void Player::Player_Move(float dt)
 
 	
 
-	if (_player_info->bMove = true)
+	if (_player_info->bMove)
 	{
-		//sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
+		sound_mgr::instance().RandSoundKeyPlay("RUN", { 1,4 }, 1.f);
 	}
 }
 

@@ -120,6 +120,17 @@ void Bmp_mgr::initialize()
 
 
 	Insert_Bmp(DefaultPath + L"BOOMERANG_SKILLBAR.bmp", L"BOOMERANG_SKILLBAR");
+
+	Insert_Bmp(DefaultPath + L"ICE_KRYSTAL_CARD.bmp", L"ICE_KRYSTAL_CARD");
+	Insert_Bmp(DefaultPath + L"ICE_BLAST_CARD.bmp", L"ICE_BLAST_CARD");
+	Insert_Bmp(DefaultPath + L"FIRE_DRAGON_CARD.bmp", L"FIRE_DRAGON_CARD");
+
+	Insert_Bmp(DefaultPath + L"GAIA_ARMOR_CARD.bmp", L"GAIA_ARMOR_CARD");
+	Insert_Bmp(DefaultPath + L"SHOP_TABLE.bmp", L"SHOP_TABLE");
+	Insert_Bmp(DefaultPath + L"ITEMSHOP_NPC.bmp", L"ITEMSHOP_NPC");
+	Insert_Bmp(DefaultPath + L"POTION.bmp", L"POTION");
+
+
 };
 
 

@@ -18,4 +18,5 @@ enum collision_tag
 	EMonsterAttack,
 	ETrigger,
 	EPrison,
+	EArcana,
 };

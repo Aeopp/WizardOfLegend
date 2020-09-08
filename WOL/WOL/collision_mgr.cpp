@@ -291,6 +291,7 @@ void collision_mgr::update()
 	collision(ETrigger, EPlayer);
 	collision(EPrison, EPlayer);
 	collision(EPrison, EMonster);
+	collision(EArcana, EPlayer);
 
 	collision_tile(EPlayer);
 	collision_tile(EMonster);

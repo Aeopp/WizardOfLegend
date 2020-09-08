@@ -245,6 +245,9 @@
     <ClInclude Include="Prison.h" />
     <ClInclude Include="UIInventory.h" />
     <ClInclude Include="UISlot.h" />
+    <ClInclude Include="ArcanaCard.h" />
+    <ClInclude Include="NPC.h" />
+    <ClInclude Include="UIItem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -500,6 +503,15 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="UISlot.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="ArcanaCard.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="UIItem.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

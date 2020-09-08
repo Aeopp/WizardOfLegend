@@ -23,6 +23,15 @@
 #include "sound_mgr.h"
 #include "WizardBall.h"
 #include "Prison.h"
+#include "ArcanaCard.h"
+#include "NPC.h"
+#include "UIItem.h"
+#include "player_info.h"
+#include "UIInventory.h"
+
+
+
+
 
 
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
@@ -108,10 +117,83 @@ void Scene_Stage::initialize()
 		_camera->_owner = _Player;
 
 		obj_mgr._Camera = _camera;
-	
 
+
+		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+			+ vec{ 200,0 }, ESkill::BLAST, L"ICE_BLAST_CARD");
+
+		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+			+ vec{ -200,0 }, ESkill::FIRE, L"FIRE_DRAGON_CARD");
+
+		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+			+ vec{  0 ,-200 }, ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
+
+
+		auto _Npc = obj_mgr.insert_object<NPC>();
+		_Npc->SetUp(vec{ 2800,150 } );
+
+		std::weak_ptr wp_Player = _Player;
+
+		auto _Potion= obj_mgr.insert_object<UIItem>();
+		_Potion->SetUp({ 2650,340 }, L"POTION", { 106,155 },
+			[wp_Player]() {
+				auto sp_Player = wp_Player.lock();
+				if (!sp_Player) return false;
+				if (!sp_Player->_player_info)return false;
+				if (sp_Player->_player_info->gold < 100)return false;
+
+				sp_Player->_player_info->AddHp(sp_Player->_player_info->max_hp);
+				sp_Player->_player_info->AddGold(-100);
+
+				std::wstring str = L"-";
+				str += std::to_wstring(100);
+				
+				vec randvec = math::RandVec();
+				randvec.y = (abs(randvec.y));
+				object_mgr::instance().TextEffectMap[RGB(223, 207, 0)].
+					push_back({ sp_Player->_transform->_location,randvec,
+					   1.f,100,str });
+				return true;
+			});
+
+		auto _ArmorItem = obj_mgr.insert_object<UIItem>();
+		_ArmorItem->SetUp({ 2850,340 }, L"GAIA_ARMOR_CARD", { 106,172 },
+			[wp_Player]() {
+				auto sp_Player = wp_Player.lock();
+				if (!sp_Player) return false;
+				if (!sp_Player->_player_info)return false;
+				if (sp_Player->_player_info->gold < 150)return false;
+
+				sp_Player->_player_info->AddGold(-150);
+
+				std::wstring str = L"-";
+				str += std::to_wstring(150);
+
+				vec randvec = math::RandVec();
+				randvec.y = (abs(randvec.y));
+				object_mgr::instance().TextEffectMap[RGB(223, 207, 0)].
+					push_back({ sp_Player->_transform->_location,randvec,
+					   1.f,150,str });
+
+				auto iter = std::find_if(std::begin(UIInventory::SlotInfoMap),
+					std::end(UIInventory::SlotInfoMap),
+					[](auto& _KeySlot) {
+						return _KeySlot.second._Skill == ESkill::ARMOR ; 
+					});
+
+				if (iter != std::end(UIInventory::SlotInfoMap))
+				{
+					iter->second.bAcquire = true;
+					return true;
+				}
+
+				return false; 
+			});
 
 		TriggerSetUp(_Player);
+
+		// 로케이션 스킬 이미지키
+
 
 		//auto archer = object_mgr::instance().insert_object<WizardBall>
 		//	(_Player, vec{ 100,100 });
