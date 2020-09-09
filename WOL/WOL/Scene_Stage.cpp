@@ -99,7 +99,7 @@ void Scene_Stage::initialize()
 
 
 		sound_mgr::instance().Stop("MAIN_MENU_BGM");
-		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
+		SOUNDPLAY("DUNGEON_BGM", 0.5f, true);
 
 
 

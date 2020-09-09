@@ -479,8 +479,7 @@ void Player::BindingSkillCheckCast(int SlotIdx)
 	case ESkill::Dash:
 		break;
 	case ESkill::FIRE:
-		SkillRotBoomerang();
-
+		SkillFireDragon();
 		break;
 	case ESkill::BLAST:
 		ICE_BLAST(8);
@@ -508,7 +507,7 @@ void Player::player_check(float dt)
 	Input_mgr& _Input = Input_mgr::instance();
 	auto sp_Inven = wp_Inventory.lock();
 
-	if (_Input.Key_Down('I'))
+	if (_Input.Key_Down('N'))
 	{
 		if (sp_Inven)
 		{
@@ -545,7 +544,6 @@ void Player::player_check(float dt)
 	if (_Input.Key_Down(VK_RBUTTON)) 
 	{
 		BindingSkillCheckCast(2);
-
 	}
 
 	if (_Input.Key_Down('R'))
@@ -557,7 +555,10 @@ void Player::player_check(float dt)
 	{
 		BindingSkillCheckCast(4);
 	}
-
+	if (_Input.Key_Down('Z'))
+	{
+		SkillRotBoomerang();
+	}
 	//if (_Input.Key_Down('Z')) {
 	//	SkillBoomerang();
 	//}
@@ -721,7 +722,9 @@ void Player::SkillFireDragon()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-	static int UpDown = 1;
+	if (_player_info->SkillCurrentBoomerangNum < 1.f)return;
+	_player_info->SkillCurrentBoomerangNum -= 1;
+	
 
 	 auto mp  =  Input_mgr::instance().GetWorldMousePos(); 
 	 if (!mp)return;
@@ -731,21 +734,19 @@ void Player::SkillFireDragon()
 	auto _Fire = object_mgr::instance().insert_object<FireDragon>();
 
 	if (!_Fire)return;
+	float FireDragonInitDistance = 100;
+	vec dis = *Input_mgr::instance().GetWorldMousePos() - _transform->_location;
+	vec Dir = dis.get_normalize(); 
 
-	_Fire->_transform->_location = _transform->_location + (FireDir * FireInitDistance);
-	_Fire->rotation_center = _transform->_location + (FireDir * FireInitDistance);
-	_Fire->_transform->_dir = FireDir;
-	_Fire->rotation_center_dir = FireDir;
-	_Fire->Cross = math::rotation_dir_to_add_angle(FireDir, 90.f);
-	_Fire->Updown = UpDown;
+	_Fire->SetUp(_transform->_location + Dir* FireDragonInitDistance, Dir );
+	int UpDown =_Fire->MyFactor;
+
 	_player_info->bIdle = false;
 
 	Anim& MyAnim = _render_component->_Anim;
 	_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 
 	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
-
-	vec dis = *Input_mgr::instance().GetWorldMousePos() - _transform->_location;
 
 	math::EDir _Dir = math::checkDir(dis.get_normalize());
 
@@ -777,9 +778,7 @@ void Player::SkillFireDragon()
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
 	Camera_Shake(5, dir, 0.25f);
 
-	UpDown *= -1;
-
-	//_player_info->AddMp(-25);
+	_player_info->AddMp(-25);
 }
 
 void Player::MultiBoomerang(int Num)

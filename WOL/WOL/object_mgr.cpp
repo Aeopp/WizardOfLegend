@@ -154,6 +154,7 @@ void object_mgr::UIEffectRender(HDC hdc, vec camera_pos, std::pair<float, float>
 	{
 		for (auto& obj : object_map[i])
 		{
+			if (!obj)continue;
 			if (!obj->_transform)continue;
 
 			if (obj->get_layer_id() == layer_type::EEffect)

@@ -19,6 +19,7 @@
 #include "Camera.h"
 #include "Tile_mgr.h"
 #include "Monster.h"
+#include "ArcanaCard.h"
 
 Scene_Boss::~Scene_Boss() noexcept
 {
@@ -101,6 +102,18 @@ void Scene_Boss::initialize()
 
 			manage_objs.push_back(Midboss);
 		
+
+			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+				+ vec{ 200,0 }, ESkill::BLAST, L"ICE_BLAST_CARD");
+
+			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+				+ vec{ -200,0 }, ESkill::FIRE, L"FIRE_DRAGON_CARD");
+
+			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+				+ vec{ 0 ,-200 }, ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
+
+			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+				+ vec{ 0 ,+200 }, ESkill::ARMOR, L"GAIR_ARMOR_CARD");
 
 	/*	for (int i = 0; i < 100; ++i)
 		{

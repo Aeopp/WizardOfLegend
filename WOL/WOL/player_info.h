@@ -40,8 +40,7 @@ struct player_info
 	float SkillCurrentShieldCoolTime = SkillShieldCoolTime;
 	float SkillCurrentBoomerangNum = SkillBoomerangMaxNum;
 
-	float SkillFireDragonMotionDuration = 0.4f;
-
+	float SkillFireDragonMotionDuration = 0.2f;
 
 	float MpRegenerationAtSec = 30.f;
 	float HpRegenerationAtSec=50.f;

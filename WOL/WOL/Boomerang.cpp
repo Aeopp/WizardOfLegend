@@ -21,10 +21,10 @@ void Boomerang::initialize()
 	if (!sp_collision)return;
 
 
-	Duration = 30.f;
+	Duration = 10.f;
 
-	ScaleX = 0.6f;
-	ScaleY = 0.6f;
+	ScaleX = 0.5f;
+	ScaleY = 0.5f;
 
 	PaintSizeX = 200;
 	PaintSizeY = 200;
@@ -103,65 +103,6 @@ void Boomerang::render(HDC hdc, vec camera_pos, vec size_factor)
 	, RGB(255, 0, 255));
 
 	BitBlt(hPlgDC, 0, 0, PaintSizeX, PaintSizeY, hResetDC, 0, 0, SRCCOPY);
-
-	//auto sp_Image = wp_Image.lock();
-	//if (!sp_Image)return;
-
-	//const vec& dl = Dest_Loc;
-	//const vec& ps = Dest_Paint_Size;
-
-	//RECT CullingRect{ dl.x,dl.y,ps.x + dl.x,ps.y + dl.y };
-	//RECT _rt = game::instance().client_rect;
-
-	//if (bDebug)
-	//{
-	//	static DWORD CurTime = GetTickCount();
-	//	static int CullingObj = 0;
-	//	static int RenderObj = 0;
-	//	if (CurTime + 1000 < GetTickCount())
-	//	{
-	//		CurTime = GetTickCount();
-	//		game::instance().debug_cul_obj_setup(CullingObj, RenderObj);
-	//		CullingObj = 0;
-	//		RenderObj = 0;
-	//	}
-
-	//	if (!math::rectVSrect(CullingRect, _rt))
-	//	{
-	//		++CullingObj;
-	//		return;
-	//	}
-	//	else
-	//		++RenderObj;
-	//}
-	//_Anim.update();
-
-	//HDC _BDC = sp_Image->Get_MemDC();
-
-	//const RECT& s = _Img_src;
-	//const vec& ds = Default_Src_Paint_Size;
-
-	//switch (_RenderDesc)
-	//{
-	//case Transparent:
-	//	GdiTransparentBlt(CurrentHdc
-	//		, dl.x, dl.y
-	//		, ps.x, ps.y
-	//		, _BDC
-	//		, s.left + _Anim.ColIndex * ds.x, s.top + _Anim.RowIndex * ds.y
-	//		, s.right, s.bottom
-	//		, _ColorKey);
-	//	break;
-	//default:
-	//	break;
-	//}
-
-	/*if (_render_component->_Anim.ColIndex >= 3)
-	{
-		_render_component->_Anim.ColIndex = 3;
-	}	*/
-	
-		// 컬럼 이 4번을 넘어가면 컬럼 고정시켜주자
 }
 
 uint32_t Boomerang::get_layer_id() const&
@@ -179,7 +120,7 @@ void Boomerang::HitTile(RECT TileRt)
 {
 	actor::HitTile(TileRt);
 
-	vec dir = _transform->_dir;
+ 	vec dir = _transform->_dir;
 	dir *= -1;
 
 	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);

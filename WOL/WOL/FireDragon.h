@@ -1,71 +1,65 @@
 #pragma once
-#include "actor.h"
 #include <unordered_map>
 #include <queue>
+#include "object.h"
 
-struct Fire
+
+class FireDragon : public object 
 {
-		int col;
-		int row;
+public:	
+	  void initialize()override;
+	  Event update(float dt)override;
+	  std::weak_ptr<class collision_component>  _collision_component;
+	  uint32_t get_layer_id()const& override;
+	  void render(HDC hdc, vec camera_pos, vec size_factor)override;
+	  void HitTile(RECT TileRt)override;
+
+	  void SetUp(vec Location,vec Dir);
+public:
+	bool bWallHited = false;
+	std::shared_ptr<class Bmp> sp_DragonImg;
+	std::shared_ptr<class Bmp> sp_ParticleImg;
+	static inline float factor = 1.f;
+	  float Duration;
+	  int PaintSizeX;
+	  int PaintSizeY;
+	  float Speed;
+	  float Scale; 
+	  float P_Scale;
+
+	  int ColIdx;
+	  int RowIdx;
+	  float RotationSpeed;
+	  float CurrentAngle; 
+	  float AngleMax;
+	  float AngleMin;
+	  float MyFactor;
+	  float ParticleLocationUpdateDelta = 0.02f;
+	  float ParticleDelta = ParticleLocationUpdateDelta; 
+	  float ParticelAnimDelta = 0.035f;
+
+	  int ParticleMaxNum;
+
+	  std::deque<std::tuple<vec,int,int,float>> ParticleLocationDQ;
+private:
+	void CalcSpriteFromAngle();
+	/// <summary>
+	/// first left second right
+    //  key is 360Angle Divide by 19 value is FireDragon Sprite ColIdx
+	/// </summary>
+	std::pair<std::map<uint32_t, uint32_t>, std::map<uint32_t, uint32_t>> SpriteAngleColMap
+	{
+		{
+			{7,0},{6,1},{5,2},{4,3},{8,7},
+			{9,8},{10,9},{11,10},{12,11},
+			{13,12},{14,13},{15,14},
+			{16,15},{17,16},{18,17},{19,18}
+		},
+		{
+			{0,9},{19,9 } ,{1,10},{2,11},{3,12},
+		    {4,13},{5,14},{6,15},{18,8},
+		    {17,7},{16,6},{15,5},{14,4},{13,3},
+		    {12,6},{11,5},{10,4},{20,11}
+		}
+	};
 };
-class FireDragon :
-    public actor
-{
-public:
-	static inline std::unordered_map<int32_t, int>LeftDirSpriteTable
-	{ {9,0},{8,1},{7,2},{6,3},{7,4},
-	{8,5},{9,6},{10,7},{11,8},
-	{12,9},{13,10},{14,11},{15,12},{16,13},{17,14},{18,15},{19,16},{20,17},{21,18} };
-	// 360도 degree 기준 각도를 15도로 나눈것이 키 값이 스프라이트 인덱스
-	static inline std::unordered_map<int32_t, int>RightDirSpriteTable
-	{ {0,9},{1,10},{2,11},{3,12},{4,13},{5,14},{6,15},{7,15} ,
-	{15,0},{16,1},{17,2},{18,3},{19,4},{20,5},{21,6},{22,7},{23,8} };
-public:
-	void initialize()override;
-	void render(HDC hdc, vec camera_pos, vec size_factor)override;
-	Event update(float dt)override;
-	uint32_t get_layer_id()const& override;
-	std::weak_ptr<class collision_component>  _collision_component;
-	void Hit(std::weak_ptr<class object> _target)override;
-	void HitTile(RECT rt)override;
-public:
-	void LaunchSoundPlay();
-	void DieSoundPlay();
-	void WallHitSoundPlay();
-
-	// 직선의 중심점
-	vec rotation_center{};
-	// 직선 방향
-	vec rotation_center_dir{};
-	// 현재 바라보는 방향
-	vec rot_dir;
-
-	// 직선에서 90도 회전된 직선
-	vec Cross;
-
-	float UpdownDistance{};
-
-	// 각이 회전하는 속도 /s
-	float amplitudeSpeed = 45.f;
-	float amplitude = 70.f;
-	float ParticleBetWeen;
-	float ParticlePaintScale{};
-
-	vec particlePaintSize{};
-	int CurrentParticleIndex = 0;
-	float DefaultParticleDelta = 0.1f;
-	float ParticleDelta = DefaultParticleDelta;
-	int ParticleNum = 8;
-	std::deque<Fire> ParticleRender{};
-
-	std::weak_ptr<class Bmp> FireParticle{};
-
-	float CurrentAngle = 0.f;
-	
-	int Updown = 1;
-	float factor = 1.f;
-	float Tick{};
-	float Duration{};
-	float Scale{};
-};
-

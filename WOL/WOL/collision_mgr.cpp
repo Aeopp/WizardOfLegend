@@ -284,7 +284,7 @@ void collision_mgr::update()
 	//collision(EMonster, EPlayer);
 	collision(EPlayerAttack, EMonster);
 	collision(EPlayerAttack, EMonsterAttack);
-	collision(EFireDragon, EMonster);
+
 	collision(EMonsterAttack, EPlayer);
 	collision(EShield, EMonster);
 	collision(EShield,EMonsterAttack);
@@ -295,10 +295,8 @@ void collision_mgr::update()
 
 	collision_tile(EPlayer);
 	collision_tile(EMonster);
-	collision_tile(EFireDragon);
 	collision_tile(EPlayerAttack);
 	collision_tile(EMonsterAttack);
-
 	check_erase();
 }
 void collision_mgr::release()
