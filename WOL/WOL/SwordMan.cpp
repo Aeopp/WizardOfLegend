@@ -234,6 +234,8 @@ void SwordMan::Hit(std::weak_ptr<object>
 		_render_component->ChangeAnim(EAnimState::Dead, 0.95, EAnimState::Dead);
 		Monster::MonsterDie();
 	};
+
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
 }
 void SwordMan::render(HDC hdc, vec camera_pos, vec size_factor)
 {

@@ -38,3 +38,8 @@ float player_info::GetMP()
 {
 	return mp;
 }
+
+void player_info::SignatureGaugeAdd(float Damage)
+{
+	AddMp(Damage * 1.f);
+}

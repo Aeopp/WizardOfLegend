@@ -25,6 +25,12 @@
 #include "SwordMan.h"
 #include "WIZARD.h"
 #include "HomingBlast.h"
+#include "BossFireDragon.h"
+#include "RotationBoomerang.h"
+#include "BossBoomerang.h"
+#include "Input_mgr.h"
+#include "Monster.h"
+#include "Boss_Blast.h"
 
 
 MIDDLE_BOSS::~MIDDLE_BOSS() noexcept
@@ -99,9 +105,6 @@ void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
 
-	MoveToEx(hdc, _transform->_location.x, _transform->_location.y, nullptr);
-	LineTo(hdc, wp_AttackTarget.lock()->_transform->_location.x, wp_AttackTarget.lock()->_transform->_location.y);
-
 	auto sp_Bmp = AnimDirSpriteUpdate();
 	if (!sp_Bmp)return;
 
@@ -174,6 +177,10 @@ void MIDDLE_BOSS::Hit(std::weak_ptr<object> _target)
 			DieAction(); 
 		}
 	};
+
+
+
+
 }
 
 void MIDDLE_BOSS::SetUp(std::weak_ptr<class object> AttackTarget, vec Location)
@@ -201,7 +208,7 @@ void MIDDLE_BOSS::HitCalc(std::pair<int,int> AttackRange)
 	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
 	push_back({ MyLocation ,vec{0,1}*3,
 	1.f,int(Atk),std::to_wstring((int)Atk) });
-
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
 	sp_MyInfo->CurrentHP -= Atk;
 
 	if (sp_MyInfo->CurrentHP < 0)
@@ -246,14 +253,17 @@ void MIDDLE_BOSS::AttackStart()
 	case MIDDLE_BOSS::EPattern::FIRE:
 		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_Skill_Fire, this);
 		break;
-	case MIDDLE_BOSS::EPattern::BALLSPAWN:
-		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_BallSpawn, this);
+	case MIDDLE_BOSS::EPattern::BLAST:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_Blast, this);
 		break;
 	case MIDDLE_BOSS::EPattern::CRYSTAL:
 		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_Skill_ICECrystal, this, 3);
 		break;
-	case MIDDLE_BOSS::EPattern::BLAST:
-		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_ICEBlast, this);
+	case MIDDLE_BOSS::EPattern::BOOMERANG:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_Boomerang, this,4);
+		break;
+	case MIDDLE_BOSS::EPattern::FIRE_DRAGON:
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_FireDragon, this ,  8);
 		break;
 	default:
 		break;
@@ -431,8 +441,6 @@ void MIDDLE_BOSS::BOSS_Skill_Fire()
 	Timer::instance().event_regist_ReWhileDelta(8.f, 0.1f, &MIDDLE_BOSS::FireSpawn, this);
 }
 
-
-
 void MIDDLE_BOSS::BOSS_SKill_BallSpawn()
 {
 	auto sp_Target = wp_AttackTarget.lock();
@@ -442,7 +450,7 @@ void MIDDLE_BOSS::BOSS_SKill_BallSpawn()
 	Timer::instance().event_regist_ReWhileDelta(2.f, 2.f/7,&MIDDLE_BOSS::BallSpawn,this,7);
 }
 
-void MIDDLE_BOSS::BOSS_SKill_ICEBlast()
+void MIDDLE_BOSS::BOSS_SKill_HomingBlast()
 {
 	BlastSpawn(4);
 }
@@ -516,6 +524,159 @@ void MIDDLE_BOSS::BOSS_Skill_ICECrystal(size_t NUM)
 	};
 }
 
+void MIDDLE_BOSS::BOSS_SKill_FireDragon(size_t NUM)
+{
+	if (!_transform)return;
+
+	float InitDistance = 100.f;
+	float SpawnBetWeenAngle = 360.f / NUM;
+	vec MyLocation = _transform->_location;
+
+	std::shared_ptr<vec> _vec = std::make_shared<vec>(math::dir_from_angle(0));
+
+	Timer::instance().event_regist_ReWhileDelta(6.f, 0.33f,[=]() {
+		vec SpawnDirFromBoss = *_vec;
+		for (size_t i = 0; i < NUM; ++i)
+		{
+			auto _FD = object_mgr::instance().insert_object<BossFireDragon>();
+			if (!_FD)return;
+
+			vec SpawnLocation = MyLocation + SpawnDirFromBoss * InitDistance;
+			_FD->SetUp(SpawnLocation, SpawnDirFromBoss);
+
+			SpawnDirFromBoss =
+				math::rotation_dir_to_add_angle(SpawnDirFromBoss,
+					SpawnBetWeenAngle);
+		}
+		*_vec = math::rotation_dir_to_add_angle(*_vec, SpawnBetWeenAngle/2);
+	});
+}
+
+void MIDDLE_BOSS::BOSS_SKill_Boomerang(size_t NUM)
+{
+	if (!_transform)return;
+	auto sp_Target =wp_AttackTarget.lock();
+	if (!sp_Target)return;
+	vec MyLocation = _transform->_location;
+	vec InitDis = sp_Target->_transform->_location - MyLocation;
+	vec InitDir = InitDis.get_normalize();
+
+	float InitInstanceBetWeenAngle = 90.f / NUM;
+	float Boomerang_Init_Distance = 10.f;
+
+	Timer::instance().event_regist_ReWhileDelta(3.f, 1.f, [=]() {
+		Timer::instance().event_regist_ReWhileDelta(1.0f, 0.3f, [=]() {
+			for (int i = 0; i < NUM; ++i)
+			{
+				vec CurrentInitDir = math::rotation_dir_to_add_angle(InitDir,
+					InitInstanceBetWeenAngle * i);
+				auto sp_Boo = object_mgr::instance().insert_object<BossBoomerang>();
+
+				if (!sp_Boo)return;
+				sp_Boo->SetUp
+				(wp_AttackTarget,
+					MyLocation + CurrentInitDir * Boomerang_Init_Distance,
+					CurrentInitDir);
+			};
+		});
+	});
+}
+
+void MIDDLE_BOSS::BOSS_SKill_Blast()
+{
+	std::shared_ptr<float> sp_Angle = std::make_shared<float> (0) ;
+	std::shared_ptr<int> sp_Num = std::make_shared<int>(4);
+
+	Timer::instance().event_regist_ReWhileDelta(3.1, 1, [=,this]() {
+		if (!sp_Angle)return;
+
+		for (int i = 0; i < 4; ++i)
+		{
+			BOSS_Blast_launch(*sp_Num, i * 90 + *sp_Angle);
+		}
+		*sp_Angle += 90.f /3.f ;
+		*sp_Num += 4;
+	});
+}
+
+void MIDDLE_BOSS::BOSS_Blast_launch(size_t NUM, float launchAngle)
+{
+	Timer& _Timer = Timer::instance();
+
+	float BlastDistanceMin = 80.f;
+	float BlastDistanceBetween = 80.f;
+	float BlastSpawnCycle = 0.05f;
+	int    IcePilarNum = 2;
+	float IcePilarDuration = 4.f;
+	int IcePilarDistribution = 300;
+	float IcePilarBeetWeen = 100.f;
+
+	// 블라스트 생성 이펙트 한번 뿌려주기
+	object_mgr& obj_mgr = object_mgr::instance();
+	vec PlayerLocation = _transform->_location;
+	vec dis = math::dir_from_angle(launchAngle);
+	vec dir = dis.get_normalize();
+
+	for (int i = 0; i < NUM; ++i)
+	{
+		vec blast_location = PlayerLocation + dir * (BlastDistanceBetween * i + BlastDistanceMin);
+
+		_Timer.event_regist(time_event::EOnce, i * BlastSpawnCycle, [blast_location]()->bool {
+			auto BLAST = object_mgr::instance().insert_object<Boss_Blast>();
+			BLAST->_transform->_location = blast_location;
+			return true;
+		});
+	};
+
+	vec PilarSpwanLocation = PlayerLocation + dir * (BlastDistanceBetween * NUM);
+
+	_Timer.event_regist(time_event::EOnce, NUM * BlastSpawnCycle, [
+		IcePilarBeetWeen, IcePilarDistribution, IcePilarDuration, BlastSpawnCycle, IcePilarNum,
+			&_Timer = _Timer, PilarSpwanLocation = PilarSpwanLocation, dir = dir]()->bool {
+
+		_Timer.event_regist(time_event::EOnce, 0.6f,
+			[IcePilarBeetWeen, PilarSpwanLocation, IcePilarDistribution, IcePilarDuration, IcePilarNum]()->bool {
+
+			vec left = vec{ -1,0 };
+			vec right = vec{ +1,0 };
+			vec up = vec{ 0,1 };
+			vec down = vec{ 0,-1 };
+
+			vec CurrentDir{};
+			// 4방향 기둥 생성
+			for (int i = 0; i < 4; ++i)
+			{
+				switch (i)
+				{
+				case 0:
+					CurrentDir = left;
+					break;
+				case 1:
+					CurrentDir = right;
+					break;
+				case 2:
+					CurrentDir = up;
+					break;
+				case 3:
+					CurrentDir = down;
+					break;
+				default:
+					break;
+				}
+				for (int i = 0; i < IcePilarNum; ++i)
+				{
+					auto BLAST = object_mgr::instance().insert_object<Boss_Blast>();
+					BLAST->Duration = IcePilarDuration;
+					BLAST->_transform->_location = PilarSpwanLocation + (CurrentDir * IcePilarBeetWeen * i);
+				}
+			}
+			return true;
+		});
+
+		return true;
+	});
+}
+
 void MIDDLE_BOSS::SummonMonster()
 {
 	if (MonsterSpawnCurrentTick > 0)return;
@@ -524,17 +685,17 @@ void MIDDLE_BOSS::SummonMonster()
 	float SummonDistance = 150.f;
 	vec BossPos =_transform->_location;
 
-	vec WizardLocation = BossPos + vec{ 0,-1 }*SummonDistance;
+	vec ARHCER2Location = BossPos + vec{ 0,-1 }*SummonDistance;
 	vec ARHCERLocation = BossPos + vec{ -1,0 }*SummonDistance;
 	vec SwordManLocation = BossPos + vec{ 1,0 }*SummonDistance;
 		
-	Monster::CardEffect(WizardLocation,L"SUMMON_CARD_WIZARD");
+	Monster::CardEffect(ARHCER2Location,L"SUMMON_CARD_ARCHER");
 	Monster::CardEffect(SwordManLocation, L"SUMMON_CARD_SWORDMAN");
 	Monster::CardEffect(ARHCERLocation, L"SUMMON_CARD_ARCHER");
 
 	object_mgr::instance().insert_object<SwordMan>(wp_AttackTarget, SwordManLocation);
 	object_mgr::instance().insert_object<ARCHER>(wp_AttackTarget, ARHCERLocation);
-	object_mgr::instance().insert_object<WIZARD>(wp_AttackTarget, WizardLocation);
+	object_mgr::instance().insert_object<ARCHER>(wp_AttackTarget, ARHCER2Location);
 
 	MonsterSpawnCurrentTick = MonsterSpawnCycle;
 }

@@ -34,7 +34,7 @@ public:
     float DefaultInvincibletime;
     float IceCrystalTick = 0;
     bool bInputDiagonal{ false };
-
+    bool bUltiOn{ false };
     std::shared_ptr<class player_info> _player_info;
     void Camera_Shake(float force, vec dir, float duration);
 private:

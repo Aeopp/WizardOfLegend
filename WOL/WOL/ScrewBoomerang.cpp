@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ScrewBoomerang.h"
+#include "collision_component.h"
 
 Event ScrewBoomerang::update(float dt)
 {
@@ -19,11 +20,6 @@ Event ScrewBoomerang::update(float dt)
 
 	ImgAngle += dt * RotationSpeed;
 
-	ScaleX = 0.8f;
-	ScaleY = 0.8f;
-
-
-
 	return _event;
 }
 
@@ -33,5 +29,20 @@ void ScrewBoomerang::late_initialize(vec RotationInitCenter, vec RotationInitDir
 	CurrentRotationDir = std::move(RotationInitDir);
 
 	RotationSpeed = 900.f;
+
+	Duration = 5.f;
+
+	ScaleX = 0.8f;
+	ScaleY = 0.8f;
+
+	PaintSizeX = 200;
+	PaintSizeY = 200;
+	// 직선 운동 속도
+	_speed = 1500.f;
+	AnimSpeed = 2.f;
+
+	auto sp_collision = _collision_component.lock();
+	if (!sp_collision)return;
+	sp_collision->bTileHitEffect = false;
 
 }

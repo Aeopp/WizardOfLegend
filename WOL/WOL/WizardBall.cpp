@@ -147,6 +147,9 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 			shield::DefenseMsg(_transform->_location);
 		}
 	}
+
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
+
 }
 
 

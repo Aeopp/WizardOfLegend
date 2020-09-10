@@ -17,9 +17,10 @@ public:
     enum class EPattern : uint8_t
     {
         FIRE,
-        BALLSPAWN,
-        CRYSTAL,
         BLAST,
+        CRYSTAL,
+        BOOMERANG,
+        FIRE_DRAGON,
     };
     virtual ~MIDDLE_BOSS()noexcept;
 
@@ -71,10 +72,10 @@ public:
     std::shared_ptr<class Bmp> AnimDirSpriteUpdate();
 
 
-    std::vector<EPattern> PatternTable
-    { EPattern::FIRE,EPattern::BALLSPAWN,EPattern::CRYSTAL,EPattern::BLAST,
-     EPattern::FIRE,EPattern::CRYSTAL,EPattern::BALLSPAWN,EPattern::BLAST,EPattern::CRYSTAL,
-    EPattern::BALLSPAWN,EPattern::BLAST,EPattern::FIRE,EPattern::BLAST,EPattern::BALLSPAWN };
+	 std::vector<EPattern> PatternTable
+	 { EPattern::FIRE,EPattern::BLAST,EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::BOOMERANG,
+	  EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::FIRE,EPattern::BLAST,EPattern::BOOMERANG,
+	 EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::FIRE,EPattern::BLAST,EPattern::FIRE };
 
     int PatternTableNum;
     int CurrentPatternIdx = 0;
@@ -95,13 +96,17 @@ public:
     void ConditionCheck();
     EState CurrentState = EState::IDLE;
     void IdleAction();
-
+    // // //////////////////////////////////////
     void BOSS_Skill_Fire();
     void BOSS_SKill_BallSpawn();
     // 전방위 각으로 몇개나 발사할지
-    void BOSS_SKill_ICEBlast();
+    void BOSS_SKill_HomingBlast();
     void BOSS_Skill_ICECrystal(size_t NUM);
-
+    void BOSS_SKill_FireDragon(size_t NUM);
+    void BOSS_SKill_Boomerang(size_t NUM);
+    void BOSS_SKill_Blast();
+     // // //////////////////////////////////////
+    void BOSS_Blast_launch(size_t NUM, float launchAngle =0);
     void FireSpawn();
     void BallSpawn(size_t NUM);
     void SummonMonster();

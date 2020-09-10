@@ -247,6 +247,9 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	}
+
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
+
 }
 void WIZARD::render(HDC hdc, vec camera_pos, vec size_factor)
 {

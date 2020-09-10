@@ -35,9 +35,10 @@ void UIInventory::initialize()
 		{L"ICE_BLAST_ICON",L"ICE_BLAST_EX",ESkill::BLAST},
 		{L"ICE_KRYSTAL_ICON",L"ICE_KRYSTAL_EX",ESkill::CRYSTAL},
 		{L"GAIA_ARMOR_ICON",L"GAIA_ARMOR_EX",ESkill::ARMOR},
+		{L"BOOMERANG_ICON",L"",ESkill::BOOMERANG}
 	};
 
-	for (int i = 0; i < IconKeyTable.size(); ++i)
+	for (int i = 0; i < IconKeyTable.size()-1; ++i)
 	{
 		SlotInfo _SlotInfo;
 		_SlotInfo.Location = vec{ 270 + 66* i,160 };
@@ -48,6 +49,18 @@ void UIInventory::initialize()
 		_SlotInfo._Skill = _ESkill;
 		SlotInfoMap[i] = std::move(_SlotInfo);
 	}
+	
+	// 마지막 창작스킬 부메랑 슬롯
+	int IDX = IconKeyTable.size() - 1;
+	SlotInfo _SlotInfo;
+	_SlotInfo.Location = vec{ 270 + 66 * (IDX-1)-2,224 };
+	auto& [ImgKey, InfoKey, _ESkill] = IconKeyTable[IDX];
+
+	_SlotInfo.ImgKey = std::move(ImgKey);
+	_SlotInfo.InfoKey = std::move(InfoKey);
+	_SlotInfo._Skill = _ESkill;
+	SlotInfoMap[IDX] = std::move(_SlotInfo);
+
 
 	SlotInfoMap[0].bAcquire = true;
 	SlotInfoMap[1].bAcquire = true;
@@ -107,7 +120,6 @@ uint32_t UIInventory::get_layer_id() const&
 
 Event UIInventory::update(float dt)
 {
-
 	if (!bInventoryOpen)return Event::None;
 	ChangeCoolTime -= dt;
 
@@ -120,7 +132,8 @@ Event UIInventory::update(float dt)
 
 	for (auto& [SlotIdx, _SlotInfo]  :SlotInfoMap)
 	{
-		if (!SlotInfoMap[SlotIdx].bAcquire)return Event::None;
+		//if (!SlotInfoMap[SlotIdx].bAcquire)return Event::None;
+		if (!_SlotInfo.bAcquire)return Event::None;
 
 		RECT _SlotRect = { _SlotInfo.Location.x - 24 ,
 			_SlotInfo.Location.y - 24 ,

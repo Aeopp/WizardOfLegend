@@ -96,9 +96,9 @@ void Scene_Boss::initialize()
 		sound_mgr::instance().Stop("DUNGEON_BGM");
 		SOUNDPLAY("BOSS_BGM", 1.f, true );
 
-			auto Midboss = object_mgr::instance().insert_object<BOSS>();
+			auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
 
-			Midboss->SetUp(_Player, PlayerSpawnLocation + vec{ -1000,0 });
+			Midboss->SetUp(_Player, vec{ 2700,1400 });
 
 			manage_objs.push_back(Midboss);
 		
@@ -115,6 +115,8 @@ void Scene_Boss::initialize()
 			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
 				+ vec{ 0 ,+200 }, ESkill::ARMOR, L"GAIR_ARMOR_CARD");
 
+			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+				+ vec{ 0 ,-400 }, ESkill::ARMOR, L"BOOMERANG_CARD");
 	/*	for (int i = 0; i < 100; ++i)
 		{
 			Timer::instance().event_regist(time_event::EOnce, 10*i, [=,this]() {

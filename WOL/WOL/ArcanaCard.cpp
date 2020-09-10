@@ -64,9 +64,14 @@ void ArcanaCard::Hit(std::weak_ptr<object> _target)
 		{
 			if (_SlotInfo._Skill == _Skill)
 			{
+
+
 				SOUNDPLAY("GET_SKILL", 1.f, false);
 				_SlotInfo.bAcquire = true;
+
+
 			}
+
 		}
 
 		bDie = true;

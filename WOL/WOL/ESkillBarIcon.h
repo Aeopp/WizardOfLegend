@@ -11,5 +11,6 @@ enum class ESkill :uint8_t
 	CRYSTAL,
 	ARMOR,
 	BOOMERANG,
+	None,
 };
 

@@ -9,7 +9,8 @@
 #include "shield.h"
 #include "shield.h"
 
-void ArcherArrow::launch(vec init,vec dir, int Row, std::shared_ptr<class Bmp> SetImg)
+void ArcherArrow::launch(vec init,vec dir, int Row, 
+	std::shared_ptr<class Bmp> SetImg)
 {
 	if (!_transform)return;
 	this->RowIdx = Row;
@@ -87,7 +88,7 @@ void ArcherArrow::initialize()
 	PaintSizeY = 170;
 	ScaleX = 1;
 	ScaleY = 1;
-	speed = 1400.f;
+	speed = 2000.f;
 	ObjectTag = object::Tag::monster_attack;
 
 	Attack={ 20,40 };

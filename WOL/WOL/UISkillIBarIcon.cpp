@@ -51,7 +51,6 @@ void UISkillIBarIcon::late_initialize(vec pos,std::wstring FileName)
 	_render_component->_RenderDesc = ERender::Transparent;
 
 	_transform->_location = std::move(pos); 
-
 }
 
 void UISkillIBarIcon::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -110,14 +109,16 @@ void UISkillIBarIcon::CoolTimeRefUpdate()
 		Max = &sp_PlayerInfo->SkillShieldCoolTime;
 		break;
 	case ESkill::FIRE:
-		Current = &sp_PlayerInfo->SkillCurrentBoomerangNum;
-		Max = &sp_PlayerInfo->SkillBoomerangMaxNum;
+		Current = &sp_PlayerInfo->SkillCurrentFireDragonNum;
+		Max = &sp_PlayerInfo->SkillFireDragonMaxNum;
 		break;
 	case ESkill::CRYSTAL:
 		Current = &sp_PlayerInfo->SkillCurrentICECrystalCoolTime;
 		Max = &sp_PlayerInfo->SkillICECrystalCoolTime;
 		break;
 	case ESkill::BOOMERANG:
+		Current = &sp_PlayerInfo->SkillCurrentBoomerangNum;
+		Max = &sp_PlayerInfo->SkillBoomerangMaxNum;
 		break;
 	default:
 		break;

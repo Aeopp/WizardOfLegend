@@ -30,7 +30,7 @@ void BossFireDragon::initialize()
 	sp_collision->bCollision = true;
 
 
-	Duration = 10.f;
+	Duration = 3.f;
 
 	PaintSizeX = 180;
 	PaintSizeY = 180;
@@ -42,8 +42,8 @@ void BossFireDragon::initialize()
 
 	// 자기자신의 회전속도임
 
-	 Speed = 1666 * 0.8f;
-	RotationSpeed = 600 * 0.8f;
+	 Speed = 1666 * 1.2;
+	RotationSpeed = 600 * 1.2f;
 	Attack = { 20,40 };
 	bAttacking = true;
 	MyFactor = BossFireDragon::factor *= -1.f;
@@ -196,8 +196,8 @@ void BossFireDragon::SetUp(vec Location, vec Dir)
 	_transform->_location = Location;
 	_transform->_dir = Dir;
 	CurrentAngle = math::AngleFromVec(Dir);
-	AngleMin = CurrentAngle - 45;
-	AngleMax = CurrentAngle + 45;
+	AngleMin = CurrentAngle - 135;
+	AngleMax = CurrentAngle + 135;
 	
 	CalcSpriteFromAngle();
 }

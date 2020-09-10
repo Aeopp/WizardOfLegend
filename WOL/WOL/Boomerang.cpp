@@ -92,7 +92,8 @@ void Boomerang::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	PlgBlt(hPlgDC, RotPts.data(), hMemDC, 0, 0, PaintSizeX, PaintSizeY, NULL, NULL, NULL);
 
-	vec v = _transform->_location - camera_pos - (_render_component->Dest_Paint_Size * 0.5);
+	vec v = _transform->_location - camera_pos -
+	(_render_component->Dest_Paint_Size * 0.5);
 
 	GdiTransparentBlt(hdc,
 		 v.x, v.y
@@ -125,14 +126,13 @@ void Boomerang::HitTile(RECT TileRt)
 
 	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
 	
-	float RandAngle = math::Rand<int>({ -45,+45 });
+	int RandAngle = math::Rand<int>({ -1,+1 });
 
-	dir =math::rotation_dir_to_add_angle(dir,RandAngle);
+	dir =math::rotation_dir_to_add_angle(dir, RandAngle * 45);
 
 	_transform->_dir = dir;
 
 	CalcImgAngle(math::radian_to_degree(atan2f(dir.y, dir.x)));
-
 }
 
 

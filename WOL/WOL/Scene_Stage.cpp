@@ -101,8 +101,6 @@ void Scene_Stage::initialize()
 		sound_mgr::instance().Stop("MAIN_MENU_BGM");
 		SOUNDPLAY("DUNGEON_BGM", 0.5f, true);
 
-
-
 	/*late_initialize(int ImgLocationX, int ImgLocationY,
 		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
 		int AnimRowIndex, float Duration, float AnimDuration,
@@ -131,6 +129,11 @@ void Scene_Stage::initialize()
 		auto crystal_card = obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
 			+ vec{  0 ,-200 }, ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
 
+		auto boomerang_card = obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+			+ vec{ 0 ,+200 }, ESkill::BOOMERANG, L"BOOMERANG_CARD");
+	
+		auto M_Boss = obj_mgr.insert_object<MIDDLE_BOSS>();
+		M_Boss->SetUp(_Player, { 600,250});
 
 		auto _Npc = obj_mgr.insert_object<NPC>();
 		_Npc->SetUp(vec{ 2800,150 } );
@@ -158,7 +161,7 @@ void Scene_Stage::initialize()
 					   1.f,100,str });
 				return true;
 			});
-
+		
 		auto _ArmorItem = obj_mgr.insert_object<UIItem>();
 		_ArmorItem->SetUp({ 2850,340 }, L"GAIA_ARMOR_CARD", { 106,172 },
 			[wp_Player]() {
@@ -195,9 +198,6 @@ void Scene_Stage::initialize()
 
 		TriggerSetUp(_Player);
 
-		// 로케이션 스킬 이미지키
-
-
 		//auto archer = object_mgr::instance().insert_object<WizardBall>
 		//	(_Player, vec{ 100,100 });
 
@@ -218,8 +218,13 @@ void Scene_Stage::initialize()
 		//	manage_objs.push_back(swordman);
 
 		//	manage_objs.push_back(wizard);
-		//	});
-
+		//	});		
+		manage_objs.push_back(_ArmorItem);
+		manage_objs.push_back(_Potion);
+		manage_objs.push_back(M_Boss);
+		manage_objs.push_back(_Teleport);
+		manage_objs.push_back(_Npc);
+		manage_objs.push_back(boomerang_card);
 		manage_objs.push_back(crystal_card);
 		manage_objs.push_back(fire_card);
 		manage_objs.push_back(blast_card);

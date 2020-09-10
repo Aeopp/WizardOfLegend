@@ -4,8 +4,8 @@ struct player_info
 {
 	float gold = { 0 };
 
-	float max_hp{1000};
-	float max_mp{1000};
+	float max_hp{500};
+	float max_mp{500};
 
 	float dash_speed{ 1500.f };
 
@@ -23,13 +23,15 @@ struct player_info
 	float AttackAnimDuration = 0.4;
 	float CurrentAttackDuration = DefaultAttackDuration;
 
-	float SkillBoomerangMotionDuration = 0.35f;
+	float  	SkillBoomerangMotionDuration = 0.35f;
+	float SkillFireDragonMotionDuration = 0.2f;
 	float SkillICECrystalMotionDuration = 0.5f;
 	float SkillICEBlastMotionDuration = 0.5f;
 	float SkillShieldMotionDuration = 0.5f;
 
 
-	const float SkillBoomerangMaxNum = 8; 
+	const float SkillFireDragonMaxNum = 8; 
+	const float SkillBoomerangMaxNum = 4;
 	const float SkillICECrystalCoolTime = 6.5f;
 	const float SkillICEBlastCoolTime = 3.5f;
 	const float SkillShieldCoolTime = 13.f;
@@ -37,12 +39,13 @@ struct player_info
 	float SkillCurrentICECrystalCoolTime = SkillICECrystalCoolTime;
 	float SkillCurrentICEBlastCoolTime = SkillICEBlastCoolTime;
 	float SkillCurrentShieldCoolTime = SkillShieldCoolTime;
+	float SkillCurrentFireDragonNum = SkillFireDragonMaxNum;
 	float SkillCurrentBoomerangNum = SkillBoomerangMaxNum;
 
-	float SkillFireDragonMotionDuration = 0.2f;
 
-	float MpRegenerationAtSec = 30.f;
-	float HpRegenerationAtSec=50.f;
+
+	float MpRegenerationAtSec = -1.f;
+	float HpRegenerationAtSec= 10.f;
 
 	float ShieldDuration = 20.f;
 
@@ -60,6 +63,7 @@ public :
 	void SetMp(float MP);
 	float GetHP();
 	float GetMP();
+	void SignatureGaugeAdd(float Damage);
 private:
 	float  hp{ max_hp };
 	float mp{ max_mp };

@@ -7,8 +7,6 @@ void RotationBoomerang::initialize()
 
 	ScaleX = 0.8f;
 	ScaleY = 0.8f;
-
-
 }
 
 Event RotationBoomerang::update(float dt)

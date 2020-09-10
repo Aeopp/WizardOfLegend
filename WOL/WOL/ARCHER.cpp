@@ -230,9 +230,11 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 		push_back({ v ,vec{0,1}*3,
 		1.f,int(Atk),std::to_wstring((int)Atk) });
 
+	
 	if (_EnemyInfo.HP < 0)
 	{
-		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.87f, EAnimState::Dead);
+		_render_component->ChangeUnstoppableAnim
+		(EAnimState::Dead, 0.87f, EAnimState::Dead);
 		MonsterDie();
 	}
 	else
@@ -244,6 +246,8 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 		_render_component->ChangeAnim(EAnimState::Walk, 0.6f);
 		_Shadow.CurrentShadowState = EShadowState::MIDDLE;
 	}
+
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
 }
 void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 {
@@ -264,7 +268,7 @@ void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 		static float ColorConstant = 255 / AttackPreparationTimeMax;
 		float CurrentColor = 255-(ColorConstant * AttackPreparationTime); 
 		HPEN MyPen, OldPen;
-		MyPen = CreatePen(PS_SOLID, 3, RGB(255, 
+		MyPen = CreatePen(PS_SOLID, 5, RGB(255, 
 		CurrentColor , CurrentColor));
 		OldPen = (HPEN)SelectObject(hdc, MyPen);
 

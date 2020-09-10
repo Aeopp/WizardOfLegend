@@ -4,6 +4,8 @@
 #include "EnemyInfo.h"
 #include "Effect.h"
 
+
+
 class Monster :
     public actor
 {
@@ -35,6 +37,7 @@ public:
 	void NormalHitSoundPlay();
 	void BoomerangSoundPlay();
 
+	static void MonsterHitPlayerSignatureGageAdd(float Atk);
 	virtual std::wstring GetSummonKey()abstract;
 public:
 	std::weak_ptr<collision_component>  _collision_component{};

@@ -164,9 +164,11 @@
     <ClInclude Include="Bmp_mgr.h" />
     <ClInclude Include="Boomerang.h" />
     <ClInclude Include="BOSS.h" />
+    <ClInclude Include="BossBoomerang.h" />
     <ClInclude Include="BossCrystal.h" />
     <ClInclude Include="BossFireDragon.h" />
     <ClInclude Include="BossInfo.h" />
+    <ClInclude Include="Boss_Blast.h" />
     <ClInclude Include="BOSS_BOX.h" />
     <ClInclude Include="BOSS_ROTBOX.h" />
     <ClInclude Include="BOSS_SKILL.h" />
@@ -281,9 +283,11 @@
     <ClCompile Include="Bmp_mgr.cpp" />
     <ClCompile Include="Boomerang.cpp" />
     <ClCompile Include="BOSS.cpp" />
+    <ClCompile Include="BossBoomerang.cpp" />
     <ClCompile Include="BossCrystal.cpp" />
     <ClCompile Include="BossFireDragon.cpp" />
     <ClCompile Include="BossInfo.cpp" />
+    <ClCompile Include="Boss_Blast.cpp" />
     <ClCompile Include="BOSS_BOX.cpp" />
     <ClCompile Include="BOSS_ROTBOX.cpp" />
     <ClCompile Include="BOSS_SKILL.cpp" />

@@ -19,6 +19,7 @@
 #include "BOSS_ROTBOX.h"
 #include "BOSS_SKILL.h"
 #include "Camera.h"
+#include "Monster.h"
 
 void BOSS::initialize()
 {
@@ -456,7 +457,7 @@ void BOSS::HitCalc(std::pair<int, int> AttackRange)
 		1.f,int(Atk),std::to_wstring((int)Atk) });
 
 	sp_MyInfo->CurrentHP -= Atk;
-
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
 	if (sp_MyInfo->CurrentHP < 0)
 	{
 		CurrentState = EState::DIE;

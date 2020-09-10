@@ -11,6 +11,9 @@
 #include "sound_mgr.h"
 
 
+#include "game.h"
+#include "player_info.h"
+
 
 void Monster::CheckDirChangeImgFile()
 {
@@ -163,6 +166,14 @@ void Monster::BoomerangSoundPlay()
 	RAND_SOUNDPLAY("FIRE_DRAGON_HITTED_ENEMY", { 1,6 }, 1.f, false);
 }
 
+void Monster::MonsterHitPlayerSignatureGageAdd(float Atk)
+{
+	auto sp_PInfo = game::instance()._player_info;
+	if (!sp_PInfo)return;
+
+
+	sp_PInfo->SignatureGaugeAdd(Atk);
+}
 
 /*late_initialize(int ImgLocationX, int ImgLocationY,
 		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,

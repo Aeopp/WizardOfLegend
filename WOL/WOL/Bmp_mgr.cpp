@@ -119,7 +119,9 @@ void Bmp_mgr::initialize()
 	Insert_Bmp(DefaultPath + L"SELECT_ICON.bmp", L"SELECT_ICON");
 
 
+	Insert_Bmp(DefaultPath + L"BOOMERANG_ICON.bmp", L"BOOMERANG_ICON");
 	Insert_Bmp(DefaultPath + L"BOOMERANG_SKILLBAR.bmp", L"BOOMERANG_SKILLBAR");
+	Insert_Bmp(DefaultPath + L"BOOMERANG_CARD.bmp", L"BOOMERANG_CARD");
 
 	Insert_Bmp(DefaultPath + L"ICE_KRYSTAL_CARD.bmp", L"ICE_KRYSTAL_CARD");
 	Insert_Bmp(DefaultPath + L"ICE_BLAST_CARD.bmp", L"ICE_BLAST_CARD");

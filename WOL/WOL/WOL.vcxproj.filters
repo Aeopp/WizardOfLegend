@@ -250,6 +250,8 @@
     <ClInclude Include="UIItem.h" />
     <ClInclude Include="Teleport.h" />
     <ClInclude Include="BossFireDragon.h" />
+    <ClInclude Include="BossBoomerang.h" />
+    <ClInclude Include="Boss_Blast.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -520,6 +522,12 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="BossFireDragon.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="BossBoomerang.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss_Blast.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

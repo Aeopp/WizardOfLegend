@@ -110,6 +110,7 @@ void Player::initialize()
 	make_skillbar_icon(ESkill::BLAST);
 	make_skillbar_icon(ESkill::CRYSTAL);
 	make_skillbar_icon(ESkill::FIRE);
+	make_skillbar_icon(ESkill::BOOMERANG);
 
 	_speed = 400.f;
 
@@ -165,8 +166,8 @@ Event Player::update(float dt)
 	_player_info->SkillCurrentICEBlastCoolTime = 
 	min(_player_info->SkillCurrentICEBlastCoolTime+dt, _player_info->SkillICEBlastCoolTime);  
 
-	_player_info->SkillCurrentBoomerangNum= 
-	min(_player_info->SkillCurrentBoomerangNum + dt, _player_info->SkillBoomerangMaxNum);
+	_player_info->SkillCurrentFireDragonNum= 
+	min(_player_info->SkillCurrentFireDragonNum + dt, _player_info->SkillFireDragonMaxNum);
 
 	_player_info->SkillCurrentICECrystalCoolTime= 
 	min(_player_info->SkillCurrentICECrystalCoolTime + dt, _player_info->SkillICECrystalCoolTime);
@@ -174,8 +175,12 @@ Event Player::update(float dt)
 	_player_info->SkillCurrentShieldCoolTime = 
 	min(_player_info->SkillCurrentShieldCoolTime + dt, _player_info->SkillShieldCoolTime);
 
+	_player_info->SkillCurrentBoomerangNum =
+		min(_player_info->SkillCurrentBoomerangNum + dt, _player_info->SkillBoomerangMaxNum);
+
 	if (_player_info->GetMP() >= _player_info->max_mp)
 	{
+		bUltiOn = true;
 		SOUNDPLAY("ULT_ON", 1.f, false);
 	}
 	
@@ -496,6 +501,7 @@ void Player::BindingSkillCheckCast(int SlotIdx)
 		MakeShield();
 		break;
 	case ESkill::BOOMERANG:
+		SkillScrewBoomerang();
 		break;
 	default:
 		break;
@@ -555,29 +561,17 @@ void Player::player_check(float dt)
 	{
 		BindingSkillCheckCast(4);
 	}
+	if (_Input.Key_Down('T'))
+	{
+
+
+		BindingSkillCheckCast(6);
+	}
 	if (_Input.Key_Down('Z'))
 	{
 		SkillRotBoomerang();
 	}
-	//if (_Input.Key_Down('Z')) {
-	//	SkillBoomerang();
-	//}
-	//if (_Input.Key_Down('X')) {
-	//	MultiBoomerang(8);
-	//}
 
-	//if (_Input.Key_Down('C')) {
-	//	SkillBoomerang();
-	//}
-	//if (_Input.Key_Down('V')) {
-	//	MultiRotBoomerang(6);
-	//}
-	//if (_Input.Key_Down('B')) {
-	//	SkillScrewBoomerang();
-	//}
-	//if (_Input.Key_Down('N')) {
-	//	MultiScrewBoomerang(8);
-	//}
 
 	if (_Input.Key_Down(VK_SPACE))
 	{
@@ -597,7 +591,7 @@ void Player::SkillBoomerang()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-	if (_player_info->SkillCurrentBoomerangNum< _player_info->SkillBoomerangMaxNum)return;
+	if (_player_info->SkillCurrentFireDragonNum< _player_info->SkillFireDragonMaxNum)return;
 	_player_info->SkillCurrentICECrystalCoolTime -= 1;
 
 	object_mgr& _object_mgr = object_mgr::instance();
@@ -621,19 +615,19 @@ void Player::SkillBoomerang()
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
 
 	int AttackAnimNum =math::Rand<int>({ 1,2 });
 
 	if (AttackAnimNum == 1)
 	{
 		_render_component->ChangeAnim(AnimTable::attack1,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 	else 
 	{
 		_render_component->ChangeAnim(AnimTable::attack2,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
@@ -715,15 +709,16 @@ void Player::SkillUlti()
 	_player_info->AddMp(-_player_info->max_mp);
 
 	SOUNDPLAY("ULT_USE", 1.f, false);
+	bUltiOn = false;
+	SkillInCastSlowTime(0.5f, 0.5f);
 }
-
 
 void Player::SkillFireDragon()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-	if (_player_info->SkillCurrentBoomerangNum < 1.f)return;
-	_player_info->SkillCurrentBoomerangNum -= 1;
+	if (_player_info->SkillCurrentFireDragonNum < 1.f)return;
+	_player_info->SkillCurrentFireDragonNum -= 1;
 	
 
 	 auto mp  =  Input_mgr::instance().GetWorldMousePos(); 
@@ -778,7 +773,7 @@ void Player::SkillFireDragon()
 	vec dir{ math::Rand<float>({ -3,+3 }), math::Rand<float>({ -3,+3 }) };
 	Camera_Shake(5, dir, 0.25f);
 
-	_player_info->AddMp(-25);
+	_player_info->AddMp(-1);
 }
 
 void Player::MultiBoomerang(int Num)
@@ -810,19 +805,19 @@ void Player::MultiBoomerang(int Num)
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
 
 	int AttackAnimNum = math::Rand<int>({ 1,2 });
 
 	if (AttackAnimNum == 1)
 	{
 		_render_component->ChangeAnim(AnimTable::attack1,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 	else
 	{
 		_render_component->ChangeAnim(AnimTable::attack2,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
@@ -835,8 +830,8 @@ void Player::SkillRotBoomerang()
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-	if (_player_info->SkillCurrentBoomerangNum < 1.f)return;
-	_player_info->SkillCurrentBoomerangNum -= 1;
+	if (_player_info->SkillCurrentFireDragonNum < 1.f)return;
+	_player_info->SkillCurrentFireDragonNum -= 1;
 	object_mgr& _object_mgr = object_mgr::instance();
 
 	auto _Boom = _object_mgr.insert_object<RotationBoomerang>();
@@ -858,7 +853,7 @@ void Player::SkillRotBoomerang()
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
 
 	int AttackAnimNum = math::Rand<int>({ 1,2 });
 
@@ -867,12 +862,12 @@ void Player::SkillRotBoomerang()
 	if (AttackAnimNum == 1)
 	{
 		_render_component->ChangeAnim(AnimTable::attack1,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 	else
 	{
 		_render_component->ChangeAnim(AnimTable::attack2,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
@@ -910,19 +905,19 @@ void Player::MultiRotBoomerang(int Num)
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
 
 	int AttackAnimNum = math::Rand<int>({ 1,2 });
 
 	if (AttackAnimNum == 1)
 	{
 		_render_component->ChangeAnim(AnimTable::attack1,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 	else
 	{
 		_render_component->ChangeAnim(AnimTable::attack2,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
@@ -965,26 +960,26 @@ void Player::SkillScrewBoomerang()
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
 
 	int AttackAnimNum = math::Rand<int>({ 1,2 });
 
 	if (AttackAnimNum == 1)
 	{
 		_render_component->ChangeAnim(AnimTable::attack1,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 	else
 	{
 		_render_component->ChangeAnim(AnimTable::attack2,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
 
 	Camera_Shake(1, dir, 0.2f);
 
-//	_player_info->AddMp(-50);
+	_player_info->AddMp(-7);
 }
 
 void Player::MultiScrewBoomerang(int Num)
@@ -1017,19 +1012,19 @@ void Player::MultiScrewBoomerang(int Num)
 
 	Anim& MyAnim = _render_component->_Anim;
 	_player_info->bAttack = true;
-	_player_info->CurrentAttackDuration = _player_info->SkillBoomerangMotionDuration;
+	_player_info->CurrentAttackDuration = _player_info->SkillFireDragonMotionDuration;
 
 	int AttackAnimNum = math::Rand<int>({ 1,2 });
 
 	if (AttackAnimNum == 1)
 	{
 		_render_component->ChangeAnim(AnimTable::attack1,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 	else
 	{
 		_render_component->ChangeAnim(AnimTable::attack2,
-			_player_info->SkillBoomerangMotionDuration);
+			_player_info->SkillFireDragonMotionDuration);
 	}
 
 	vec dir{ math::Rand<float>({ -7,+7 }), math::Rand<float>({ -7,+7 }) };
@@ -1198,6 +1193,12 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 			vec{ 315 + 57,838 }, L"GAIA_ARMOR_SKILLBAR.bmp");
 		USBI->wp_PlayerInfo = _player_info;
 		USBI->CurrentSlotIdx = 5;
+		break;
+	case ESkill::BOOMERANG:
+		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
+			vec{429,838 }, L"BOOMERANG_SKILLBAR.bmp");
+		USBI->wp_PlayerInfo = _player_info;
+		USBI->CurrentSlotIdx = 6;
 		break;
 	default:
 		break;
