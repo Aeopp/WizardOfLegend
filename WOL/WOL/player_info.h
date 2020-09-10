@@ -7,7 +7,7 @@ struct player_info
 	float max_hp{1000};
 	float max_mp{1000};
 
-	float dash_speed{ 1700.f };
+	float dash_speed{ 1500.f };
 
 	bool bAttack{ false };
 	bool bIdle{ true };
@@ -17,12 +17,11 @@ struct player_info
 	bool bProtected = false;
 	float DashDuration = 0.3;
 	float AnimDashDuration = 0.3;
-	float PlayerAttackMoveSpeed = 3000;
+	float PlayerAttackMoveSpeed = 2333;
 	float AttackCollisionDuration = 0.1f;
 	float DefaultAttackDuration = 0.4;
 	float AttackAnimDuration = 0.4;
 	float CurrentAttackDuration = DefaultAttackDuration;
-
 
 	float SkillBoomerangMotionDuration = 0.35f;
 	float SkillICECrystalMotionDuration = 0.5f;

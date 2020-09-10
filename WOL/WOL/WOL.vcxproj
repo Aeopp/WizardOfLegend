@@ -165,6 +165,7 @@
     <ClInclude Include="Boomerang.h" />
     <ClInclude Include="BOSS.h" />
     <ClInclude Include="BossCrystal.h" />
+    <ClInclude Include="BossFireDragon.h" />
     <ClInclude Include="BossInfo.h" />
     <ClInclude Include="BOSS_BOX.h" />
     <ClInclude Include="BOSS_ROTBOX.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="Boomerang.cpp" />
     <ClCompile Include="BOSS.cpp" />
     <ClCompile Include="BossCrystal.cpp" />
+    <ClCompile Include="BossFireDragon.cpp" />
     <ClCompile Include="BossInfo.cpp" />
     <ClCompile Include="BOSS_BOX.cpp" />
     <ClCompile Include="BOSS_ROTBOX.cpp" />

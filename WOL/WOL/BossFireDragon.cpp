@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "FireDragon.h"
+#include "BossFireDragon.h"
 #include "sound_mgr.h"
 #include "collision_mgr.h"
 #include "Color.h"
@@ -8,11 +8,11 @@
 #include "game.h"
 #include "Bmp.h"
 
-void FireDragon::initialize()
+void BossFireDragon::initialize()
 {
 	object::initialize();
 
-	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EPlayerAttack, ECircle);
+	_collision_component = collision_mgr::instance().insert(_ptr, collision_tag::EMonsterAttack, ECircle);
 
 	auto sp_collision = _collision_component.lock();
 
@@ -21,7 +21,7 @@ void FireDragon::initialize()
 	sp_collision->_size = { 40,40};
 	sp_collision->bSlide = true;
 	sp_collision->bCollisionSlideAnObject = false;
-	ObjectTag = object::Tag::player_attack;
+	ObjectTag = object::Tag::monster_attack;
 	sp_collision->bCollisionTargetPushFromForce = true;
 	sp_collision->PushForce = 10.f;
 	sp_collision->bCollision = true;
@@ -46,7 +46,7 @@ void FireDragon::initialize()
 	RotationSpeed = 600 * 0.8f;
 	Attack = { 20,40 };
 	bAttacking = true;
-	MyFactor = FireDragon::factor *= -1.f;
+	MyFactor = BossFireDragon::factor *= -1.f;
 	UniqueID = EObjUniqueID::FIREDRAGON;
 
 	RAND_SOUNDPLAY("FIRE_DRAGON", { 1,3 }, 1.f, false);
@@ -58,7 +58,7 @@ void FireDragon::initialize()
 	amplitude = 100.f;
 };
 
-Event FireDragon::update(float dt)
+Event BossFireDragon::update(float dt)
 {
 	Duration -= dt;
 	ParticleDelta -= dt;
@@ -118,12 +118,12 @@ Event FireDragon::update(float dt)
 	return _event;
 }
 
-uint32_t FireDragon::get_layer_id() const&
+uint32_t BossFireDragon::get_layer_id() const&
 {
 	return layer_type::EEffect;
 }
 
-void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
+void BossFireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
 
@@ -170,7 +170,7 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 		PaintSizeX, PaintSizeY, COLOR::MRGENTA());
 }
 
-void FireDragon::HitTile(RECT TileRt)
+void BossFireDragon::HitTile(RECT TileRt)
 {
 	object::HitTile(TileRt);
 
@@ -189,7 +189,7 @@ void FireDragon::HitTile(RECT TileRt)
 	Duration = ParticleLocationUpdateDelta* ParticleMaxNum + 0.05f;
 }
 
-void FireDragon::SetUp(vec Location, vec Dir)
+void BossFireDragon::SetUp(vec Location, vec Dir)
 {
 	if (!_transform)return;
 
@@ -202,7 +202,7 @@ void FireDragon::SetUp(vec Location, vec Dir)
 	CalcSpriteFromAngle();
 }
 
-void FireDragon::CalcSpriteFromAngle()
+void BossFireDragon::CalcSpriteFromAngle()
 {
 	int IDX = abs(CurrentAngle / 19);
 

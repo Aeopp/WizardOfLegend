@@ -4,7 +4,7 @@
 #include "object.h"
 
 
-class FireDragon : public object 
+class BossFireDragon : public object 
 {
 public:	
 	  void initialize()override;

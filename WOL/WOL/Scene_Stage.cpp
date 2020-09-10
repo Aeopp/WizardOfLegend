@@ -122,13 +122,13 @@ void Scene_Stage::initialize()
 		auto _Teleport = obj_mgr.insert_object<Teleport>();
 		_Teleport->SetUp(PlayerSpawnLocation, false);
 
-		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+		auto blast_card = obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
 			+ vec{ 200,0 }, ESkill::BLAST, L"ICE_BLAST_CARD");
 
-		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+		auto fire_card = obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
 			+ vec{ -200,0 }, ESkill::FIRE, L"FIRE_DRAGON_CARD");
 
-		obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
+		auto crystal_card = obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
 			+ vec{  0 ,-200 }, ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
 
 
@@ -220,6 +220,9 @@ void Scene_Stage::initialize()
 		//	manage_objs.push_back(wizard);
 		//	});
 
+		manage_objs.push_back(crystal_card);
+		manage_objs.push_back(fire_card);
+		manage_objs.push_back(blast_card);
 		manage_objs.push_back(_Teleport);
 		manage_objs.push_back(_camera);
 		manage_objs.push_back(_Player);
@@ -311,8 +314,10 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 	EventQ.push(std::move(Event_1));
 	EventQ.push(std::move(Event_2 ));
 
+	std::pair<vec, vec> camera_range = { {1350,2450} , {1500,2600}  };
 	_Trigger->SetUp({ 200,200 }, vec{ 1350,2450}, std::move(StartEvent),
-		[]() {}, std::move(EventQ  ) );
+		[]() {}, std::move(EventQ  ),true,
+		camera_range);
 
 	manage_objs.push_back(_Trigger);
 }

@@ -249,6 +249,7 @@
     <ClInclude Include="NPC.h" />
     <ClInclude Include="UIItem.h" />
     <ClInclude Include="Teleport.h" />
+    <ClInclude Include="BossFireDragon.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -516,6 +517,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Teleport.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="BossFireDragon.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

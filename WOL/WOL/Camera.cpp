@@ -19,11 +19,18 @@ Event Camera::update(float dt)
 	int height = (_rt.bottom - _rt.top) / 2;
 
 	vec& cp = _object_mgr->camera_pos;
-
 	cp = _transform->_location = _target_ptr->_transform->_location;
-
-	cp.x -= width;
-	cp.y -= height;
+	// 카메라가 고정되어 있는 상태라면 지정한 좌표에 카메라 고정
+	if (bCameraFixing)
+	{
+		vec RangeLT = CameraFixPos.first;
+		vec RangeRB = CameraFixPos.second;
+		cp.x = std::clamp<>(cp.x, RangeLT.x, RangeRB.x);
+		cp.y = std::clamp<>(cp.y, RangeLT.y, RangeRB.y); 
+	}
+		cp.x -= width;
+		cp.y -= height;
+	
 	Shaking(dt);
 
 	// 카메라흔들림
@@ -45,6 +52,12 @@ void Camera::initialize()
 void Camera::camera_shake(float force, vec dir,float duration  =0.05f)
 {
 	Shake_Infos.push_back({ force, dir, duration });
+}
+
+void Camera::SetCameraFix(bool bFix, std::pair<vec, vec> CameraFixRange)
+{
+	bCameraFixing = bFix;
+	this->CameraFixPos = CameraFixRange;
 }
 
 bool Camera::Shaking(float dt)

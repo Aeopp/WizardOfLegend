@@ -3,6 +3,8 @@
 #include "collision_component.h"
 #include "collision_mgr.h"
 #include "Prison.h"
+#include "object_mgr.h"
+#include "Camera.h"
 
 Event Trigger::update(float dt)
 {
@@ -31,8 +33,7 @@ Event Trigger::update(float dt)
 			if (Event_End)
 				Event_End();
 
-			bEventEnd = true;
-			bDie = true;
+			release();
 			return Event::Die;
 		}
 	}
@@ -74,10 +75,29 @@ void Trigger::Hit(std::weak_ptr<object> _target)
 	{
 		wp_EventZoneMonsters = Event_Start();
 		bEventStart = true;
+
+		TriggerStart();
 	}
 }
 
- void Trigger::SetUp(std::pair<int, int> EventZoneSize, vec Location, std::function<std::vector<std::weak_ptr<class object>>()> StartEvent, std::function<void()> EndEvent, std::queue<std::function<std::vector<std::weak_ptr<class object>>()>> EventList)
+void Trigger::release() noexcept
+{
+	bEventEnd = true;
+	bDie = true;
+
+	if (!bCameraFixZone)return;
+
+	auto sp_camera = object_mgr::instance()._Camera.lock();
+	if (!sp_camera)return;
+	sp_camera->SetCameraFix(false);
+}
+
+ void Trigger::SetUp
+ (std::pair<int, int> EventZoneSize, vec Location,
+	 std::function<std::vector<std::weak_ptr<class object>>()> StartEvent, 
+	 std::function<void()> EndEvent, 
+	 std::queue<std::function<std::vector<std::weak_ptr<class object>>()>> EventList,
+	 bool bCameraFixZone , std::pair<vec, vec> CameraRange)
 {
 	this->EventZoneSize = std::move(EventZoneSize);
 	if (!_transform)return;
@@ -89,7 +109,21 @@ void Trigger::Hit(std::weak_ptr<object> _target)
 	auto sp_collision = wp_collision.lock();
 	if (!sp_collision) return;
 	sp_collision->_size = EventZoneSize;
+
+	
+	if (!bCameraFixZone)return;
+	this->bCameraFixZone = bCameraFixZone;
+	TriggerCameraRange = std::move(CameraRange);
 }
+
+ void Trigger::TriggerStart()
+ {
+	 if (!bCameraFixZone)return;
+
+	 auto sp_camera = object_mgr::instance()._Camera.lock();
+	 if (!sp_camera)return;
+	 sp_camera->SetCameraFix(bCameraFixZone, TriggerCameraRange);
+ }
 
 
 bool Trigger::ConditionCheck()
