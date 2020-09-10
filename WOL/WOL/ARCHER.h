@@ -24,6 +24,9 @@ public:
     bool bArrowLineRender = false; 
     vec TargetPositionRenderPos{};
 private:
+    void SetArrowLineRender(bool SetFlag);
+    static inline const float AttackPreparationTimeMax = 1.8f;
+    float AttackPreparationTime = 0.0f;
     void DirCheckAnimFileChange();
 
     enum class EAnimState : uint8_t

@@ -66,6 +66,8 @@ Event ARCHER::update(float dt)
 		return Event::Die;
 	if (bDying)
 		return Event::None;
+	if (bArrowLineRender)
+		AttackPreparationTime += dt;
 
 	CurrentFireCoolTime -= dt;
 	Event _E = Monster::update(dt);
@@ -104,9 +106,9 @@ Event ARCHER::update(float dt)
 	{
 		_EnemyInfo.bAttack = true;
 		NormalAttack->Preparation(true);
-		bArrowLineRender = true;
+		SetArrowLineRender(true);
 
-		_render_component->ChangeAnim(EAnimState::Attack, 1.8f,EAnimState::Attack);
+		_render_component->ChangeAnim(EAnimState::Attack, AttackPreparationTimeMax,EAnimState::Attack);
 
 		sound_mgr::instance().Play("ARCHER_AIM", false, 1.f);
 		
@@ -116,20 +118,20 @@ Event ARCHER::update(float dt)
 		// 여기서 공격
 		if (CurrentFireCoolTime < 0)
 		{
-			Timer::instance().event_regist(time_event::EOnce, 1.8f,
+			Timer::instance().event_regist(time_event::EOnce, AttackPreparationTimeMax,
 				[&bParticle = NormalAttack,
 				&TargetLoc = sp_Target->_transform->_location,
 				loc = _transform->_location,
 				&_Shadow = _Shadow, &_Info = _EnemyInfo,
 				&render = _render_component,
 				&_NormalAttack = NormalAttack, 
-				&bArrowLineRender = bArrowLineRender,
+				this,
 				&_CoolTime = this->CurrentFireCoolTime](){
 
 				if (!bParticle)return true;
 				if (_Info.bHit)return true;
 				if (!_Info.bAttack)return true;
-				bArrowLineRender = false;
+				this->SetArrowLineRender(false); 
 
 				_NormalAttack->Preparation(false);
 				vec dir = (TargetLoc - loc).get_normalize();
@@ -140,14 +142,15 @@ Event ARCHER::update(float dt)
 				return true;
 			});				
 
-			CurrentFireCoolTime = 1.8f;
+			CurrentFireCoolTime = AttackPreparationTimeMax;
 
 		}
 		else if (CurrentFireCoolTime > 0)
 		{
 			_render_component->ChangeAnim(EAnimState::Attack, 0.3f);
 			_Shadow.CurrentShadowState = EShadowState::NORMAL; 		
-			bArrowLineRender = false;
+			SetArrowLineRender(false);
+			 
 
 			NormalAttack->Preparation(false);
 		}
@@ -156,7 +159,7 @@ Event ARCHER::update(float dt)
 	{
 		NormalAttack->Preparation(false);
 		_EnemyInfo.bAttack = false;
-		bArrowLineRender = false;
+		SetArrowLineRender(false);
 
 		StalkerPosReTargetDuration -= dt;
 		if (StalkerPosReTargetDuration < 0)
@@ -174,7 +177,7 @@ Event ARCHER::update(float dt)
 		_render_component->ChangeAnim(EAnimState::Idle, 0.3f);
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		NormalAttack->Preparation(false);		
-		bArrowLineRender = false;
+		SetArrowLineRender(false);
 	}
 
 	return _E;
@@ -200,7 +203,7 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	NormalAttack->Preparation(false);
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
-	bArrowLineRender = false;
+	SetArrowLineRender(false);
 	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
 	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
@@ -234,7 +237,7 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	}
 	else
 	{
-		bArrowLineRender = false;
+		SetArrowLineRender(false);
 		NormalAttack->Preparation(false);
 		EscapeVec = math::RandVec();
 		EscapeRamainTick = EscapeDuration;
@@ -258,9 +261,11 @@ void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 
 		vec MyLocation = _transform->_location - camera_pos;
 		vec TargetLocation = sp_Target->_transform->_location - camera_pos;
-
+		static float ColorConstant = 255 / AttackPreparationTimeMax;
+		float CurrentColor = 255-(ColorConstant * AttackPreparationTime); 
 		HPEN MyPen, OldPen;
-		MyPen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+		MyPen = CreatePen(PS_SOLID, 3, RGB(255, 
+		CurrentColor , CurrentColor));
 		OldPen = (HPEN)SelectObject(hdc, MyPen);
 
 		MoveToEx(hdc, MyLocation.x, MyLocation.y, nullptr);
@@ -270,6 +275,11 @@ void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 		DeleteObject(MyPen);
 	}
 	
+}
+void ARCHER::SetArrowLineRender(bool SetFlag)
+{
+	bArrowLineRender = SetFlag;
+	AttackPreparationTime = 0.0f;
 }
 void ARCHER::DirCheckAnimFileChange()
 {

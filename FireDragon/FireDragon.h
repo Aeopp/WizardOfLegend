@@ -42,8 +42,7 @@ public:
 
 	  std::deque<std::tuple<vec,int,int,float>> ParticleLocationDQ;
 
-	  float InitAngle;
-	  vec PerpendicularDir;
+
 	  vec LineDir;
 	  vec LinePos;
 	  float amplitude;

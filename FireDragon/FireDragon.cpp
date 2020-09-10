@@ -55,14 +55,13 @@ void FireDragon::initialize()
 	sp_ParticleImg= Bmp_mgr::instance().Find_Image_SP(L"FIRE_PARTICLE");
 
 	//////////////////
-	amplitude = 70;
+	amplitude = 100.f;
 };
 
 Event FireDragon::update(float dt)
 {
 	Duration -= dt;
 	ParticleDelta -= dt;
-	T += dt * 12;
 
 	if (ParticleDelta < 0)
 	{
@@ -93,18 +92,29 @@ Event FireDragon::update(float dt)
 
 	if (!_transform)return Event::Die;
 
-	// 커런트 앵글과 트랜스폼 방향 반드시 갱신
-	// 커런트 앵글 360 으로 트랜스폼 방향 용의 머리를 결정 하도록
+	// 현재 각도의 회전 스피드 에 델타타임을 곱해서 각도를 점점 증가시키거나
+	// 감소시킨다.
+	CurrentAngle += (RotationSpeed * MyFactor) * dt;
+	// 각도가 Max 나 Min 에 도달 할 시 각도의 증가나 감소의 여부를 결정한다.
+	if (CurrentAngle > AngleMax )
+	{
+		 CurrentAngle = AngleMax; 
+		MyFactor *= -1.f;
+	}
+	else if (CurrentAngle < AngleMin)
+	{
+		CurrentAngle = AngleMin;
+		MyFactor *= -1.f;
+	}
+	 // 현재 각도로부터 벡터를 만듬.
+	vec NewDir = math::dir_from_angle(CurrentAngle);
+	// 데카르트 좌표계가 아닌 화면 좌표계 이기 때문에 y 를 뒤집는다.
+	NewDir.y *= -1;
 
-	LinePos += LineDir * Speed * dt;
-	float y = std::sinf(T);
-	;
-	vec Pos = LinePos + (PerpendicularDir * (y * amplitude * MyFactor ) );
-	_transform->_location = Pos;
+	_transform->_dir = NewDir;
+	// 계산한 방향에 스피드를 곱해서 위치에 더한다.
+	_transform->_location += (_transform->_dir * Speed * dt);
 
-
-	CurrentAngle = InitAngle + (45 * y);
-	_transform->_dir = math::dir_from_angle(CurrentAngle);
 	return _event;
 }
 
@@ -185,14 +195,11 @@ void FireDragon::SetUp(vec Location, vec Dir)
 
 	_transform->_location = Location;
 	_transform->_dir = Dir;
-	InitAngle=CurrentAngle = math::AngleFromVec(Dir);
+	CurrentAngle = math::AngleFromVec(Dir);
+	AngleMin = CurrentAngle - 45;
+	AngleMax = CurrentAngle + 45;
 	
 	CalcSpriteFromAngle();
-
-	PerpendicularDir = math::rotation_dir_to_add_angle(Dir, 90);
-	LineDir = Dir;
-	LinePos = Location;
-	T = 0;
 }
 
 void FireDragon::CalcSpriteFromAngle()
