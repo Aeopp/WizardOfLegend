@@ -116,7 +116,7 @@ void Scene_Boss::initialize()
 				+ vec{ 0 ,+200 }, ESkill::ARMOR, L"GAIR_ARMOR_CARD");
 
 			obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
-				+ vec{ 0 ,-400 }, ESkill::ARMOR, L"BOOMERANG_CARD");
+				+ vec{ 0 ,-400 }, ESkill::BOOMERANG, L"BOOMERANG_CARD");
 	/*	for (int i = 0; i < 100; ++i)
 		{
 			Timer::instance().event_regist(time_event::EOnce, 10*i, [=,this]() {

@@ -1196,7 +1196,7 @@ void Player::make_skillbar_icon(ESkill _eSkill)
 		break;
 	case ESkill::BOOMERANG:
 		USBI = object_mgr::instance().insert_object<UISkillIBarIcon>(
-			vec{429,838 }, L"BOOMERANG_SKILLBAR.bmp");
+			vec{ 429,838 }, L"BOOMERANG_SKILLBAR.bmp");
 		USBI->wp_PlayerInfo = _player_info;
 		USBI->CurrentSlotIdx = 6;
 		break;
