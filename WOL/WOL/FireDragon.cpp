@@ -6,6 +6,8 @@
 #include "Bmp_mgr.h"
 #include "Bmp.h"
 #include "Burning_Interface.h"
+#include "Effect.h"
+#include "object_mgr.h"
 
 
 void FireDragon::initialize()
@@ -56,6 +58,9 @@ void FireDragon::initialize()
 
 	//////////////////
 	amplitude = 70;
+
+
+
 };
 
 Event FireDragon::update(float dt)
@@ -207,6 +212,46 @@ void FireDragon::SetUp(vec Location, vec Dir)
 	LineDir = Dir;
 	LinePos = Location;
 	T = 0;
+	
+	static const size_t ParticleNum = 6;
+	static const std::wstring ImgKey = L"FIRE_PARTICLE";
+	static const float ParticleDuration = 0.6f;
+	// launch 시 파티클 위치 , 파티클 흩날릴 방향 , 파티클 스프라이트 인덱스
+	std::vector<std::tuple<vec,vec,int32_t>> ParticleInfos;
+	ParticleInfos.reserve(ParticleNum);
+	float MyFactor = this->MyFactor;
+	auto ParticleInfoGenerate = [MyFactor,Location, Dir]()
+		->typename decltype(ParticleInfos)::value_type
+	{
+		const float DistanceMin = 100;
+		const std::pair<int, int> RandRange = { -100,100};
+		
+		int32_t Row = math::Rand<int32_t>({0,3});
+		vec InitDir = math::rotation_dir_to_add_angle((Dir * -1), 45 * MyFactor);
+		vec InitLocation = Location + (InitDir * DistanceMin);
+		vec RandDir = math::rotation_dir_to_add_angle(InitDir, math::Rand<int>({0,45}));
+		InitLocation +=  (RandDir * math::Rand<int32_t>(RandRange));
+		return { InitLocation , RandDir   ,Row  };
+	};
+
+	std::generate_n(std::back_inserter(ParticleInfos),
+		ParticleNum, std::move(ParticleInfoGenerate));
+
+	for(const auto& [Location,Dir,IDX] : ParticleInfos)
+	{
+		int ImgLocationX = Location.x;
+		int ImgLocationY =  Location.y;
+		int AnimRowIndex = IDX;
+		
+		auto sp_Effect = 	object_mgr::instance().insert_object<Effect>(
+			ImgLocationX, ImgLocationY, ImgKey, layer_type::EEffect,
+			5, AnimRowIndex, ParticleDuration, ParticleDuration,
+			70, 70, 0.8f, 0.8f , Dir);
+	}
+	//void late_initialize(int ImgLocationX, int ImgLocationY,
+	//	std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
+	//	int AnimRowIndex, float Duration, float AnimDuration,
+	//	int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);
 }
 
 void FireDragon::CalcSpriteFromAngle()

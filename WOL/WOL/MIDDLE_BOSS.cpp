@@ -562,29 +562,80 @@ void MIDDLE_BOSS::BOSS_Skill_ICECrystal(size_t NUM)
 void MIDDLE_BOSS::BOSS_SKill_FireDragon(size_t NUM)
 {
 	if (!_transform)return;
-
-	float InitDistance = 100.f;
-	float SpawnBetWeenAngle = 360.f / NUM;
+	
+	// 패턴 예고
+	static const size_t ParticleNum = 12;
+	static const std::wstring ImgKey = L"FIRE_PARTICLE";
+	static const float ParticleDuration = 0.5f;
+	static const float PatternNotifyTime = 2.f;
+	static const int32_t ParticlePlayNumber = 4;
+	// launch 시 파티클 위치 , 파티클 스프라이트 인덱스
+	std::vector<std::tuple<vec, vec,int32_t>> ParticleInfos;
 	vec MyLocation = _transform->_location;
+	
+	auto ParticleInfoGenerate = [MyLocation]()
+		->typename decltype(ParticleInfos)::value_type
+	{
+		const std::pair<int, int> RandRange = { -100,100};
+	
+		int32_t Row = math::Rand<int32_t>({0,3});
+		vec InitLocation = MyLocation;
+		vec RandDir = math::RandVec();
+		InitLocation += RandDir* math::Rand<int32_t>(RandRange);
+		return { InitLocation , RandDir   ,Row  };
+	};
+	
+	Timer::instance().event_regist_ReWhileDelta(PatternNotifyTime +0.05f, PatternNotifyTime /(float)ParticlePlayNumber ,
+		[ParticleInfos, ParticleInfoGenerate]()mutable
+	{
+		if (!ParticleInfos.empty())
+			ParticleInfos.clear();
+		
+		ParticleInfos.reserve(ParticleNum);
+		
+		std::generate_n(std::back_inserter(ParticleInfos),
+			ParticleNum, (ParticleInfoGenerate));
 
-	std::shared_ptr<vec> _vec = std::make_shared<vec>(math::dir_from_angle(0));
-
-	Timer::instance().event_regist_ReWhileDelta(6.f, 0.33f,[=]() {
-		vec SpawnDirFromBoss = *_vec;
-		for (size_t i = 0; i < NUM; ++i)
+		for (const auto& [Location, Dir, IDX] : ParticleInfos)
 		{
-			auto _FD = object_mgr::instance().insert_object<BossFireDragon>();
-			if (!_FD)return;
+			int ImgLocationX = Location.x;
+			int ImgLocationY = Location.y;
+			int AnimRowIndex = IDX;
 
-			vec SpawnLocation = MyLocation + SpawnDirFromBoss * InitDistance;
-			_FD->SetUp(SpawnLocation, SpawnDirFromBoss);
-
-			SpawnDirFromBoss =
-				math::rotation_dir_to_add_angle(SpawnDirFromBoss,
-					SpawnBetWeenAngle);
+			auto sp_Effect = object_mgr::instance().insert_object<Effect>(
+				ImgLocationX, ImgLocationY, ImgKey, layer_type::EEffect,
+				5, AnimRowIndex, ParticleDuration, ParticleDuration,
+				70, 70, 0.8f, 0.8f , Dir);
 		}
-		*_vec = math::rotation_dir_to_add_angle(*_vec, SpawnBetWeenAngle/2);
 	});
+	 //  공격 시작
+	
+	Timer::instance().event_regist(time_event::EOnce, PatternNotifyTime, [MyLocation,NUM]()
+	{
+		float InitDistance = 100.f;
+		float SpawnBetWeenAngle = 360.f / NUM;
+
+		std::shared_ptr<vec> _vec = std::make_shared<vec>(math::dir_from_angle(0));
+
+		Timer::instance().event_regist_ReWhileDelta(6.f, 0.33f, [=]() {
+			vec SpawnDirFromBoss = *_vec;
+			for (size_t i = 0; i < NUM; ++i)
+			{
+				auto _FD = object_mgr::instance().insert_object<BossFireDragon>();
+				if (!_FD)return;
+
+				vec SpawnLocation = MyLocation + SpawnDirFromBoss * InitDistance;
+				_FD->SetUp(SpawnLocation, SpawnDirFromBoss);
+
+				SpawnDirFromBoss =
+					math::rotation_dir_to_add_angle(SpawnDirFromBoss,
+						SpawnBetWeenAngle);
+			}
+			*_vec = math::rotation_dir_to_add_angle(*_vec, SpawnBetWeenAngle / 2);
+		});
+		return true; 
+	});
+
 }
 
 void MIDDLE_BOSS::BOSS_SKill_Boomerang(size_t NUM)

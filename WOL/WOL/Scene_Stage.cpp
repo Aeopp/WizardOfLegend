@@ -100,11 +100,6 @@ void Scene_Stage::initialize()
 		sound_mgr::instance().Stop("MAIN_MENU_BGM");
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
 
-	/*late_initialize(int ImgLocationX, int ImgLocationY,
-		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
-		int AnimRowIndex, float Duration, float AnimDuration,
-		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
-//	 TOOD :: Scene Dependent Init 
 	{
 			object_mgr& obj_mgr = object_mgr::instance();
 
@@ -117,21 +112,9 @@ void Scene_Stage::initialize()
 
 			auto _Teleport = obj_mgr.insert_object<Teleport>();
 			_Teleport->SetUp(PlayerSpawnLocation, false);
-
-		
-
-		auto boomerang_card = obj_mgr.insert_object<ArcanaCard>(PlayerSpawnLocation
-			+ vec{ 0 ,+200 }, ESkill::BOOMERANG, L"BOOMERANG_CARD");
-
-
-		manage_objs.push_back(boomerang_card);
-	 // 	manage_objs.push_back(crystal_card);
-		//manage_objs.push_back(fire_card);
-	 // 	manage_objs.push_back(blast_card);
 		
 		store_set_up(_Player);
 		TriggerSetUp(_Player);
-		
 		manage_objs.push_back(_Teleport);
 		manage_objs.push_back(_camera);
 		manage_objs.push_back(_Player);
@@ -149,12 +132,11 @@ void Scene_Stage::release()
 
 void Scene_Stage::player_set_up()
 {
-
+	
 }
 
 void Scene_Stage::store_set_up(std::weak_ptr<class Player> _Player)
 {
-	
 	auto _Npc = object_mgr::instance().insert_object<NPC>();
 	_Npc->SetUp(vec{ 2800,150 });
 
@@ -189,7 +171,7 @@ void Scene_Stage::store_set_up(std::weak_ptr<class Player> _Player)
 		if (!sp_Player) return false;
 		if (!sp_Player->_player_info)return false;
 		if (sp_Player->_player_info->gold < 150)return false;
-
+		 
 		sp_Player->_player_info->AddGold(-150);
 
 		std::wstring str = L"-";
@@ -226,43 +208,38 @@ Scene_Stage::~Scene_Stage() noexcept
 	release();
 }
 
-void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
+std::shared_ptr<class object> Scene_Stage::Stage_1(std::weak_ptr<class Player> _Player)
 {
 	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
 
 	std::weak_ptr<class object> wp_Trigger = _Trigger;
 
 	// Start 
-	auto StartEvent = [wp_Trigger,_Player]() {
+	auto StartEvent = [wp_Trigger, _Player]() {
 
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
-		vec PrisonLocation = vec{ 1660,2385};
+		vec PrisonLocation = vec{ 1660,2385 };
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 1.5, Prison::EType::Ver,
 			wp_Trigger, { 100,250 }, PrisonLocation);
-		
+
 		vec SwordManLocation = vec{ 600, 2440 };
-		
+
 		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player,
 			{ SwordManLocation });
-		
+
 		return ReturnObjects;
 	};
 	// 1 
 	auto Event_1 = [_Player]()
 	{
 		std::vector< std::weak_ptr<class object>> ReturnObjects;
-		
-		vec FireCardLocation =  { 900, 2000 };
-		
-		auto fire_card = object_mgr::instance().
-		insert_object<ArcanaCard>(FireCardLocation, ESkill::FIRE, L"FIRE_DRAGON_CARD");
 
-		std::vector<vec> MonsterLocation { {561,2344} , { 505,2718}  };
+		std::vector<vec> MonsterLocation{ {561,2344} , { 505,2718} };
 
-		ReturnObjects+=Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, MonsterLocation);
-		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, MonsterLocation);
+
 		return ReturnObjects;
 	};
 	// 2 
@@ -270,15 +247,15 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 	{
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
-		vec BlastCardLocation = vec{ 914,3100 };
+		vec FireCardLocation = { 900, 2000 };
 
-		auto blast_card = object_mgr::instance().
-		insert_object<ArcanaCard>(BlastCardLocation	, ESkill::BLAST, L"ICE_BLAST_CARD");
-		
+		auto fire_card = object_mgr::instance().
+			insert_object<ArcanaCard>(FireCardLocation, ESkill::FIRE, L"FIRE_DRAGON_CARD");
+
 		std::vector<vec> MonsterLocation{ {1361,2545} , { 474,2484} };
 
 		ReturnObjects += Monster::TypeMatchMonstersSpawn<ARCHER>(_Player, MonsterLocation);
-		
+
 		return ReturnObjects;
 	};
 	// 3
@@ -286,28 +263,204 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 	{
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
-		vec CrystalCardLocation = vec{ 500,2500 };
-
-		auto crystal_card = object_mgr::instance().
-		insert_object<ArcanaCard>(CrystalCardLocation,ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
-	
 		std::vector<vec> MonsterLocation{ {900,2200} , { 900,3100} };
-		
+
 		ReturnObjects += Monster::TypeMatchMonstersSpawn<WIZARD>(_Player, MonsterLocation);
 
+		return ReturnObjects;
+	};
+	
+	auto EndEvent = [BlastCardLocation =this->PlayerSpawnLocation]()
+	{
+		auto blast_card = object_mgr::instance().
+		insert_object<ArcanaCard>(BlastCardLocation, ESkill::BLAST, L"ICE_BLAST_CARD");
+	};
+
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	EventQ.push(std::move(Event_1));
+	EventQ.push(std::move(Event_2));
+	EventQ.push(std::move(Event_3));
+	vec  EventZoneSize = { 500,500 };
+	vec TriggerLocation = { 1350,2450 };
+
+	_Trigger->SetUp({ 200,200 }, vec{ 1350,2450 },
+		std::move(StartEvent),
+		std::move( EndEvent ) , std::move(EventQ));
+
+	return _Trigger;
+}
+
+std::shared_ptr<object> Scene_Stage::Stage_2(std::weak_ptr<Player> _Player)
+{
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	// Start 
+	auto StartEvent = [wp_Trigger, _Player]() {
+
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		vec PrisonLocation = vec{ 3779,2381};
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 0.8, Prison::EType::Ver,
+			wp_Trigger, { 100,200 }, PrisonLocation);
+		
+		 PrisonLocation = vec{ 4750,2400};
+		 _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 0.8, Prison::EType::Ver,
+			wp_Trigger, { 150,200 }, PrisonLocation);
+		
+		 PrisonLocation = vec{ 4030,2920};
+		 _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.1, 0.7, Prison::EType::Hor,
+			wp_Trigger, { 150,250 }, PrisonLocation);
+		
+		 PrisonLocation = vec{ 4160,2040 };
+		 _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(0.9, 0.7, Prison::EType::Hor,
+			wp_Trigger, { 150,250 }, PrisonLocation);
+
+		std::vector<vec> SwordManLocations = { { 3983, 2282 },{4514,2533} };
+		std::vector<vec> ArcherLocations = { { 4035, 2314},{4441,2502} };
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player,
+			 SwordManLocations );
+		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<ARCHER>(_Player,
+			ArcherLocations);
+		
+		return ReturnObjects;
+	};
+
+	auto Event_1 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		std::vector<vec> MonsterLocation{ {4007,2275} , { 4530,2272},{3970,2550}
+		,{4500,2500}};
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, MonsterLocation);
+
+		return ReturnObjects;
+	};
+
+	auto EndEvent = []()
+	{
+		vec CrystalCardLocation = vec{ 4776,4292};
+
+		auto crystal_card = object_mgr::instance().
+			insert_object<ArcanaCard>(CrystalCardLocation, ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
+	};
+	
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	EventQ.push(std::move(Event_1));
+	std::pair<int,int>  EventZoneSize = { 200,200};
+	vec TriggerLocation = { 4100,2409};
+	std::pair<vec, vec> CameraRange = { { 4200,2300} ,  { 4400,2500} };
+	_Trigger->SetUp(EventZoneSize, TriggerLocation,
+		std::move(StartEvent),
+		std::move(EndEvent) , std::move(EventQ),true,
+		CameraRange);
+
+	return _Trigger;
+}
+
+std::shared_ptr<object> Scene_Stage::Stage_3(std::weak_ptr<Player> _Player)
+{
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	// Start 
+	auto StartEvent = [wp_Trigger, _Player]() {
+
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		vec PrisonLocation = vec{ 4260,4232};
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1, Prison::EType::Ver,
+			wp_Trigger, { 100,150 }, PrisonLocation);
+		
+
+		std::vector<vec> WizardBallLocations = 
+		{
+			{ 4817, 3971 },{4498 ,  4294} , {5113  , 4341 } , {4808 ,4785 }
+		};
+		
+		for(auto& Location : WizardBallLocations)
+		{
+			auto sp_Ball=
+			object_mgr::instance().insert_object<WizardBall>(_Player, std::move(Location));
+			
+			ReturnObjects.push_back(sp_Ball);
+		}
+		
+		return ReturnObjects;
+	};
+
+	auto Event_1 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+		
+		std::vector<vec> WizardBallLocations =
+		{
+			{ 4817, 3971 },{4498 ,  4294} , {5113  , 4341 } , {4808 ,4785 },
+			{ 4900, 3971 },{4598 ,  4294} , {5213  , 4341 } , {4908 ,4785 }
+		};
+		
+		for (auto& Location : WizardBallLocations)
+		{
+			auto sp_Ball =
+				object_mgr::instance().insert_object<WizardBall>(_Player, std::move(Location));
+
+			ReturnObjects.push_back(sp_Ball);
+		}
+		
 		return ReturnObjects;
 	};
 
 	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
 	EventQ.push(std::move(Event_1));
-	EventQ.push(std::move(Event_2 ));
-	EventQ.push(std::move(Event_3));
-	vec  EventZoneSize = { 500,500 };
-	vec TriggerLocation = { 1350,2450 };
-	
-	_Trigger->SetUp({ 200,200 }, vec{ 1350,2450 },
+	std::pair<int, int>  EventZoneSize = { 200,200 };
+	vec TriggerLocation = { 4861,4326 };
+	std::pair<vec, vec> CameraRange = { { 4700,4200} ,  { 4900,4400} };
+	_Trigger->SetUp(EventZoneSize, TriggerLocation,
 		std::move(StartEvent),
-		[]() {}, std::move(EventQ));
-	
-	manage_objs.push_back(_Trigger);
+		[] {}, std::move(EventQ), true,
+		CameraRange);
+
+	return _Trigger;
+}
+
+std::shared_ptr<object> Scene_Stage::Stage_4(std::weak_ptr<Player> _Player)
+{
+	return {};
+}
+
+std::shared_ptr<object> Scene_Stage::Stage_5(std::weak_ptr<Player> _Player)
+{
+	return {};
+}
+
+std::shared_ptr<object> Scene_Stage::Stage_6(std::weak_ptr<Player> _Player)
+{
+	return {};
+}
+
+std::shared_ptr<object> Scene_Stage::Stage_7(std::weak_ptr<Player> _Player)
+{
+	return {}; 
+}
+
+
+void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
+{
+	manage_objs.push_back(Stage_1(_Player));
+	manage_objs.push_back(Stage_2(_Player));
+	manage_objs.push_back(Stage_3(_Player));
+	manage_objs.push_back(Stage_4(_Player));
+	manage_objs.push_back(Stage_5(_Player));
+	manage_objs.push_back(Stage_6(_Player));
+	manage_objs.push_back(Stage_7(_Player));
 }

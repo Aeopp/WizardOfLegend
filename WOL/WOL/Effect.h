@@ -21,8 +21,8 @@ public:
 	// 프로퍼티들 초기화 해주세요 ===========================================
 	COLORREF ColorKey = COLOR::MRGENTA();
 	// 이미지 그릴 위치 (센터기준)
-	int ImgLocationX;
-	int ImgLocationY;
+	float ImgLocationX;
+	float ImgLocationY;
 	std::wstring ImgKey{};
 
 	layer_type layer_ID;
@@ -42,9 +42,10 @@ public:
 	float ScaleX;
 	float ScaleY;
 
-	void late_initialize(int ImgLocationX,int ImgLocationY,
+	vec ImgMoveDir;
+	void late_initialize(float ImgLocationX, float ImgLocationY,
 	std::wstring ImgKey, layer_type layer_ID,int AnimColNum,
 		int AnimRowIndex,float Duration,float AnimDuration,
-		int PaintSizeX,int PaintSizeY,float ScaleX,float ScaleY);
+		int PaintSizeX,int PaintSizeY,float ScaleX,float ScaleY,vec ImgMoveDir= {0,0});
 };
 
