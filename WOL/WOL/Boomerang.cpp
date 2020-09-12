@@ -72,6 +72,8 @@ Event Boomerang::update(float dt)
 	Event _event = actor::update(dt);
 
 	Duration -= dt;
+	HitTileEffectRemainTime -= dt;
+	
 	if (Duration < 0)return Event::Die;
 
 	_transform->_location +=_transform->_dir * _speed * dt;
@@ -124,7 +126,12 @@ void Boomerang::HitTile(RECT TileRt)
  	vec dir = _transform->_dir;
 	dir *= -1;
 
-	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+	if (HitTileEffectRemainTime <0  )
+	{
+		HitTileEffectRemainTime = HitTileEffectTick;
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
+		RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+	}
 	
 	int RandAngle = math::Rand<int>({ -1,+1 });
 

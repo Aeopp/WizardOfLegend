@@ -69,6 +69,8 @@ Event BossBoomerang::update(float dt)
 {
 	Event _event = object::update(dt);
 
+	HitTileEffectRemainTime -= dt;
+	
 	Duration -= dt;
 	if (Duration < 0)return Event::Die;
 
@@ -142,11 +144,16 @@ void BossBoomerang::HitTile(RECT TileRt)
 	vec dir = _transform->_dir;
 	dir *= -1;
 
-	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+	if (HitTileEffectRemainTime < 0)
+	{
+		HitTileEffectRemainTime = Boomerang::HitTileEffectTick;
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
+		RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+	}
 
-	float RandAngle = math::Rand<int>({ -45,+45 });
+	int RandAngle = math::Rand<int>({ -1,+1 });
 
-	dir = math::rotation_dir_to_add_angle(dir, RandAngle);
+	dir = math::rotation_dir_to_add_angle(dir, RandAngle * 45);
 
 	_transform->_dir = dir;
 

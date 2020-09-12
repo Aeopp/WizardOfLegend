@@ -1,4 +1,5 @@
 #pragma once
+#include "Boomerang.h"
 #include "object.h"
 class BossBoomerang :
     public object
@@ -28,6 +29,7 @@ public:
 	int CurrentColIdx;
 	float AnimDelta;
 	float CurrentAnimRemainTime;
+	float HitTileEffectRemainTime = Boomerang::HitTileEffectTick;
 private:
 	std::weak_ptr<class object> wp_Target{};
 	float ScaleX ;

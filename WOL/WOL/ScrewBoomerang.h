@@ -12,6 +12,6 @@ public:
     void late_initialize(vec RotationInitCenter,
         vec RotationInitDir);
     void HitTile(RECT TileRt) override;
-    float HitTick = 0.3f;
+  
 };
 

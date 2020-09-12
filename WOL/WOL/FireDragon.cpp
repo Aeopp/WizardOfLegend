@@ -4,9 +4,9 @@
 #include "collision_mgr.h"
 #include "Color.h"
 #include "Bmp_mgr.h"
-#include "helper.h"
-#include "game.h"
 #include "Bmp.h"
+#include "Burning_Interface.h"
+
 
 void FireDragon::initialize()
 {
@@ -172,6 +172,25 @@ void FireDragon::HitTile(RECT TileRt)
 
 	bWallHited = true;
 	Duration = ParticleLocationUpdateDelta* ParticleMaxNum + 0.05f;
+}
+
+void FireDragon::Hit(std::weak_ptr<object> _target)
+{
+	auto sp_Target = _target.lock();
+	if (!sp_Target)return;
+
+	if (Burning_Interface::probability_calculation()
+		&& sp_Target->ObjectTag == object::Tag::monster)
+	{
+		auto sp_EnableObject = std::dynamic_pointer_cast<Burning_Interface>(sp_Target);
+		if (!sp_EnableObject)return;
+		if (!_transform)return;
+
+		vec MsgLocation = _transform->_location;
+
+		sp_EnableObject->_Burning_Info.burn(MsgLocation);
+	}
+
 }
 
 void FireDragon::SetUp(vec Location, vec Dir)

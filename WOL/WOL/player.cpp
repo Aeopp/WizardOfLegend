@@ -41,8 +41,12 @@ void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 	Freezing_render(hdc, _transform->_location - camera_pos);
 	
 	if (!_Freezing_Info.IsFreezing())
+	{
 		actor::render(hdc, camera_pos, size_factor);
-	 
+
+		Burning_render(hdc, _transform->_location - camera_pos);
+	}
+	
 	if (bDebug)
 	{
 		vec v = _transform->_location;
@@ -186,6 +190,7 @@ Event Player::update(float dt)
 	}
 	
 	Freezing_update(dt, _collision_component);
+	burning_update(dt);
 	
 	if (!_Freezing_Info.IsFreezing  ())
 	{
@@ -219,46 +224,27 @@ void Player::Hit(std::weak_ptr<object> _target)
 		MissMsg();
 		return;
 	}
-	Timer& _Timer = Timer::instance();
-
-	if(_player_info->GetHP()>0)
-	{
-		CurrentInvincibletime = DefaultInvincibletime;
-
-		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		_player_info->bHit = true;
-		if (!_player_info->bDash)
-			_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.5f, AnimTable::idle);
-			collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
-			_Timer.event_regist(time_event::EOnce, 0.5f,
-			[&bHit = _player_info->bHit]() 
-			{
-				bHit = false; 
-			return true; 
-			});
-	}
-	else
-	{
-		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
-		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f,	AnimTable::dead);
 	
-	//	Timer::instance().time_scale = 0.1f;
-		sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
-	///*	_Timer.event_regist(EOnce, 1.f, []() {
-	//		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
-	//			MB_OK);
-	//		return true;
-	//		});;
-	//	_Timer.time_scale = 1.0f;*/
-	//	DeltaTime = 0.0f;
-
-		_player_info->SetHp(_player_info->max_hp);
-		_player_info->SetMp(_player_info->max_mp);
-	}
+	Timer& _Timer = Timer::instance();
 	
 	float Atk = math::Rand<int>(sp_target->Attack);
+	COLORREF _HitEffectColor = RGB(255, 50, 64);
+	std::wstring Msg = std::to_wstring((int)Atk);
 
+	if (_Freezing_Info.IsFreezing())
+	{
+		Atk *= Freezing_Interface::Amplification_factor;
+		_HitEffectColor = Freezing_Interface::EffectColor;
+		Msg += L"!"; 
+	}
+	else if (_Burning_Info.IsBurning())
+	{
+		Atk *= Burning_Interface::Amplification_factor;
+		_HitEffectColor = Burning_Interface::EffectColor;
+		Msg += L"!";
+	}
+	
+	
 	_player_info->AddHp(-Atk);
 
 	vec randvec = math::RandVec();
@@ -267,15 +253,50 @@ void Player::Hit(std::weak_ptr<object> _target)
 	v.y -= 35;
 	v.x += math::Rand<int>({ -40,+40 });
 
-	object_mgr::instance().TextEffectMap[RGB(255, 50, 64)].
+	object_mgr::instance().TextEffectMap[_HitEffectColor].
 		push_back({ v ,vec{0,1}*3,
-		1.f,int(Atk),std::to_wstring((int)Atk) });
+		1.f,int(Atk),std::move(Msg) });
 
+
+	if (_player_info->GetHP() > 0)
+	{
+		CurrentInvincibletime = DefaultInvincibletime;
+
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
+		_player_info->bHit = true;
+		if (!_player_info->bDash)
+			_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.5f, AnimTable::idle);
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+		_Timer.event_regist(time_event::EOnce, 0.5f,
+			[&bHit = _player_info->bHit]()
+		{
+			bHit = false;
+			return true;
+		});
+	}
+	else
+	{
+		_Shadow.CurrentShadowState = EShadowState::NORMAL;
+		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
+		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f, AnimTable::dead);
+
+		//	Timer::instance().time_scale = 0.1f;
+		sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
+		///*	_Timer.event_regist(EOnce, 1.f, []() {
+		//		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
+		//			MB_OK);
+		//		return true;
+		//		});;
+		//	_Timer.time_scale = 1.0f;*/
+		//	DeltaTime = 0.0f;
+
+		_player_info->SetHp(_player_info->max_hp);
+		_player_info->SetMp(_player_info->max_mp);
+	}
+	
 	Camera_Shake(Atk, 
 		(_transform->_location - sp_target->_transform->_location).get_normalize(),
 		Atk*0.01);
-
-
 };
 
 void Player::StateCheck()

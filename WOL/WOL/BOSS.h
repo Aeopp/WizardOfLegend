@@ -4,6 +4,7 @@
 #include "SOIL.h"
 #include "ICE_Blast.h"
 #include "Freezing_Interface.h"
+#include "Burning_Interface.h"
 
 struct PatternInfo
 {
@@ -11,7 +12,7 @@ struct PatternInfo
     float Duration;
     std::function<void()> Skill;
 };
-class BOSS : public object , public Freezing_Interface
+class BOSS : public object , public Freezing_Interface , public Burning_Interface
 {
 public:
     enum class EState : uint8_t

@@ -8,7 +8,7 @@ Event ScrewBoomerang::update(float dt)
 {
 	Event _event = actor::update(dt);
 
-	HitTick -= dt;
+	HitTileEffectRemainTime -= dt;
 
 	Duration -= dt;
 	if (Duration < 0)return Event::Die;
@@ -53,24 +53,5 @@ void ScrewBoomerang::late_initialize(vec RotationInitCenter, vec RotationInitDir
 
 void ScrewBoomerang::HitTile(RECT TileRt)
 {
-	actor::HitTile(TileRt);
-
-	vec dir = _transform->_dir;
-	dir *= -1;
-
-	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
-
-	int RandAngle = math::Rand<int>({ -45,+45 });
-
-	dir = math::rotation_dir_to_add_angle(dir, RandAngle);
-
-	_transform->_dir = dir;
-
-	if (HitTick < 0)
-	{
-		HitTick = 0.3f;
-
-		collision_mgr::instance().HitEffectPush(_transform->_location, 0.3f);
-	}
-	CalcImgAngle(math::radian_to_degree(atan2f(dir.y, dir.x)));
+	Boomerang::HitTile(TileRt);
 }

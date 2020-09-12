@@ -11,6 +11,7 @@ public:
 	  Event update(float dt)override;
 	  std::weak_ptr<class collision_component>  _collision_component;
 	  uint32_t get_layer_id()const& override;
+	void Hit(std::weak_ptr<object> _target) override;
 	  void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	  void HitTile(RECT TileRt)override;
 

@@ -4,9 +4,9 @@
 #include "EnemyInfo.h"
 #include "Effect.h"
 #include "Freezing_Interface.h"
+#include "Burning_Interface.h"
 
-
-class Monster :  public actor ,  public Freezing_Interface
+class Monster :  public actor ,  public Freezing_Interface , public Burning_Interface 
 {
 public:
 	enum class EMonsterState :uint8_t
@@ -36,7 +36,8 @@ public:
 	void WINDHitSoundPlay();
 	void NormalHitSoundPlay();
 	void BoomerangSoundPlay();
-	
+
+	void Hit_Calculation(int HitAnimIdx, std::pair<int, int> AttackRange);
 	void burn();
 	static void MonsterHitPlayerSignatureGageAdd(float Atk);
 	virtual std::wstring GetSummonKey()abstract;

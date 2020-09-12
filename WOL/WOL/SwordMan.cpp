@@ -208,39 +208,17 @@ void SwordMan::Hit(std::weak_ptr<object>
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
 	AttackStartTime = AttackEndRemainTime = -1;
-	
-	
-	
-	_render_component->ChangeAnim(EAnimState::Hit, HitCoolTime);
-	_Shadow.CurrentShadowState = EShadowState::BIG;
-	collision_mgr::instance().HitEffectPush(_transform->_location, HitCoolTime);
+
 
 	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
+	Hit_Calculation((int)EAnimState::Hit, sp_target->Attack);
 
-	vec randvec = math::RandVec();
-	randvec.y = (abs(randvec.y));
-	vec v = _transform->_location;
-	v.y -= 35;
-	v.x += math::Rand<int>({ -40,+40 });
-
-	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
-		[&bHit = _EnemyInfo.bHit](){
-		bHit = false;
-		return true;
-	});
-
-	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
-		push_back({ v ,vec{0,1}*3,
-		   1.f,int(Atk),std::to_wstring((int)Atk) });
-
-	if (_EnemyInfo.HP < 0)
+	if (_EnemyInfo.HP < 0 &&   !_Freezing_Info.IsFreezing())
 	{
 		_render_component->_Anim.bOn = true;
 		_render_component->ChangeAnim(EAnimState::Dead, 0.95, EAnimState::Dead);
 		Monster::MonsterDie();
 	};
-
-	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
 }
 void SwordMan::render(HDC hdc, vec camera_pos, vec size_factor)
 {

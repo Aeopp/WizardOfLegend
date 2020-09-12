@@ -21,7 +21,10 @@ void Monster::render(HDC hdc, vec camera_pos, vec size_factor)
 	Freezing_render(hdc, _transform->_location - camera_pos);
 	
 	if (!_Freezing_Info.IsFreezing())
+	{
 		actor::render(hdc, camera_pos, size_factor);
+		Burning_render(hdc, _transform->_location - camera_pos);
+	}
 }
 
 void Monster::CheckDirChangeImgFile()
@@ -86,7 +89,7 @@ Event Monster::update(float dt)
 
 	CheckDirChangeImgFile();
 	Freezing_update(dt, _collision_component);
-	
+	burning_update(dt);
 	
 	return _E;
 };
@@ -174,6 +177,54 @@ void Monster::BoomerangSoundPlay()
 	RAND_SOUNDPLAY("FIRE_DRAGON_HITTED_ENEMY", { 1,6 }, 1.f, false);
 }
 
+void Monster::Hit_Calculation(int HitAnimIdx , std::pair<int,int> AttackRange)
+{
+	_render_component->ChangeAnim(HitAnimIdx, HitCoolTime);
+	_Shadow.CurrentShadowState = EShadowState::BIG;
+	collision_mgr::instance().HitEffectPush(_transform->_location, HitCoolTime);
+
+	float Atk = math::Rand<int>(AttackRange);
+	COLORREF _HitEffectColor = RGB(221, 221, 221);
+	std::wstring Msg = std::to_wstring((int)Atk); 
+	// 속성 상태일시 피해증폭
+
+	if (_Freezing_Info.IsFreezing())
+	{
+		Atk *= Freezing_Interface::Amplification_factor;
+		_HitEffectColor = Freezing_Interface::EffectColor;
+		Msg += L"!";
+	}
+	else if(_Burning_Info.IsBurning())
+	{
+		Atk *= Burning_Interface::Amplification_factor;
+		_HitEffectColor = Burning_Interface::EffectColor;
+		Msg += L"!";
+	}
+	
+	_EnemyInfo.HP -= Atk;
+
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
+		[&bInvincible = bInvincible]()->bool
+	{  bInvincible = false; return true;  });
+
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
+		[&bHit = _EnemyInfo.bHit](){
+		bHit = false;
+		return true; });
+
+	vec randvec = math::RandVec();
+	randvec.y = (abs(randvec.y));
+	vec v = _transform->_location;
+	v.y -= 35;
+	v.x += math::Rand<int>({ -40,+40 });
+
+	object_mgr::instance().TextEffectMap[_HitEffectColor].
+		push_back({ v ,vec{0,1}*3,
+		1.f,int(Atk),  std::move( Msg  ) });
+
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
+}
+
 
 void Monster::MonsterHitPlayerSignatureGageAdd(float Atk)
 {
@@ -191,3 +242,5 @@ void Monster::CardEffect(vec v,std::wstring ImageKey)
 
 	sound_mgr::instance().Play("CARD_SUMMON", false, 1.f);
 };
+
+

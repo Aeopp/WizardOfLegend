@@ -1,8 +1,6 @@
 #pragma once
-#include <unordered_map>
 #include <queue>
 #include "object.h"
-
 
 class FireDragon : public object 
 {
@@ -13,7 +11,7 @@ public:
 	  uint32_t get_layer_id()const& override;
 	  void render(HDC hdc, vec camera_pos, vec size_factor)override;
 	  void HitTile(RECT TileRt)override;
-
+	  void Hit(std::weak_ptr<object> _target) override;
 	  void SetUp(vec Location,vec Dir);
 public:
 	bool bWallHited = false;

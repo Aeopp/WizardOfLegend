@@ -1,8 +1,9 @@
 #pragma once
 #include "object.h"
 #include "Shadow.h"
+#include "Burning_Interface.h"
 
-class MIDDLE_BOSS : public object , public Freezing_Interface
+class MIDDLE_BOSS : public object , public Freezing_Interface , public Burning_Interface
 {
 public:
     enum class EState : uint8_t

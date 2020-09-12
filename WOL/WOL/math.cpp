@@ -352,7 +352,13 @@ bool vec::operator>=(const vec& _rhs) const
 	return vec{ 0.7071067811865475 ,0.7071067811865475 };
 }
 
- bool vec::isnan(vec Target)
+vec vec::RandVecFromRange(vec Range)
+{
+	return vec{ math::Rand<float>({ -Range.x , +Range.x }) , 
+				math::Rand<float>({ -Range.y , +Range.y  }) };
+}
+
+bool vec::isnan(vec Target)
  {
 	 return std::isnan(Target.x) || std::isnan(Target.y);
  }

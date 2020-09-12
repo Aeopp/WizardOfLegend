@@ -173,6 +173,7 @@
     <ClInclude Include="BOSS_ROTBOX.h" />
     <ClInclude Include="BOSS_SKILL.h" />
     <ClInclude Include="BOTTOM_HOLE.h" />
+    <ClInclude Include="Burning_Interface.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="collision_component.h" />
     <ClInclude Include="collision_mgr.h" />
@@ -293,6 +294,7 @@
     <ClCompile Include="BOSS_ROTBOX.cpp" />
     <ClCompile Include="BOSS_SKILL.cpp" />
     <ClCompile Include="BOTTOM_HOLE.cpp" />
+    <ClCompile Include="Burning_Interface.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="collision_component.cpp" />
     <ClCompile Include="collision_mgr.cpp" />

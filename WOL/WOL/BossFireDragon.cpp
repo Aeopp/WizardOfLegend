@@ -7,6 +7,7 @@
 #include "helper.h"
 #include "game.h"
 #include "Bmp.h"
+#include "Burning_Interface.h"
 
 void BossFireDragon::initialize()
 {
@@ -123,6 +124,24 @@ uint32_t BossFireDragon::get_layer_id() const&
 	return layer_type::EEffect;
 }
 
+void BossFireDragon::Hit(std::weak_ptr<object> _target)
+{
+	auto sp_Target = _target.lock();
+	if (!sp_Target)return;
+
+	if (Burning_Interface::probability_calculation()
+		&& sp_Target->ObjectTag == object::Tag::player)
+	{
+		auto sp_EnableObject = std::dynamic_pointer_cast<Burning_Interface>(sp_Target);
+		if (!sp_EnableObject)return;
+		if (!_transform)return;
+
+		vec MsgLocation = _transform->_location;
+
+		sp_EnableObject->_Burning_Info.burn(MsgLocation);
+	}
+}
+
 void BossFireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
@@ -217,6 +236,5 @@ void BossFireDragon::CalcSpriteFromAngle()
 		ColIdx = SpriteAngleColMap.first[IDX]; 
 	}
 }
-
 
 

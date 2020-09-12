@@ -60,7 +60,7 @@ struct vec
 	bool operator>=(const vec& _rhs)const;	
 
 	static vec unit_diagonal_vec();
-
+	static vec RandVecFromRange(vec Range);
 
 	static bool isnan(vec Target);
 	

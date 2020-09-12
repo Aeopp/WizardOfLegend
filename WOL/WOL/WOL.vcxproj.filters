@@ -253,6 +253,7 @@
     <ClInclude Include="BossBoomerang.h" />
     <ClInclude Include="Boss_Blast.h" />
     <ClInclude Include="Freezing_Interface.h" />
+    <ClInclude Include="Burning_Interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -532,6 +533,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Freezing_Interface.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Burning_Interface.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

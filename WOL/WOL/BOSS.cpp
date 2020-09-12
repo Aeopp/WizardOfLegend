@@ -111,7 +111,10 @@ void BOSS::initialize()
 	PatternMap[EPattern::PILLARMULTIPLEATTACK] = std::bind(&BOSS::PillarMultipleAttackStart, this);
 	PatternMap[EPattern::PILLARSPIRALATTACK] = std::bind(&BOSS::PillarSpiralAttackStart, this);
 
-	Freez_size = { 300,300 };
+	render_size = { 300,300 };
+
+	_Burning_Info.particle_range.y = _Burning_Info.particle_range.y * 2;
+	_Burning_Info.render_world_size_range *= 2;
 	
 };
 
@@ -120,6 +123,7 @@ void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 	object::render(hdc, camera_pos, size_factor);
 
 	Freezing_render(hdc, _transform->_location - camera_pos);
+	
 	
 	if (!_Freezing_Info.IsFreezing())
 	{
@@ -146,6 +150,8 @@ void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 			CurrentRowIdx * PaintSizeY,
 			PaintSizeX, PaintSizeY,
 			COLOR::MRGENTA());
+
+		Burning_render(hdc, _transform->_location - camera_pos);
 	}
 
 	SOIL_EffectRender(hdc, camera_pos);
@@ -160,9 +166,11 @@ Event BOSS::update(float dt)
 	SoilEffectDuration -= dt;
 
 	Freezing_update(dt, wp_collision);
+	burning_update(dt);
+
 	
 	if (_Freezing_Info.IsFreezing())return Event::None;
-	
+
 	JumpAttackAlarm();
 	UpdateDir();
 	StateTranslation();
@@ -248,7 +256,7 @@ void BOSS::Hit(std::weak_ptr<object> _target)
 
 		if (!sp_MyInfo)return;
 
-		if (sp_MyInfo->CurrentHP < 0)
+		if (sp_MyInfo->CurrentHP < 0 && !_Freezing_Info.IsFreezing() )
 		{
 			StateDuration = 0.8f;
 			CurrentState = EState::DIE;
@@ -456,15 +464,33 @@ std::shared_ptr<class Bmp> BOSS::AnimDirSpriteUpdate()
 void BOSS::HitCalc(std::pair<int, int> AttackRange)
 {
 	float Atk = math::Rand<float>(AttackRange);
+	COLORREF _HitEffectColor = RGB(221, 221, 221);
+	std::wstring Msg = std::to_wstring((int)Atk);
+
+	
+	if (_Freezing_Info.IsFreezing())
+	{
+		Atk *= Freezing_Interface::Amplification_factor;
+		_HitEffectColor = Freezing_Interface::EffectColor;
+		Msg += L"!";
+	}
+	else if (_Burning_Info.IsBurning())
+	{
+		Atk *= Burning_Interface::Amplification_factor;
+		_HitEffectColor = Burning_Interface::EffectColor;
+		Msg += L"!";
+	}
+
+	
 	vec RandVec = math::RandVec();
 	RandVec.y = (abs(RandVec.y));
 	vec MyLocation = _transform->_location;
 	MyLocation.y -= 35;
 	MyLocation.x += math::Rand<int>({ -40,+40 });
 
-	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
+	object_mgr::instance().TextEffectMap[_HitEffectColor].
 		push_back({ MyLocation ,vec{0,1}*3,
-		1.f,int(Atk),std::to_wstring((int)Atk) });
+		1.f,int(Atk),std::move(Msg) });
 
 	sp_MyInfo->CurrentHP -= Atk;
 	Monster::MonsterHitPlayerSignatureGageAdd(Atk);

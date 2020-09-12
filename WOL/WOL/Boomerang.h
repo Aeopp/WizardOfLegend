@@ -19,7 +19,7 @@ public:
 	uint32_t get_layer_id()const& override;
 	void Hit(std::weak_ptr<object> _target)override;
 	void HitTile(RECT TileRt)override;
-
+	
 	std::array<POINT, 3> RotPts;
 
 	void CalcImgAngle(float RotationImgDegree);
@@ -32,5 +32,7 @@ public:
 	int CurrentColIdx;
 	float AnimDelta;
 	float CurrentAnimRemainTime;
+	static inline const float HitTileEffectTick = 0.15f;
+	float HitTileEffectRemainTime = HitTileEffectTick;
 };
 

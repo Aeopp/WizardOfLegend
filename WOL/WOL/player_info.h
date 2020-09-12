@@ -29,7 +29,6 @@ struct player_info
 	float SkillICEBlastMotionDuration = 0.5f;
 	float SkillShieldMotionDuration = 0.5f;
 
-
 	const float SkillFireDragonMaxNum = 8; 
 	const float SkillBoomerangMaxNum = 4;
 	const float SkillICECrystalCoolTime = 6.5f;
@@ -42,17 +41,13 @@ struct player_info
 	float SkillCurrentFireDragonNum = SkillFireDragonMaxNum;
 	float SkillCurrentBoomerangNum = SkillBoomerangMaxNum;
 
-
-
-	float MpRegenerationAtSec = -1.f;
+	float MpRegenerationAtSec = -10.f;
 	float HpRegenerationAtSec= 10.f;
 
 	float ShieldDuration = 20.f;
 
 	float NormalAttackRich{60.f};
 	float NormalAttackPushForce{1.f};
-
-
 
 	std::pair<int, int> MissRange{0,8};
 public : 
@@ -66,10 +61,5 @@ public :
 	void SignatureGaugeAdd(float Damage);
 private:
 	float  hp{ max_hp };
-	float mp{ max_mp };
-};
-
-struct PlayerAnimInfo
-{
-	
+	float mp{ 0.f };
 };

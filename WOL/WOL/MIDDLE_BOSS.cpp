@@ -99,8 +99,10 @@ void MIDDLE_BOSS::initialize()
 
 	PatternTableNum = PatternTable.size();
 	CurrentPatternIdx = 0;
-	Freez_size = { 300,300 };
+	render_size = { 300,300 };
 	
+	_Burning_Info.particle_range.y = _Burning_Info.particle_range.y * 2;
+	_Burning_Info.render_world_size_range *= 2;
 };
 
 void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -128,6 +130,9 @@ void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 			CurrentRowIdx * PaintSizeY,
 			PaintSizeX, PaintSizeY,
 			COLOR::MRGENTA());
+
+
+		Burning_render(hdc, _transform->_location - camera_pos);
 	}
 }
 
@@ -139,9 +144,9 @@ Event MIDDLE_BOSS::update(float dt)
 	CurrentHitCoolTime -= dt;
 	MonsterSpawnCurrentTick -= dt;
 
-	_Freezing_Info.update(dt);
-
 	Freezing_update(dt, wp_collision);
+	burning_update(dt);
+	
 
 	if (_Freezing_Info.IsFreezing())return Event::None;
 	
@@ -183,7 +188,7 @@ void MIDDLE_BOSS::Hit(std::weak_ptr<object> _target)
 		}
 
 		if (!sp_MyInfo)return;
-		if (sp_MyInfo->CurrentHP < 0)
+		if (sp_MyInfo->CurrentHP < 0 && !_Freezing_Info.IsFreezing())
 		{
 			CurrentState = EState::DIE;
 			StateDuration = 0.8f;
@@ -212,18 +217,36 @@ std::shared_ptr<class Bmp> MIDDLE_BOSS::AnimDirSpriteUpdate()
 void MIDDLE_BOSS::HitCalc(std::pair<int,int> AttackRange)
 {
 	float Atk = math::Rand<float>(AttackRange);
+	COLORREF _HitEffectColor = RGB(221, 221, 221);
+	std::wstring Msg = std::to_wstring((int)Atk);
+
+
+	if (_Freezing_Info.IsFreezing())
+	{
+		Atk *= Freezing_Interface::Amplification_factor;
+		_HitEffectColor = Freezing_Interface::EffectColor;
+		Msg += L"!";
+	}
+	else if (_Burning_Info.IsBurning())
+	{
+		Atk *= Burning_Interface::Amplification_factor;
+		_HitEffectColor = Burning_Interface::EffectColor;
+		Msg += L"!";
+	}
+
+
 	vec RandVec = math::RandVec();
 	RandVec.y = (abs(RandVec.y));
 	vec MyLocation = _transform->_location;
 	MyLocation.y -= 35;
 	MyLocation.x += math::Rand<int>({ -40,+40 });
 
-	object_mgr::instance().TextEffectMap[RGB(221, 221, 221)].
-	push_back({ MyLocation ,vec{0,1}*3,
-	1.f,int(Atk),std::to_wstring((int)Atk) });
-	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
-	sp_MyInfo->CurrentHP -= Atk;
+	object_mgr::instance().TextEffectMap[_HitEffectColor].
+		push_back({ MyLocation ,vec{0,1}*3,
+		1.f,int(Atk),std::move(Msg) });
 
+	sp_MyInfo->CurrentHP -= Atk;
+	Monster::MonsterHitPlayerSignatureGageAdd(Atk);
 	if (sp_MyInfo->CurrentHP < 0)
 	{
 		CurrentState = EState::DIE;
