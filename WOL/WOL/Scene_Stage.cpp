@@ -31,10 +31,6 @@
 #include "Teleport.h"
 
 
-
-
-
-
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 {
 	Scene::render(hdc,size_factor);
@@ -70,10 +66,10 @@ void Scene_Stage::update(float dt)
 
 	object_mgr::instance().update();
 
-	if (_Input.Key_Down('0'))
-	{
-		Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
-	}
+	//if (_Input.Key_Down('0'))
+	//{
+	//	Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
+	//}
 
 	_Input.update();
 
@@ -91,13 +87,9 @@ void Scene_Stage::initialize()
 	_Tile_mgr.Load_Tile(Tile_mgr::StageFileName);
 
 	collision_mgr::instance().load_collision(collision_mgr::StageFileName);
-
-	auto Effect_SUMMON = object_mgr::instance().insert_object<Effect>
-		(PlayerSpawnLocation.x, PlayerSpawnLocation.y -400,
-			L"SUMMON", layer_type::EEffect, 8, 0, 1.0f, 1.0f, 225, 730,
-			1.f, 1.6f);
 	
 		sound_mgr::instance().Stop("MAIN_MENU_BGM");
+		sound_mgr::instance().Stop("BOSS_BGM");
 		SOUNDPLAY("DUNGEON_BGM", 1.f, true);
 
 	{
@@ -111,7 +103,7 @@ void Scene_Stage::initialize()
 			obj_mgr._Camera = _camera;
 
 			auto _Teleport = obj_mgr.insert_object<Teleport>();
-			_Teleport->SetUp(PlayerSpawnLocation, false);
+			_Teleport->SetUp(PlayerSpawnLocation);
 		
 		store_set_up(_Player);
 		TriggerSetUp(_Player);
@@ -435,12 +427,129 @@ std::shared_ptr<object> Scene_Stage::Stage_3(std::weak_ptr<Player> _Player)
 
 std::shared_ptr<object> Scene_Stage::Stage_4(std::weak_ptr<Player> _Player)
 {
-	return {};
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	// Start 
+	auto StartEvent = [wp_Trigger, _Player]() {
+
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		vec PrisonLocation = vec{ 2849,3852};
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1, Prison::EType::Ver,
+			wp_Trigger, { 100,150 }, PrisonLocation);
+
+		PrisonLocation = vec{ 3321,4587};
+		_Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(0.5, 1, Prison::EType::Hor,
+			wp_Trigger, { 100,150 }, PrisonLocation);
+		
+		vec SpawnInitCenter = vec{ 3346,3980 };
+		int32_t MonsterNum = 12;
+		float Angle = 360.f / (float)MonsterNum;
+		vec InitDir = math::dir_from_angle(Angle);
+		float Radius = 300.f;
+		std::vector<vec> Locations;
+		Locations.reserve(MonsterNum);
+
+		static auto SpawnGenerater = [SpawnInitCenter, InitDir, Radius, Angle]()mutable
+		{
+			vec SpawnLocation = SpawnInitCenter + InitDir * Radius;
+			InitDir = math::rotation_dir_to_add_angle(InitDir, Angle);
+			return SpawnLocation;
+		};
+		
+		std::generate_n(std::back_inserter(Locations), MonsterNum,SpawnGenerater);
+
+		ReturnObjects+=Monster::TypeMatchMonstersSpawn<ARCHER>(_Player, std::move( Locations ) );
+
+		return ReturnObjects;
+	};
+
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	std::pair<int, int>  EventZoneSize = { 200,200 };
+	vec TriggerLocation = { 3337,3957};
+	std::pair<vec, vec> CameraRange = { { 3300,3950} ,  { 3400,4050} };
+	_Trigger->SetUp(EventZoneSize, TriggerLocation,
+		std::move(StartEvent),
+		[] {}, std::move(EventQ), true,
+		CameraRange);
+
+	return _Trigger;
 }
 
 std::shared_ptr<object> Scene_Stage::Stage_5(std::weak_ptr<Player> _Player)
 {
-	return {};
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	// Start 
+	auto StartEvent = [wp_Trigger, _Player]() {
+
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		vec PrisonLocation = vec{ 1912,4658};
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1, Prison::EType::Ver,
+			wp_Trigger, { 100,150 }, PrisonLocation);
+
+		std::vector<vec> Locations=
+		{
+			{362,4029},{1524,4035},{379,4896},{1547,4911}
+		};
+
+		ReturnObjects+=Monster::TypeMatchMonstersSpawn<WIZARD>(_Player, std::move(Locations));
+
+		Locations = {{582,4216},{1118,4272},{860,4613}};
+		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, std::move(Locations));
+
+		return ReturnObjects;
+	};
+
+	auto Event_1 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		float Distance = 150.f;
+		std::vector<vec> Centers = {{347,4029} , {1469,4018},
+		{395,4839} , {1534,4880} , {854,4444}  };
+		std::vector<vec> Locations;
+		Locations.reserve(Centers.size() * 3);
+		auto Location_Push_iter = std::back_inserter(Locations);
+		
+		for(const auto& Center : Centers)
+		{
+			Location_Push_iter  = Center + ( math::dir_from_angle(45)* Distance );
+			Location_Push_iter  = Center + (math::dir_from_angle(135) * Distance);
+			Location_Push_iter  = Center + (math::dir_from_angle(270) * Distance);
+		}
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, std::move(Locations));
+
+		return ReturnObjects;
+	};
+
+	auto EndEvent = []
+	{
+		vec TelePort_Location = { 856,4464 };
+		
+		auto _Teleport = object_mgr::instance().insert_object<Teleport>();
+		_Teleport->SetUp(TelePort_Location,true ,ESceneID::EMIDDLE_BOSS);
+	};
+
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	EventQ.push(std::move(Event_1));
+	std::pair<int, int>  EventZoneSize = { 200,200 };
+	vec TriggerLocation = { 856,4464};
+	_Trigger->SetUp(EventZoneSize, TriggerLocation,
+		std::move(StartEvent),
+		std::move(EndEvent), std::move(EventQ));
+
+	return _Trigger;
 }
 
 std::shared_ptr<object> Scene_Stage::Stage_6(std::weak_ptr<Player> _Player)

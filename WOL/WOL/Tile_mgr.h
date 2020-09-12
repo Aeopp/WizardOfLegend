@@ -34,6 +34,7 @@ public:
     static inline const std::wstring DefaultTilePath = L"..\\..\\Resources\\MapInfo\\";
     static inline const std::wstring BossStageFileName = L"BossTileInfo.txt";
     static inline const std::wstring StageFileName = L"StageTileInfo.txt";
+    static inline const std::wstring Middle_BossStageFileName = L"Middle_Boss_TileInfo.txt";
 private:
     std::vector<std::reference_wrapper<Tile>> DecoVec;
     std::vector<Tile> _Tile_list;

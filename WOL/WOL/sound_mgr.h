@@ -24,6 +24,8 @@ public:
 
 	void RandSoundKeyPlay(const std::string& SoundKey,
 		std::pair<uint8_t, uint8_t> Range, float Volume);
+
+	std::string CurrentBgmKey{};
 private:
 };
 

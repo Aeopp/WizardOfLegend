@@ -41,10 +41,11 @@ public:
 		L"InfoStage.txt";
 	static inline const std::wstring BossStageFileName =
 		L"InfoBoss.txt";
-
+	static inline const std::wstring Middle_BossStageFileName =
+		L"InfoMiddle_Boss.txt";
+	
 	bool IsHitEffectMappingTag(collision_tag lhs,collision_tag rhs);
 	bool IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs);
-
 	void HitEffectPush(vec location, float Duration);
 private:
 	void check_erase()&;

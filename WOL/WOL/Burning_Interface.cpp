@@ -29,6 +29,7 @@ Burning_Interface::Burning::Particle_Info Burning_Interface::Burning::Particle_I
 	_Info.ColIdx = 0;
 	_Info.RowIdx = math::Rand<int>({0, 3});
 	_Info.render_location = vec::RandVecFromRange(particle_range);
+	_Info.render_dir = math::RandVec();
 	int RandParticleSize = math::Rand<int>({ render_world_size_range . x , render_world_size_range . y });
 	
 	_Info.render_world_size = vec{ RandParticleSize  , RandParticleSize };
@@ -71,6 +72,8 @@ bool Burning_Interface::Burning::update(float dt)
 
 	for(auto & _Particle_Info : _Particle_Infos)
 	{
+		_Particle_Info.render_location += _Particle_Info.render_dir;
+		
 		_Particle_Info.AnimTick -= dt;
 		if (_Particle_Info.AnimTick < 0)
 		{

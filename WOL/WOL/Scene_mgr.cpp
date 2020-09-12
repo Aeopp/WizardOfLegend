@@ -6,6 +6,7 @@
 #include "Scene_Start.h"
 #include "Scene_End.h"
 #include "Scene_Edit.h"
+#include "Scene_Middle_Boss.h"
 
 void Scene_mgr::Scene_Change(ESceneID _ESceneID)
 {
@@ -21,6 +22,9 @@ void Scene_mgr::Scene_Change(ESceneID _ESceneID)
 			break;
 		case ESceneID::EStage:
 			sp_scene = std::make_shared<Scene_Stage>();
+			break;
+		case ESceneID::EMIDDLE_BOSS:
+			sp_scene = std::make_shared<Scene_Middle_Boss>();
 			break;
 		case ESceneID::EBoss:
 			sp_scene = std::make_shared<Scene_Boss>();

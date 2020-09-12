@@ -18,18 +18,22 @@ void sound_mgr::initialize()
 
 bool sound_mgr::Play( std::string SoundKey,
 	bool IsBgm, const float Volume) {
-
-	namespace fs = std::filesystem;
-
+	
 	if (Sounds.empty()){
 		return false;
 	}
 
+	if(IsBgm)
+	{
+		CurrentBgmKey = SoundKey;
+	}
+	
 	FMOD_RESULT HR;
 	bool isplay = false;
 
 	if (auto iter = Sounds.find(SoundKey);
-		iter != std::end(Sounds)) {
+		iter != std::end(Sounds)) 
+	{
 		auto& [System, Sound, Channel] = iter->second;
 		{
 			Channel->isPlaying(&isplay);
@@ -41,12 +45,13 @@ bool sound_mgr::Play( std::string SoundKey,
 				&Channel);
 			Channel->setVolume(Volume == DefaultVolume ? DefaultVolume : Volume);
 
-			if (HR != FMOD_OK) {
+			if (HR != FMOD_OK) 
+			{
 				return  false;
 			}
-			}
-			return  true;
 		}
+			return  true;
+	}
 	return true; 
 }
 void sound_mgr::Stop(std::string SoundKey)
@@ -87,6 +92,20 @@ bool sound_mgr::Frame(const float DeltaTime) {
 	if (FMOD_System == nullptr) return false;
 	// update 함수는 매프레임마다 반드시 호출해줘야함을 요구함
 	FMOD_System->update();
+
+	// BGM 재생 루프
+	auto iter = Sounds.find(CurrentBgmKey);
+	if (iter != std::end(Sounds))
+	{
+		auto& [System, Sound, Channel] = iter->second;
+		
+		bool bPlayedBgm = false; 
+		Channel->isPlaying(&bPlayedBgm);
+		if (!bPlayedBgm)
+		{
+			 System->playSound(Sound, nullptr, false,&Channel);
+		}
+	};
 	return true;
 }
 bool sound_mgr::Release()

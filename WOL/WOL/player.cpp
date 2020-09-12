@@ -502,9 +502,12 @@ void Player::Camera_Shake(float force,vec dir,float duration)
 void Player::BindingSkillCheckCast(int SlotIdx)
 {
 	if (!UIInventory::SlotInfoMap[SlotIdx].bAcquire)return;
-
+	if (!_transform)return;
+	
 	ESkill _Skill = UIInventory::SlotInfoMap[SlotIdx]._Skill;
 
+	InputDirSpriteChange(_transform->_dir);
+	
 	switch (_Skill)
 	{
 	case ESkill::Normal:
@@ -739,7 +742,7 @@ void Player::SkillUlti()
 
 	SOUNDPLAY("ULT_USE", 1.f, false);
 	bUltiOn = false;
-	SkillInCastSlowTime(0.5f, 0.5f);
+	SkillInCastSlowTime(0.25f, 0.5f);
 }
 
 void Player::SkillFireDragon()
@@ -1079,9 +1082,9 @@ void Player::EnterBossStage(std::shared_ptr<class object> IsPortal)
 		auto sp_Teleport = std::dynamic_pointer_cast<Teleport>(IsPortal);
 		if (!sp_Teleport) return;
 		
-		if ( (GetAsyncKeyState('F') & 0x8000) && sp_Teleport->bEnding)
+		if ( (GetAsyncKeyState('F') & 0x8000) && sp_Teleport->bChangeScene)
 		{
-			Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
+			Scene_mgr::instance().Scene_Change(sp_Teleport->_TargetScene);
 		}
 	}
 }

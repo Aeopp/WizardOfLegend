@@ -8,6 +8,8 @@
 #include "collision_mgr.h"
 #include "Bmp.h"
 #include "Bmp_mgr.h"
+#include "Effect.h"
+#include "object_mgr.h"
 
 
 void Teleport::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -35,12 +37,19 @@ void Teleport::initialize()
 }
 
 
-void Teleport::SetUp(vec Location, bool bEnding)
+void Teleport::SetUp(vec Location, bool bEnding, ESceneID _TargetScene)
 {
 	if (!_transform)return;
 	_transform->_location = std::move(Location);
-	this->bEnding = bEnding;
-	if (this->bEnding)
+	this->bChangeScene = bEnding;
+	this->_TargetScene = _TargetScene;
+	
+	auto Effect_SUMMON = object_mgr::instance().insert_object<Effect>
+		(Location.x, Location.y - 300,
+			L"SUMMON", layer_type::EEffect, 8, 0, 0.7f, 0.7f, 225, 730,
+			1.f, 1.0f  /*1.6f*/);
+	
+	if (this->bChangeScene)
 	{
 		_collision_component = collision_mgr::instance().
 			insert(_ptr, collision_tag::ETrigger, figure_type::ERect);

@@ -236,6 +236,7 @@
     <ClInclude Include="Scene_Edit.h" />
     <ClInclude Include="Scene_End.h" />
     <ClInclude Include="Scene_mgr.h" />
+    <ClInclude Include="Scene_Middle_Boss.h" />
     <ClInclude Include="Scene_Stage.h" />
     <ClInclude Include="Scene_Start.h" />
     <ClInclude Include="ScrewBoomerang.h" />
@@ -338,6 +339,7 @@
     <ClCompile Include="Scene_Edit.cpp" />
     <ClCompile Include="Scene_End.cpp" />
     <ClCompile Include="Scene_mgr.cpp" />
+    <ClCompile Include="Scene_Middle_Boss.cpp" />
     <ClCompile Include="Scene_Stage.cpp" />
     <ClCompile Include="Scene_Start.cpp" />
     <ClCompile Include="ScrewBoomerang.cpp" />

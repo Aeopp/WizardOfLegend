@@ -52,7 +52,6 @@ void ARCHER::initialize()
 
 Event ARCHER::update(float dt)
 {
-	
 	InitTime -= dt;
 
 	if (InitTime > 0)return Event::None;;

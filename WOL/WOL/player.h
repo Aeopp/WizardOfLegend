@@ -13,6 +13,7 @@ enum class PlayerState : uint8_t
     Dash,
     Dead,
 };
+
 class Player : public actor , public  Freezing_Interface , public Burning_Interface
 {
 public:

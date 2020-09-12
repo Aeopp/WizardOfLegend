@@ -254,6 +254,7 @@
     <ClInclude Include="Boss_Blast.h" />
     <ClInclude Include="Freezing_Interface.h" />
     <ClInclude Include="Burning_Interface.h" />
+    <ClInclude Include="Scene_Middle_Boss.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WOL.cpp">
@@ -536,6 +537,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="Burning_Interface.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_Middle_Boss.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

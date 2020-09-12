@@ -31,6 +31,7 @@ public:
 			// 타겟으로부터 상대적인 거리
 			vec render_location{};
 			vec render_world_size{};
+			vec render_dir{};
 			float AnimTick = Burning::AnimDelta;
 			int ColIdx;
 			int RowIdx;
