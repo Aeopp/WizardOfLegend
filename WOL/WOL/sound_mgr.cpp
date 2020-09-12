@@ -34,9 +34,9 @@ bool sound_mgr::Play( std::string SoundKey,
 		{
 			Channel->isPlaying(&isplay);
 
-			if (isplay == true) {
+		/*	if (isplay == true) {
 				Channel->stop();
-			};
+			};*/
 			HR = System->playSound(Sound, nullptr, false,
 				&Channel);
 			Channel->setVolume(Volume == DefaultVolume ? DefaultVolume : Volume);
@@ -129,7 +129,7 @@ bool sound_mgr::Init()
 		// FMOD 시스템 로딩 실패
 		if (F_Result != FMOD_OK)
 			return false;
-		F_Result = FMOD_System->init(255, FMOD_INIT_NORMAL, 0);
+		F_Result = FMOD_System->init(128, FMOD_INIT_NORMAL, 0);
 		if (F_Result != FMOD_OK)
 			return false;
 	}

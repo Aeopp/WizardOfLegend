@@ -6,7 +6,8 @@
 #include "object_mgr.h"
 #include "Effect.h"
 #include "sound_mgr.h"
-
+#include "Monster.h"
+#include "Bmp.h"
 
 void ICE_Blast::initialize()
 {
@@ -62,9 +63,8 @@ void ICE_Blast::initialize()
 
 	UniqueID = EObjUniqueID::ICEBLAST;
 
-
+	
 	IceEffectPlay();
-
 };
 
 Event ICE_Blast::update(float dt)
@@ -94,6 +94,29 @@ Event ICE_Blast::update(float dt)
 
 	return _Event;
 };
+
+void ICE_Blast::Hit(std::weak_ptr<object> _target)
+{
+	actor::Hit(_target);
+
+	auto sp_Target = _target.lock();
+	if (!sp_Target)return;
+
+	// 속성 공격 확률 계산
+	float DICE = math::Rand<float>({ 0.01f,1.f });
+	if(DICE>=ICE_Percentage)return ;
+	
+	if ( sp_Target->ObjectTag == object::Tag::monster  )
+	{
+		auto sp_EnableFreezObject = std::dynamic_pointer_cast<Freezing_Interface>(sp_Target);
+		if (!sp_EnableFreezObject)return;
+		if (!_transform)return;
+		
+		vec MsgLocation = _transform->_location;
+		
+		sp_EnableFreezObject->_Freezing_Info.Freez(MsgLocation);
+	}
+}
 
 void ICE_Blast::HitTile(RECT _rt)
 {
@@ -126,5 +149,56 @@ void ICE_Blast::IceEffectPlay()
 uint32_t ICE_Blast::get_layer_id() const&
 {
 	return layer_type::EObject;
-};
+}
 
+std::shared_ptr<Bmp> ICE_Blast::Freezing::GetImg()
+{
+	static auto sp_Img = Bmp_mgr::instance().Find_Image_SP(L"ICE_BLAST");
+	return sp_Img;
+}
+
+void ICE_Blast::Freezing::Freez(vec msgLocation)
+{
+	if (RemainTime > 0)return;
+
+	object_mgr::instance().TextEffectMap[RGB(127, 255, 255)].
+		push_back({ msgLocation,vec{0,1}*3,2.f,25,L"Freezing!" });
+	
+	RemainTime = Duration;
+	ColIdx = 0;
+	AnimTick = AnimDelta;
+}
+
+
+bool ICE_Blast::Freezing::update(float dt)
+{
+	RemainTime -= dt;
+	if (RemainTime < 0)return false;
+	
+	AnimTick -= dt;
+	if(AnimTick<0)
+	{
+		AnimTick = AnimDelta;
+		++ColIdx;
+		ColIdx = min(ColIdx, 8);
+		if(RemainTime>0.23)
+		{
+			ColIdx = min(ColIdx, 2);
+		}
+	}
+	return true;
+}
+
+void ICE_Blast::Freezing::render(HDC hdc, vec location, vec size)
+{
+	if (!IsFreezing())return;
+	
+	auto sp_Img = GetImg();
+	if (!sp_Img)return;
+	
+	vec DestLoc = location -  ( size * 0.5f) ;
+
+	GdiTransparentBlt(hdc, DestLoc.x, DestLoc.y, size.x, size.y,
+		sp_Img->Get_MemDC(), PaintSize.x * ColIdx, 0,
+		PaintSize.x, PaintSize.y, COLOR::MRGENTA());
+}

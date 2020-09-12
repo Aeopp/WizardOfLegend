@@ -2,7 +2,7 @@
 #include "object.h"
 #include "Shadow.h"
 
-class MIDDLE_BOSS : public object
+class MIDDLE_BOSS : public object , public Freezing_Interface
 {
 public:
     enum class EState : uint8_t

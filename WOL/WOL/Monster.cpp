@@ -14,6 +14,15 @@
 #include "game.h"
 #include "player_info.h"
 
+void Monster::render(HDC hdc, vec camera_pos, vec size_factor)
+{
+	if (!_transform)return;
+	
+	Freezing_render(hdc, _transform->_location - camera_pos);
+	
+	if (!_Freezing_Info.IsFreezing())
+		actor::render(hdc, camera_pos, size_factor);
+}
 
 void Monster::CheckDirChangeImgFile()
 {
@@ -76,15 +85,15 @@ Event Monster::update(float dt)
 	Event _E = actor::update(dt);
 
 	CheckDirChangeImgFile();
-	              
-
+	Freezing_update(dt, _collision_component);
+	
+	
 	return _E;
 };
 
 void Monster::Hit(std::weak_ptr<object> _target)
 {
 	actor::Hit(_target);
-
 }
 
 void Monster::late_initialize(std::weak_ptr<class object> SetTarget, vec SetLocation)
@@ -121,7 +130,6 @@ void Monster::DieSoundPlay()
 
 void Monster::MonsterDie()
 {
-
 	bDying = true;
 
 	Timer::instance().event_regist(time_event::EOnce, 0.8,
@@ -166,20 +174,14 @@ void Monster::BoomerangSoundPlay()
 	RAND_SOUNDPLAY("FIRE_DRAGON_HITTED_ENEMY", { 1,6 }, 1.f, false);
 }
 
+
 void Monster::MonsterHitPlayerSignatureGageAdd(float Atk)
 {
 	auto sp_PInfo = game::instance()._player_info;
 	if (!sp_PInfo)return;
-
-
+	
 	sp_PInfo->SignatureGaugeAdd(Atk);
 }
-
-/*late_initialize(int ImgLocationX, int ImgLocationY,
-		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
-		int AnimRowIndex, float Duration, float AnimDuration,
-		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
-		// TOOD :: Scene Dependent Init 
 
 void Monster::CardEffect(vec v,std::wstring ImageKey)
 {

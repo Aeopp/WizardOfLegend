@@ -11,6 +11,8 @@ public:
 
 	vec PlayerSpawnLocation = { 2564,2413};
 
+	void player_set_up();
+	void store_set_up(std::weak_ptr<class Player> _Player);
 	~Scene_Stage()noexcept override;
 private:
 	void TriggerSetUp(std::weak_ptr<class Player> _Player);

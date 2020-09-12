@@ -2,7 +2,7 @@
 #include "actor.h"
 #include "collision_component.h"
 #include "ESkillBarIcon.h"
-
+#include "Freezing_Interface.h"
 enum class PlayerState : uint8_t
 {
     Attack,
@@ -11,8 +11,7 @@ enum class PlayerState : uint8_t
     Dash,
     Dead,
 };
-class Player :
-    public actor
+class Player : public actor , public  Freezing_Interface
 {
 public:
     std::weak_ptr<collision_component> _collision_component;

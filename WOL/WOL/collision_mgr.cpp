@@ -417,23 +417,7 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				}
 				if (lhs_obj->bHitEffect)
 				{
-				/*	if (!_ptr->_transform)continue;
-					if (false == IsHitEffectMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))return;
-
-					auto sp_owner = lhs_obj->get_owner().lock();
-					if (!sp_owner)
-					{
-						lhs_obj->bDie = true;
-						continue;
-					}
-					
-					float dt = CollisionHitEffectDelta;
-					int Row = math::Rand<int>({ 0,3 });
-					int Col = 0;
-
-					vec r = _ptr->_transform->_location + math::RandVec() * math::Rand<int>({ -30,30});
-
-					CollisionHitEffectList.push_back({r,Col,Row,dt});*/
+			
 				}
 			}
 		}

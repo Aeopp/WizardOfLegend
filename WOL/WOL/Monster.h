@@ -3,11 +3,10 @@
 #include "collision_component.h"
 #include "EnemyInfo.h"
 #include "Effect.h"
+#include "Freezing_Interface.h"
 
 
-
-class Monster :
-    public actor
+class Monster :  public actor ,  public Freezing_Interface
 {
 public:
 	enum class EMonsterState :uint8_t
@@ -23,6 +22,7 @@ public:
 		Skill4,
 	};
 
+	void render(HDC hdc, vec camera_pos, vec size_factor) override;
 	void CheckDirChangeImgFile();
 	void initialize()override;
 	Event update(float dt)override;
@@ -36,7 +36,8 @@ public:
 	void WINDHitSoundPlay();
 	void NormalHitSoundPlay();
 	void BoomerangSoundPlay();
-
+	
+	void burn();
 	static void MonsterHitPlayerSignatureGageAdd(float Atk);
 	virtual std::wstring GetSummonKey()abstract;
 public:
@@ -45,9 +46,9 @@ public:
 	vec collision_lower_correction{};
 
 	bool bDying = false;
-	float DefaultHitDuration = 0.4f;
+	float HitCoolTime = 0.25f;
 	bool bInvincible = false;
-	float InvincibleTime = 0.3f;
+	float InvincibleTime = HitCoolTime;
 	float StateDuration{};
 	std::weak_ptr<class object> _AttackTarget;
 	EnemyInfo _EnemyInfo{};
@@ -64,6 +65,6 @@ protected:
 	float MyAnimDuration;
 	std::pair<int,int> ShadowWorldSizeCorrection;
 	float InitTime;
-	
 };
+
 

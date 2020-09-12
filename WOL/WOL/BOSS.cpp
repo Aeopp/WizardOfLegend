@@ -110,35 +110,43 @@ void BOSS::initialize()
 	PatternMap[EPattern::BOXDIRECTPILLARATTACK] = std::bind(&BOSS::BoxDirectPillarAttackStart, this);
 	PatternMap[EPattern::PILLARMULTIPLEATTACK] = std::bind(&BOSS::PillarMultipleAttackStart, this);
 	PatternMap[EPattern::PILLARSPIRALATTACK] = std::bind(&BOSS::PillarSpiralAttackStart, this);
+
+	Freez_size = { 300,300 };
+	
 };
 
 void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
 
-	// 여기서 스프라이트 이미지 판단
-	auto sp_Bmp = AnimDirSpriteUpdate();
-	if (!sp_Bmp)return;
+	Freezing_render(hdc, _transform->_location - camera_pos);
+	
+	if (!_Freezing_Info.IsFreezing())
+	{
+		// 여기서 스프라이트 이미지 판단
+		auto sp_Bmp = AnimDirSpriteUpdate();
+		if (!sp_Bmp)return;
 
-	// 여기서 캐릭터 방향으로 Row Idx 판단
-	AnimUpdateFromCurrentState();
-	_Shadow.render(hdc, camera_pos);
+		// 여기서 캐릭터 방향으로 Row Idx 판단
+		AnimUpdateFromCurrentState();
+		_Shadow.render(hdc, camera_pos);
 
-	vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
-	vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
-	DestLoc += RenderCorrection;
+		vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
+		vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
+		DestLoc += RenderCorrection;
 
-	// Col 인덱스 업데이트.
-	AnimColUpdate();
+		// Col 인덱스 업데이트.
+		AnimColUpdate();
 
-	GdiTransparentBlt(hdc,
-		DestLoc.x, DestLoc.y
-		, DestPaintSize.x, DestPaintSize.y
-		, sp_Bmp->Get_MemDC(),
-		CurrentColIdx * PaintSizeX,
-		CurrentRowIdx * PaintSizeY,
-		PaintSizeX, PaintSizeY,
-		COLOR::MRGENTA());
+		GdiTransparentBlt(hdc,
+			DestLoc.x, DestLoc.y
+			, DestPaintSize.x, DestPaintSize.y
+			, sp_Bmp->Get_MemDC(),
+			CurrentColIdx * PaintSizeX,
+			CurrentRowIdx * PaintSizeY,
+			PaintSizeX, PaintSizeY,
+			COLOR::MRGENTA());
+	}
 
 	SOIL_EffectRender(hdc, camera_pos);
 }
@@ -151,8 +159,10 @@ Event BOSS::update(float dt)
 	CurrentHitCoolTime -= dt;
 	SoilEffectDuration -= dt;
 
-
-
+	Freezing_update(dt, wp_collision);
+	
+	if (_Freezing_Info.IsFreezing())return Event::None;
+	
 	JumpAttackAlarm();
 	UpdateDir();
 	StateTranslation();

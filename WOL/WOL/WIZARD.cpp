@@ -19,7 +19,7 @@ void WIZARD::initialize()
 {
 	collision_lower_correction = { 0,+40 };
 
-	lower_size = { 25,50 };
+	lower_size = { 40,70 };
 
 	LeftAnimKey = L"WIZARD_LEFT";
 	RightAnimKey = L"WIZARD_RIGHT";
@@ -45,12 +45,12 @@ void WIZARD::initialize()
 		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 
 
-	DefaultHitDuration = 0.15f;
 	EscapeRamainTick = EscapeDuration = 1.3f;
 	_speed = 200.f;
 
 	FireImg = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_FIRE");
-
+	
+	
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
 }
@@ -64,11 +64,14 @@ Event WIZARD::update(float dt)
 		return Event::Die;
 	if (bDying)
 		return Event::None;
-
+	Event _E = Monster::update(dt);
+	if (_Freezing_Info.IsFreezing())return Event::None; 
+	
+	
 	CurrentBallCoolTime -= dt;
 	CurrentRandMoveDuration -= dt;
 	CurrentFireCoolTime -= dt;
-	Event _E = Monster::update(dt);
+	
 	EscapeRamainTick -= dt;
 
 	if (_EnemyInfo.bHit)
@@ -159,7 +162,6 @@ Event WIZARD::update(float dt)
 	}
 	else if (Attack_distance < distance)
 	{
-		//NormalAttack->Preparation(false);
 		_EnemyInfo.bAttack = false;
 
 		StalkerPosReTargetDuration -= dt;
@@ -182,7 +184,6 @@ Event WIZARD::update(float dt)
 		 CurrentRandMoveDuration = RandMoveVecDuration;
 		 RandMoveVec = math::RandVec();
 	 }
-	//RandMoveVec = vec{ 0,0 };
 	return _E;
 }
 
@@ -199,6 +200,7 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 	//	if (sp_target->ObjectTag == object::Tag::player_shield)return;
 	if (sp_target->ObjectTag == object::Tag::monster)return;
 	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
+	if (sp_target->UniqueID == EObjUniqueID::ICEBLAST && _Freezing_Info.IsFreezing())return;
 
 	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
 
@@ -206,18 +208,18 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
 
-	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
+	_render_component->ChangeAnim(EAnimState::Hit, HitCoolTime);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
-	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+	collision_mgr::instance().HitEffectPush(_transform->_location, HitCoolTime);
 
 	float Atk = math::Rand<int>(sp_target->Attack);
 	_EnemyInfo.HP -= Atk;
 
-	Timer::instance().event_regist(time_event::EOnce, 0.3f,
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
 		[&bInvincible = bInvincible]()->bool
 		{  bInvincible = false; return true;  });
 
-	Timer::instance().event_regist(time_event::EOnce, 0.3f,
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
 		[&bHit = _EnemyInfo.bHit](){
 		bHit = false;
 		return true; });
@@ -234,8 +236,6 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 
 	if (_EnemyInfo.HP < 0)
 	{
-
-
 		_render_component->ChangeUnstoppableAnim(EAnimState::Dead, 0.8f, EAnimState::Dead);
 		MonsterDie();
 	}
@@ -254,8 +254,6 @@ void WIZARD::Hit(std::weak_ptr<object> _target)
 void WIZARD::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	if (InitTime > 0)return;
-
-
 	Monster::render(hdc, camera_pos, size_factor);
 }
 void WIZARD::FireCast()

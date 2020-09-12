@@ -17,7 +17,7 @@ void ARCHER::initialize()
 {
 	collision_lower_correction = { 0,+40 };
 
-	lower_size = { 25,50 };
+	lower_size = { 35,60 };
 
 	LeftAnimKey = L"ARCHER_LEFT";
 	RightAnimKey = L"ARCHER_RIGHT";
@@ -37,16 +37,11 @@ void ARCHER::initialize()
 
 	shadow_correction = { 0,PaintSizeY * 0.23f };
 	ShadowWorldSizeCorrection = { 3,0 };
-	/*void late_initialize(int ImgLocationX, int ImgLocationY,
-		std::wstring ImgKey, layer_type layer_ID, int AnimColNum,
-		int AnimRowIndex, float Duration, float AnimDuration,
-		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
-
+	
 	NormalAttack = object_mgr::instance().insert_object<ArcherBow>();
 	NormalAttack->_owner = _ptr;
 	NormalAttack->wp_Target = _AttackTarget;
 
-	DefaultHitDuration = 0.15f;
 	EscapeRamainTick = EscapeDuration = 1.3f;
 	_speed = 400.f;
 
@@ -68,9 +63,12 @@ Event ARCHER::update(float dt)
 		return Event::None;
 	if (bArrowLineRender)
 		AttackPreparationTime += dt;
-
-	CurrentFireCoolTime -= dt;
 	Event _E = Monster::update(dt);
+	if (_Freezing_Info.IsFreezing())return Event::None;
+	
+	
+	CurrentFireCoolTime -= dt;
+
 	EscapeRamainTick -= dt;
 
 	if (_EnemyInfo.bHit)
@@ -193,10 +191,11 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
 	if (!sp_target->bAttacking)return;
-//	if (sp_target->ObjectTag == object::Tag::player_shield)return;
 	if (sp_target->ObjectTag == object::Tag::monster)return;
 	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
-
+	//	if (sp_target->ObjectTag == object::Tag::player_shield)return;
+	if (sp_target->UniqueID == EObjUniqueID::ICEBLAST && _Freezing_Info.IsFreezing())return;
+	
 	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
 
 	bInvincible = true;
@@ -204,18 +203,18 @@ void ARCHER::Hit(std::weak_ptr<object> _target)
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
 	SetArrowLineRender(false);
-	_render_component->ChangeAnim(EAnimState::Hit, 0.4f);
+	_render_component->ChangeAnim(EAnimState::Hit, HitCoolTime);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
-	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+	collision_mgr::instance().HitEffectPush(_transform->_location, HitCoolTime);
 
 	float Atk = math::Rand<int>(sp_target->Attack);
 	_EnemyInfo.HP -= Atk;
 
-	Timer::instance().event_regist(time_event::EOnce, 0.3f,
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
 		[&bInvincible = bInvincible]()->bool
 		{  bInvincible = false; return true;  });
 
-	Timer::instance().event_regist(time_event::EOnce, 0.3f,
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
 		[&bHit = _EnemyInfo.bHit](){
 		bHit = false;
 		return true;});
@@ -255,8 +254,6 @@ void ARCHER::render(HDC hdc, vec camera_pos, vec size_factor)
 	if (!_transform)return;
 	
 	Monster::render(hdc, camera_pos, size_factor);
-
-	
 
 	if (bArrowLineRender)
 	{

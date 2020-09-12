@@ -5,8 +5,32 @@
 #include "render_component.h"
 #include "object_mgr.h"
 #include "Effect.h"
+#include "Freezing_Interface.h"
 #include "sound_mgr.h"
 
+
+void Boss_Blast::Hit(std::weak_ptr<object> _target)
+{
+	actor::Hit(_target);
+
+	auto sp_Target = _target.lock();
+	if (!sp_Target)return;
+	
+	// 속성 공격 확률 계산
+	float DICE = math::Rand<float>({ 0.01f,1.f });
+	if (DICE >= ICE_Percentage)return;
+
+	if (sp_Target->ObjectTag == object::Tag::player)
+	{
+		auto sp_EnableFreezObject = std::dynamic_pointer_cast<Freezing_Interface>(sp_Target);
+		if (!sp_EnableFreezObject)return;
+		if (!_transform)return;
+
+		vec MsgLocation = _transform->_location;
+		
+		sp_EnableFreezObject->_Freezing_Info.Freez(MsgLocation);
+	}
+}
 
 void Boss_Blast::initialize()
 {

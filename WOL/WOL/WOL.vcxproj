@@ -203,6 +203,7 @@
     <ClInclude Include="fmod_output.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Freezing_Interface.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GoldEffect.h" />
     <ClInclude Include="helper.h" />
@@ -301,6 +302,7 @@
     <ClCompile Include="EffectPlayerAttack.cpp" />
     <ClCompile Include="FireDragon.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="Freezing_Interface.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GoldEffect.cpp" />
     <ClCompile Include="helper.cpp" />

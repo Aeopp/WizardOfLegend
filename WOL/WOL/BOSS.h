@@ -2,6 +2,8 @@
 #include "object.h"
 #include "Shadow.h"
 #include "SOIL.h"
+#include "ICE_Blast.h"
+#include "Freezing_Interface.h"
 
 struct PatternInfo
 {
@@ -9,7 +11,7 @@ struct PatternInfo
     float Duration;
     std::function<void()> Skill;
 };
-class BOSS : public object
+class BOSS : public object , public Freezing_Interface
 {
 public:
     enum class EState : uint8_t
@@ -72,9 +74,8 @@ public:
     std::weak_ptr<class UIBossName> wp_UIBossName{};
 
     Shadow _Shadow;
-
-    EPattern CurrentPattern; 
-
+    EPattern CurrentPattern;
+	
     int PaintSizeX;
     int PaintSizeY;
     float ScaleX;

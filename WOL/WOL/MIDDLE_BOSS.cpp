@@ -99,29 +99,36 @@ void MIDDLE_BOSS::initialize()
 
 	PatternTableNum = PatternTable.size();
 	CurrentPatternIdx = 0;
+	Freez_size = { 300,300 };
+	
 };
 
 void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
 
-	auto sp_Bmp = AnimDirSpriteUpdate();
-	if (!sp_Bmp)return;
+	Freezing_render(hdc, _transform->_location - camera_pos);
+	
+	if ( ! _Freezing_Info.IsFreezing()  ) 
+	{
+		auto sp_Bmp = AnimDirSpriteUpdate();
+		if (!sp_Bmp)return;
 
-	AnimUpdateFromCurrentState();
-	_Shadow.render(hdc, camera_pos);
+		AnimUpdateFromCurrentState();
+		_Shadow.render(hdc, camera_pos);
 
-	vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
-	vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
+		vec DestPaintSize = { PaintSizeX * ScaleX, PaintSizeY * ScaleY };
+		vec DestLoc = _transform->_location - camera_pos - (DestPaintSize * 0.5);
 
-	GdiTransparentBlt(hdc,
-		DestLoc.x, DestLoc.y
-		, DestPaintSize.x, DestPaintSize.y
-		, sp_Bmp->Get_MemDC(),
-		CurrentColIdx * PaintSizeX,
-		CurrentRowIdx * PaintSizeY,
-		PaintSizeX, PaintSizeY,
-		COLOR::MRGENTA());
+		GdiTransparentBlt(hdc,
+			DestLoc.x, DestLoc.y
+			, DestPaintSize.x, DestPaintSize.y
+			, sp_Bmp->Get_MemDC(),
+			CurrentColIdx * PaintSizeX,
+			CurrentRowIdx * PaintSizeY,
+			PaintSizeX, PaintSizeY,
+			COLOR::MRGENTA());
+	}
 }
 
 Event MIDDLE_BOSS::update(float dt)
@@ -132,6 +139,12 @@ Event MIDDLE_BOSS::update(float dt)
 	CurrentHitCoolTime -= dt;
 	MonsterSpawnCurrentTick -= dt;
 
+	_Freezing_Info.update(dt);
+
+	Freezing_update(dt, wp_collision);
+
+	if (_Freezing_Info.IsFreezing())return Event::None;
+	
 	UpdateDir();
 	StateAction();
 	StateTranslation();
@@ -329,7 +342,6 @@ void MIDDLE_BOSS::AnimUpdateFromCurrentState()
 		break;
 	}
 }
-
 
 void MIDDLE_BOSS::StateTranslation()
 {

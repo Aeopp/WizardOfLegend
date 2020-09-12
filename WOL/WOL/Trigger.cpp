@@ -91,7 +91,23 @@ void Trigger::release() noexcept
 	if (!sp_camera)return;
 	sp_camera->SetCameraFix(false);
 }
-
+ 
+ /// </summary>
+ /// <param name="EventZoneSize"></param>
+ /// 트리거 이벤트 시작을 감지하는 범위
+ /// <param name="Location"></param>
+ /// 트리거 존의 위치
+ /// <param name="StartEvent"></param>
+ /// 스테이지 입장 이벤트 Prison 생성이 필요한경우 여기서 생성해주세요.
+ /// <param name="EndEvent"></param>
+ /// 플레이어가 스테이지를 클리어 했을경우 이벤트
+ /// <param name="EventList"></param>
+ /// 몬스터를 생성하고 생사여부를 추적해서 다음 이벤트로 넘어갈지 결정합니다.
+ /// 추적해야하는 몬스터들을 반환해주세요.
+ /// <param name="bCameraFixZone"></param>
+ /// 카메라 위치를 제한 할 것인지 명시해주세요 기본값 false
+ /// <param name="CameraRange"></param>
+ /// 카메라 위치를 제한할경우 위치 범위를 넘겨주세요.
  void Trigger::SetUp
  (std::pair<int, int> EventZoneSize, vec Location,
 	 std::function<std::vector<std::weak_ptr<class object>>()> StartEvent, 

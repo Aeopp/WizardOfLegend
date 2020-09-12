@@ -7,7 +7,7 @@ struct player_info
 	float max_hp{500};
 	float max_mp{500};
 
-	float dash_speed{ 1500.f };
+	float dash_speed{ 1300.f };
 
 	bool bAttack{ false };
 	bool bIdle{ true };
@@ -50,7 +50,7 @@ struct player_info
 	float ShieldDuration = 20.f;
 
 	float NormalAttackRich{60.f};
-	float NormalAttackPushForce{5.f};
+	float NormalAttackPushForce{1.f};
 
 
 

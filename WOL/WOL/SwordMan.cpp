@@ -21,7 +21,7 @@ void SwordMan::initialize()
 {
 	collision_lower_correction = { 0,+40 };
 
-	lower_size = { 25,50 };
+	lower_size = { 35,65 };
 
 	LeftAnimKey = L"SWORDMAN_LEFT";
 	RightAnimKey = L"SWORDMAN_RIGHT";
@@ -55,7 +55,7 @@ void SwordMan::initialize()
 	
 	Attack = { 40,50 };
 	
-	InvincibleTime = 0.3f;
+
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
@@ -77,11 +77,13 @@ Event SwordMan::update(float dt)
 	AttackStartTime -= dt;
 	SoundTick -= dt;
 
-
 	if (InitTime > 0)return Event::None;
 	if (bDie)return Event::Die;
 	if (bDying)return Event::None;
+	Event _E = Monster::update(dt);
+	if (_Freezing_Info.IsFreezing())return Event::None;
 
+	
 	if (AttackEndRemainTime > 0)
 	{
 		_render_component->_Anim.RowIndex = (int)EAnimState::Attack;
@@ -191,11 +193,12 @@ void SwordMan::Hit(std::weak_ptr<object>
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
 	if (!sp_target->bAttacking)return;
-	//if (sp_target->ObjectTag == object::Tag::player_shield)return;
 	if (sp_target->ObjectTag == object::Tag::monster)return;
+	//	if (sp_target->ObjectTag == object::Tag::player_shield)return;
 	if (sp_target->ObjectTag == object::Tag::monster_attack)return;
+	if (sp_target->UniqueID == EObjUniqueID::ICEBLAST && _Freezing_Info.IsFreezing())return;
 	
-	Timer::instance().event_regist(time_event::EOnce, InvincibleTime,
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
 	[&bInvincible = bInvincible]()->bool {  bInvincible = false; return true;  });
 
 	float Atk = math::Rand<int>(sp_target->Attack);
@@ -205,10 +208,12 @@ void SwordMan::Hit(std::weak_ptr<object>
 	_EnemyInfo.bHit = true;
 	_EnemyInfo.bAttack = false;
 	AttackStartTime = AttackEndRemainTime = -1;
-
-	_render_component->ChangeAnim(EAnimState::Hit, 0.5f);
+	
+	
+	
+	_render_component->ChangeAnim(EAnimState::Hit, HitCoolTime);
 	_Shadow.CurrentShadowState = EShadowState::BIG;
-	collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+	collision_mgr::instance().HitEffectPush(_transform->_location, HitCoolTime);
 
 	HitSoundPlayBackByTag(sp_target->UniqueID, sp_target->ObjectTag);
 
@@ -218,7 +223,7 @@ void SwordMan::Hit(std::weak_ptr<object>
 	v.y -= 35;
 	v.x += math::Rand<int>({ -40,+40 });
 
-	Timer::instance().event_regist(time_event::EOnce, 0.5f,
+	Timer::instance().event_regist(time_event::EOnce, HitCoolTime,
 		[&bHit = _EnemyInfo.bHit](){
 		bHit = false;
 		return true;

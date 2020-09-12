@@ -23,7 +23,7 @@ void FireDragon::initialize()
 	sp_collision->bCollisionSlideAnObject = false;
 	ObjectTag = object::Tag::player_attack;
 	sp_collision->bCollisionTargetPushFromForce = true;
-	sp_collision->PushForce = 10.f;
+	sp_collision->PushForce = 5.f;
 	sp_collision->bCollision = true;
 	sp_collision->bHitEffect = true;
 	sp_collision->bTileHitEffect = true;
@@ -149,11 +149,6 @@ void FireDragon::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	CalcSpriteFromAngle();
 
-	if (ColIdx == 0)
-	{
-
-		int i = 0;
-	}
 	GdiTransparentBlt(hdc, DestLoc.x, DestLoc.y,
 		PaintSizeX *Scale, PaintSizeY*Scale, sp_DragonImg->Get_MemDC(),
 		ColIdx * PaintSizeX, RowIdx * PaintSizeY,

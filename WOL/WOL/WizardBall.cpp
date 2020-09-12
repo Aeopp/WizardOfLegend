@@ -112,7 +112,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
-		CurrentHitCoolTime = 0.1f;
+		CurrentHitCoolTime = 0.25f;
 		vec randvec = math::RandVec();
 		randvec.y = (abs(randvec.y));
 		vec v = _transform->_location;
@@ -139,7 +139,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
 		StateDuration = 0.2f;
-		CurrentHitCoolTime = 0.1f;
+		CurrentHitCoolTime = 0.25f;
 		RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
 		if (bAttacking && !bDef)
 		{

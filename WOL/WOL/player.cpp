@@ -38,9 +38,11 @@
 
 void Player::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-
-	actor::render(hdc, camera_pos, size_factor);
+	Freezing_render(hdc, _transform->_location - camera_pos);
 	
+	if (!_Freezing_Info.IsFreezing())
+		actor::render(hdc, camera_pos, size_factor);
+	 
 	if (bDebug)
 	{
 		vec v = _transform->_location;
@@ -74,7 +76,7 @@ void Player::initialize()
 
 	if (!sp_collision)return;
 	sp_collision->bSlide = true;
-	sp_collision->_size = { 30.f,30.0f };
+	sp_collision->_size = { 34.f,63.f };
 	sp_collision->bHitEffect = false;
 
 	_Camera = object_mgr::instance()._Camera;
@@ -156,8 +158,7 @@ Event Player::update(float dt)
 	Event _E = object::update(dt);
 	CurrentInvincibletime -= dt;
 	IceCrystalTick -= dt;
-
-	player_check(dt);
+	
 	if (!_player_info) return Event::Die;
 
 	_player_info->AddHp(_player_info->HpRegenerationAtSec * dt);
@@ -178,13 +179,19 @@ Event Player::update(float dt)
 	_player_info->SkillCurrentBoomerangNum =
 		min(_player_info->SkillCurrentBoomerangNum + dt, _player_info->SkillBoomerangMaxNum);
 
-	if (_player_info->GetMP() >= _player_info->max_mp)
+	if (_player_info->GetMP() >= _player_info->max_mp && !bUltiOn)
 	{
 		bUltiOn = true;
 		SOUNDPLAY("ULT_ON", 1.f, false);
 	}
 	
-
+	Freezing_update(dt, _collision_component);
+	
+	if (!_Freezing_Info.IsFreezing  ())
+	{
+		player_check(dt);
+	}
+	
 	return _E;
 }
 void Player::Hit(std::weak_ptr<object> _target)
@@ -490,8 +497,9 @@ void Player::BindingSkillCheckCast(int SlotIdx)
 		ICE_BLAST(8);
 		break;
 	case ESkill::CRYSTAL:
-		if (_player_info->GetMP() >= _player_info->max_mp){
+		if (bUltiOn){
 			SkillUlti();
+			bUltiOn = false;
 		}
 		else{
 			SkillIceCrystal(3);
