@@ -237,17 +237,16 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
-		vec PrisonLocation = vec{ 1350,2450 };
-		vec SwordManLocation = vec{ 1000, 2500 };
-		
+		vec PrisonLocation = vec{ 1660,2385};
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
-		_Prison->SetUp(1.f, 1.f, Prison::EType::Hor,
-			wp_Trigger, { 100,100 }, PrisonLocation);
-
-		auto _Swordman= object_mgr::instance().insert_object<SwordMan>
-		(_Player,	vec{ 1000,2500 });
+		_Prison->SetUp(1.f, 1.5, Prison::EType::Ver,
+			wp_Trigger, { 100,250 }, PrisonLocation);
 		
-		ReturnObjects.push_back(_Swordman);
+		vec SwordManLocation = vec{ 600, 2440 };
+		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player,
+			{ SwordManLocation });
+		
 		return ReturnObjects;
 	};
 	// 1 
@@ -255,20 +254,14 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 	{
 		std::vector< std::weak_ptr<class object>> ReturnObjects;
 		
-		vec FireCardLocation =  { 1000, 2500 };
+		vec FireCardLocation =  { 900, 2000 };
 		
 		auto fire_card = object_mgr::instance().
 		insert_object<ArcanaCard>(FireCardLocation, ESkill::FIRE, L"FIRE_DRAGON_CARD");
 
-		std::vector<vec> MonsterLocation { {1000,2500} , { 1300,2500 }  };
+		std::vector<vec> MonsterLocation { {561,2344} , { 505,2718}  };
 
-		for(const auto& locaion  :MonsterLocation)
-		{
-			auto sp_Monster = object_mgr::instance().insert_object<SwordMan>
-				(_Player, locaion);
-			
-			ReturnObjects.push_back(sp_Monster);
-		}
+		ReturnObjects+=Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, MonsterLocation);
 		
 		return ReturnObjects;
 	};
@@ -277,20 +270,14 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 	{
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
-		vec BlastCardLocation = vec{ 1000,2500 };
-		
+		vec BlastCardLocation = vec{ 914,3100 };
+
 		auto blast_card = object_mgr::instance().
 		insert_object<ArcanaCard>(BlastCardLocation	, ESkill::BLAST, L"ICE_BLAST_CARD");
 		
-		std::vector<vec> MonsterLocation{ {1000,2500} , { 1300,2500 } };
+		std::vector<vec> MonsterLocation{ {1361,2545} , { 474,2484} };
 
-		for (const auto& locaion : MonsterLocation)
-		{
-			auto sp_Monster = object_mgr::instance().insert_object<ARCHER>
-				(_Player, locaion);
-
-			ReturnObjects.push_back(sp_Monster);
-		}
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<ARCHER>(_Player, MonsterLocation);
 		
 		return ReturnObjects;
 	};
@@ -299,33 +286,25 @@ void Scene_Stage::TriggerSetUp(std::weak_ptr<class Player> _Player)
 	{
 		std::vector< std::weak_ptr<class object>  > ReturnObjects;
 
-		vec CrystalCardLocation = vec{ 1000,2500 };
+		vec CrystalCardLocation = vec{ 500,2500 };
 
 		auto crystal_card = object_mgr::instance().
 		insert_object<ArcanaCard>(CrystalCardLocation,ESkill::CRYSTAL, L"ICE_KRYSTAL_CARD");
-
-		std::vector<vec> MonsterLocation{ {1000,2500} , { 1300,2500 } };
-
-		for (const auto& locaion : MonsterLocation)
-		{
-			auto sp_Monster = object_mgr::instance().insert_object<WIZARD>
-				(_Player, locaion);
-			
-			ReturnObjects.push_back(sp_Monster);
-		}
+	
+		std::vector<vec> MonsterLocation{ {900,2200} , { 900,3100} };
+		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<WIZARD>(_Player, MonsterLocation);
 
 		return ReturnObjects;
 	};
-	
 
 	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
 	EventQ.push(std::move(Event_1));
 	EventQ.push(std::move(Event_2 ));
 	EventQ.push(std::move(Event_3));
-	vec  EventZoneSize = { 200,200 };
+	vec  EventZoneSize = { 500,500 };
 	vec TriggerLocation = { 1350,2450 };
 	
-	std::pair<vec, vec> camera_range = { {1350,2450} , {1500,2600}  };
 	_Trigger->SetUp({ 200,200 }, vec{ 1350,2450 },
 		std::move(StartEvent),
 		[]() {}, std::move(EventQ));

@@ -15,6 +15,7 @@ public:
 	void store_set_up(std::weak_ptr<class Player> _Player);
 	~Scene_Stage()noexcept override;
 private:
+	std::shared_ptr<class object> Stage_1();
 	void TriggerSetUp(std::weak_ptr<class Player> _Player);
 };
 

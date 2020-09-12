@@ -40,3 +40,24 @@ public:
 	static void MissMsg(vec Loation);;
 };
 
+
+namespace std
+{
+	template<typename T>
+	std::vector<T>& operator+=(std::vector<T>& Lhs, const std::vector<T>& Rhs)
+	{
+		Lhs.reserve(Lhs.size() + Rhs.size());                
+		Lhs.insert(Lhs.end(), Rhs.begin(), Rhs.end());        
+		return Lhs;                                        
+	}
+    // R-Value 레퍼런스로 패스했을 경우 주의
+	template<typename T>
+	std::vector<T>& operator+=(std::vector<T>& Lhs,std::vector<T>&& Rhs)
+	{
+		Lhs.reserve(Lhs.size() + Rhs.size());
+		std::move(std::begin(Rhs), std::end(Rhs), std::back_inserter(Lhs));
+		return Lhs;
+	}
+}
+	
+

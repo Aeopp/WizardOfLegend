@@ -112,7 +112,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
-		CurrentHitCoolTime = 0.25f;
+		CurrentHitCoolTime = 0.20f;
 		vec randvec = math::RandVec();
 		randvec.y = (abs(randvec.y));
 		vec v = _transform->_location;

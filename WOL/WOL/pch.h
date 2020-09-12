@@ -13,5 +13,5 @@
 #include "framework.h"
 #include "math.h"
 #include "MY_RECT.h"
-
+#include "helper.h"
 #endif //PCH_H
