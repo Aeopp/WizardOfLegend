@@ -30,6 +30,9 @@ Event UIBossHPBar::update(float dt)
 		return Event::Die;
 	}
 
+	auto sp_owner = _owner.lock();
+	if (!sp_owner) return Event::Die;
+
 	return UIBar::update(dt);;
 }
 

@@ -39,7 +39,7 @@ void WizardBall::initialize()
 	_Shadow.initialize();
 	_Shadow._owner = (_ptr);
 	_Shadow.correction = { 0,150 };
-
+	
 
 	PaintSizeX = 90;
 	PaintSizeY = 90;
@@ -50,10 +50,9 @@ void WizardBall::initialize()
 	Attack = { 40,50 };
 	AttackStartDistance = 750.f;
 	UniqueID = EObjUniqueID::EWizardBall;
-	ObjectTag = Tag::monster_attack;
+	ObjectTag = Tag::monster;
 
-	HP = 300;
-	
+	HP = 225;
 }
 
 void WizardBall::late_initialize(std::weak_ptr<class object> wp_AttackTarget, vec location)
@@ -111,12 +110,12 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 	if (!sp_Target)return;
 	float Atk = math::Rand<float>(sp_Target->Attack);
 
-	//if (sp_Target->ObjectTag == object::Tag::player && bAttacking)
-	//{
-	//	CurrentState = WizardBall::EState::AttackEnd;
-	//	StateDuration = 1.0;
-	//	AttackEnd();
-	//}
+	if (sp_Target->ObjectTag == object::Tag::player && CurrentState == EState::Attacking)
+	{
+		CurrentHitCoolTime = 0.11f;
+		StateDuration = 0.10f;
+	
+	}
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
 		CurrentHitCoolTime = 0.10f;

@@ -51,7 +51,7 @@ void ARCHER::initialize()
 	
 	_render_component->ChangeAnim(EAnimState::Idle, 1.f, EAnimState::Idle);
 
-	_EnemyInfo.HP = 450;
+	_EnemyInfo.HP = 300;
 }
 
 Event ARCHER::update(float dt)

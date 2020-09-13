@@ -151,12 +151,9 @@ void Player::initialize()
 
 	ObjectTag = object::Tag::player;
 
-	CurrentInvincibletime = DefaultInvincibletime = 0.5f;
-
+	CurrentInvincibletime = DefaultInvincibletime = 0.3f;
 
 	wp_Inventory = object_mgr::instance().insert_object<UIInventory>();
-
-	
 };
 
 Event Player::update(float dt)
@@ -255,14 +252,14 @@ void Player::Hit(std::weak_ptr<object> _target)
 		push_back({ v ,vec{0,1}*3,
 		1.f,int(Atk),std::move(Msg) });
 
-	if (_player_info->GetHP() > 0)
+	//if (_player_info->GetHP() > 0)
 	{
 		CurrentInvincibletime = DefaultInvincibletime;
 
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_player_info->bHit = true;
 		if (!_player_info->bDash)
-			_render_component->ChangeAnim(AnimTable::hit, DefaultInvincibletime, AnimTable::idle);
+			_render_component->ChangeUnstoppableAnim(AnimTable::hit, DefaultInvincibletime, AnimTable::idle);
 		collision_mgr::instance().HitEffectPush(_transform->_location, DefaultInvincibletime);
 		_Timer.event_regist(time_event::EOnce, DefaultInvincibletime,
 			[&bHit = _player_info->bHit]()
@@ -271,25 +268,22 @@ void Player::Hit(std::weak_ptr<object> _target)
 			return true;
 		});
 	}
-	else
-	{
-		_Shadow.CurrentShadowState = EShadowState::NORMAL;
-		_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
-		_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f, AnimTable::dead);
+	//else
+	//{
+	//	_Shadow.CurrentShadowState = EShadowState::NORMAL;
+	//	_render_component->wp_Image = AnimDirFileTable[(int)EAnimDir::front];
+	//	_render_component->ChangeUnstoppableAnim(AnimTable::dead, 1.f, AnimTable::dead);
 
-		//	Timer::instance().time_scale = 0.1f;
-		sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
-		///*	_Timer.event_regist(EOnce, 1.f, []() {
-		//		MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
-		//			MB_OK);
-		//		return true;
-		//		});;
-		//	_Timer.time_scale = 1.0f;*/
-		//	DeltaTime = 0.0f;
-
-		//_player_info->SetHp(_player_info->max_hp);
-		//_player_info->SetMp(_player_info->max_mp);
-	}
+	//		Timer::instance().time_scale = 0.1f;
+	//	sound_mgr::instance().Play("PLAYER_DIE", false, 1.f);
+	//	MessageBox(game::hWnd, L" 사망하셨습니다 다시 도전해 보세요. ", L"DEAD!!",
+	//		MB_OK);
+	//	    _Timer.time_scale = 1.0f;
+	//		DeltaTime = 0.016f;
+	//	
+	//	_player_info->SetHp(_player_info->max_hp);
+	//	_player_info->SetMp(_player_info->max_mp);
+	//}
 	
 	Camera_Shake(Atk*0.3, 
 		(_transform->_location - sp_target->_transform->_location).get_normalize(),
@@ -575,12 +569,28 @@ void Player::player_check(float dt)
 	if (!_player_info)return;
 
 	Player_Move(dt);
-	
+	//cheat key
 	if (_Input.Key_Down('9'))
 	{
 		auto sp_collision = _collision_component.lock();
 		if (!sp_collision)return;
 		sp_collision->bCollision = !sp_collision->bCollision;
+	}
+	// 모든 몬스터 삭제
+	if (_Input.Key_Down('0'))
+	{
+		for(auto& ObjList : object_mgr::instance().object_map)
+		{
+			for(auto & sp_Obj : ObjList.second)
+			{
+				if (!sp_Obj)continue;
+				if ( sp_Obj->ObjectTag == object::Tag::monster ||
+					sp_Obj->ObjectTag == object::Tag::monster_attack)
+				{
+					sp_Obj->bDie = true;
+				}
+			}
+		}
 	}
 	if (_Input.Key_Down('Q'))
 	{
@@ -1256,7 +1266,7 @@ void Player::Dash(float speed)
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-	//if (_player_info->bHit) return;
+	if (_player_info->bHit) return;
 
 	_player_info->bDash = true;
 	CheckDirInput();
@@ -1361,9 +1371,10 @@ void Player::Attack()
 
 void Player::Player_Move(float dt)
 {
-
 	if (!_player_info)return;
 	if (_player_info->bAttack)return;
+	if (_player_info->bHit)return;
+	
 	_player_info->bMove = false;
 	if (!_player_info->bDash)
 	{
@@ -1453,8 +1464,6 @@ void Player::Player_Move(float dt)
 			_transform->Move(_transform->_dir, _speed * dt);
 		}
 	}
-
-	
 
 	if (_player_info->bMove)
 	{

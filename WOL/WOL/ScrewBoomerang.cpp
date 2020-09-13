@@ -48,7 +48,7 @@ void ScrewBoomerang::late_initialize(vec RotationInitCenter, vec RotationInitDir
 	auto sp_collision = _collision_component.lock();
 	if (!sp_collision)return;
 	sp_collision->bTileHitEffect = false;
-
+	sp_collision->PushForce = 5.f;
 }
 
 void ScrewBoomerang::HitTile(RECT TileRt)

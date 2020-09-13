@@ -73,8 +73,8 @@ public:
 
 	 std::vector<EPattern> PatternTable
 	 { EPattern::FIRE,EPattern::BLAST,EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::BOOMERANG,
-	  EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::FIRE,EPattern::BLAST,EPattern::BOOMERANG,
-	 EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::FIRE,EPattern::BLAST,EPattern::FIRE };
+	  EPattern::CRYSTAL,EPattern::BLAST,EPattern::FIRE_DRAGON,EPattern::CRYSTAL,EPattern::BOOMERANG,
+	 EPattern::FIRE_DRAGON,EPattern::BLAST,EPattern::FIRE,EPattern::BOOMERANG,EPattern::FIRE_DRAGON };
 
     int PatternTableNum;
     int CurrentPatternIdx = 0;

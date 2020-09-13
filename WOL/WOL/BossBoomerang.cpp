@@ -22,7 +22,7 @@ void BossBoomerang::initialize()
 
 	if (!sp_collision)return;
 
-	Duration = 3.5f;
+	Duration = 3.0f;
 
 	ScaleX = 0.8f;
 	ScaleY = 0.8f;

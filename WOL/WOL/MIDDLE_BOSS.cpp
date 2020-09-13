@@ -88,11 +88,12 @@ void MIDDLE_BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 3500;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 2000;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
-
+	HPBar->_owner = _ptr;
+	
 	auto UI = object_mgr::instance().insert_object<UIBossName>(
 	L"MIDDLEBOSS_NAMEBAR.bmp",L"MIDDLEBOSS_NAMEBAR");
 	if (!UI)return;
@@ -110,6 +111,7 @@ void MIDDLE_BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
 
+	if(CurrentState !=EState::CAST)
 	Freezing_render(hdc, _transform->_location - camera_pos);
 	
 	if ( ! _Freezing_Info.IsFreezing()  ) 
@@ -379,7 +381,7 @@ void MIDDLE_BOSS::StateTranslation()
 		StateSetUp(MIDDLE_BOSS::EState::READY, 4);
 		break;
 	case MIDDLE_BOSS::EState::READY:
-		StateSetUp(MIDDLE_BOSS::EState::CAST, 10);
+		StateSetUp(MIDDLE_BOSS::EState::CAST, 8);
 		AttackStart();
 		break;
 	case MIDDLE_BOSS::EState::CAST:

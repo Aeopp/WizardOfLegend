@@ -84,11 +84,12 @@ void BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 4000;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 2000;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
-
+	HPBar->_owner = _ptr;
+	
 	auto UI = object_mgr::instance().insert_object<UIBossName>(
 		L"BOSS_NAMEBAR.bmp", L"BOSS_NAMEBAR");
 	if (!UI)return;
@@ -111,15 +112,14 @@ void BOSS::initialize()
 
 	_Burning_Info.particle_range.y = _Burning_Info.particle_range.y * 2;
 	_Burning_Info.render_world_size_range *= 2;
-	
 };
 
 void BOSS::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
 
+	if(CurrentState != EState::ATTACK)
 	Freezing_render(hdc, _transform->_location - camera_pos);
-	
 	
 	if (!_Freezing_Info.IsFreezing())
 	{

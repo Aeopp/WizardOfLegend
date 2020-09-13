@@ -17,7 +17,7 @@ public:
 public:
 	struct Burning
 	{
-		static inline const float Duration = 2.0f;
+		static inline const float Duration = 2.5f;
 		static inline const float AnimDelta = 0.08f;
 		static inline const vec PaintSize = { 70,70 };
 		vec particle_range = {  25,75};

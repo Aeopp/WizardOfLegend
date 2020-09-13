@@ -159,7 +159,7 @@ void shield::late_initialize(Transform _Transform)
 	sp_collision->bSlide = true;
 	sp_collision->PushForce = 5.f;
 	sp_collision->bCollisionTargetPushFromForce = false;
-	sp_collision->_size = { 50.f,50.0f };
+	sp_collision->_size = { 50,50};
 	PaintSizeX = 100;
 	PaintSizeY = 105;
 	float Scale = 1.f;

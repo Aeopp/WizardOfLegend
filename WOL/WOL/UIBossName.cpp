@@ -30,7 +30,9 @@ Event UIBossName::update(float dt)
 	{
 		return Event::Die;
 	}
-
+	auto sp_owner = _owner.lock();
+	if (!sp_owner) return Event::Die;
+	
 	return object::update(dt);
 }
 void UIBossName::late_initialize(const std::wstring& UIFileName,const std::wstring& UIKey)

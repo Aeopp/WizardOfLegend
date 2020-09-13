@@ -452,7 +452,7 @@ std::shared_ptr<object> Scene_Stage::Stage_4(std::weak_ptr<Player> _Player)
 		_Prison->SetCollisionCorrection(vec{ 0, 70});
 		
 		vec SpawnInitCenter = vec{ 3346,3980 };
-		int32_t MonsterNum = 12;
+		int32_t MonsterNum = 10;
 		float Angle = 360.f / (float)MonsterNum;
 		vec InitDir = math::dir_from_angle(Angle);
 		float Radius = 300.f;

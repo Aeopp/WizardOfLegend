@@ -56,7 +56,7 @@ void WIZARD::initialize()
 
 	_render_component->ChangeAnim(EAnimState::Idle, 1.0f, EAnimState::Idle);
 
-	_EnemyInfo.HP = 400;
+	_EnemyInfo.HP = 300;
 	
 }
 

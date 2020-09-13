@@ -22,8 +22,8 @@ void BOSS_BOX::initialize()
 	if (!sp_collision)return;
 
 	sp_collision->bCollisionTargetPushFromForce = true;
-	sp_collision->PushForce = 40.f;
-
+	sp_collision->PushForce = 5.f;
+	
 	sp_collision->_size = { 50,50};
 	sp_collision->bRender = true;
 	sp_collision->bCollisionSlideAnObject = false;

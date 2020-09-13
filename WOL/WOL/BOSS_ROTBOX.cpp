@@ -103,7 +103,7 @@ Event BOSS_ROTBOX::update(float dt)
 		auto sp_collision = _collision_component.lock();
 		if (!sp_collision)return Event::None;
 		sp_collision->bCollision = true;
-
+		RAND_SOUNDPLAY("ROCK_THROW", { 1,2 }, 1.f, false);
 	}
 
 	if (bLaunch) {

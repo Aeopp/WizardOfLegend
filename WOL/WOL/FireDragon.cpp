@@ -32,7 +32,7 @@ void FireDragon::initialize()
 	sp_collision->bCollision = true;
 
 
-	Duration = 10.f;
+	Duration = 3.f;
 
 	PaintSizeX = 180;
 	PaintSizeY = 180;
@@ -40,7 +40,7 @@ void FireDragon::initialize()
 	 ColIdx = 0;
 	 RowIdx = 0;
 	 P_Scale = 0.93;
-	 ParticleMaxNum = 20;
+	 ParticleMaxNum = 8;
 
 	// 자기자신의 회전속도임
 
@@ -58,9 +58,6 @@ void FireDragon::initialize()
 
 	//////////////////
 	amplitude = 70;
-
-
-
 };
 
 Event FireDragon::update(float dt)
@@ -220,7 +217,7 @@ void FireDragon::SetUp(vec Location, vec Dir)
 	LinePos = Location;
 	T = 0;
 	
-	static const size_t ParticleNum = 6;
+	static const size_t ParticleNum = 4;
 	static const std::wstring ImgKey = L"FIRE_PARTICLE";
 	static const float ParticleDuration = 0.6f;
 	// launch 시 파티클 위치 , 파티클 흩날릴 방향 , 파티클 스프라이트 인덱스
