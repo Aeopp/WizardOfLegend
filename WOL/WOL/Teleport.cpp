@@ -12,6 +12,8 @@
 #include "object_mgr.h"
 
 
+
+
 void Teleport::render(HDC hdc, vec camera_pos, vec size_factor)
 {
 	object::render(hdc, camera_pos, size_factor);
@@ -57,7 +59,7 @@ void Teleport::SetUp(vec Location, bool bEnding, ESceneID _TargetScene)
 		auto sp_Portal = _collision_component.lock();
 		if (!sp_Portal) return;
 
-		sp_Portal->bCollision = true;
+		sp_Portal->bCollision = false;
 		sp_Portal->bCollisionSlideAnObject = false;
 		sp_Portal->bCollisionTargetPushFromForce = false;
 		sp_Portal->bHitEffect = false;
@@ -67,6 +69,21 @@ void Teleport::SetUp(vec Location, bool bEnding, ESceneID _TargetScene)
 		sp_Portal->PushForce = 0.f;
 		sp_Portal->_size = { 150,150};
 	}
+}
+
+Event Teleport::update(float dt)
+{
+	Event _Event  =object::update(dt);
+	
+	InitTime -= dt;
+	if(InitTime<0 && !bTelePortOn) 
+	{
+		bTelePortOn = true;
+		auto sp_Portal = _collision_component.lock();
+		if (!sp_Portal) return Event::None;
+		sp_Portal->bCollision = true;
+	}
+	return _Event;
 }
 
 uint32_t Teleport::get_layer_id() const&

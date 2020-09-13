@@ -20,8 +20,8 @@ public:
 	int print_render_obj{};
 	
 	static inline std::unordered_map<uint8_t, SlotInfo> SlotInfoMap{};
-	std::shared_ptr<class player_info> _player_info{};
-
+	static inline std::shared_ptr<class player_info> _player_info{};
+	static inline std::shared_ptr<class Player> _Player{};
 	static inline RECT client_rect{};
 	static constexpr int width = 1600;
 	static constexpr int height = 900;
@@ -37,13 +37,16 @@ public:
 	static constexpr int TileNumY{ 100 };
 	// 기본 해상도에서 변경될시 반환값에 사이즈를 곱해서 비율을 유지해주세요.
 	std::pair<float, float> size_factor();
-	
+
+	void PlayerInit();
 public:
 	static inline HDC hDC;
 	static inline HWND hWnd{};
 	static inline  HDC CurrentHdc{};
 private:
+	bool bPlayerInit = false;
 	void SlotDataInit();
+	
 };
 
 

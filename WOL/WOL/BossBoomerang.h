@@ -19,7 +19,10 @@ public:
 
 	std::array<POINT, 3> RotPts;
 
-	void SetUp(std::weak_ptr<class object> wp_AttackTarget,vec InitLocation,vec InitDir);
+	float InitTime = 1.f;
+	bool bLaunch = false;
+	
+	void SetUp(std::weak_ptr<class object> wp_AttackTarget,vec InitLocation,vec InitDir,float InitTime=1);
 	void CalcImgAngle(float RotationImgDegree);
 	virtual ~BossBoomerang()noexcept;
 public:

@@ -37,6 +37,16 @@ Event Trigger::update(float dt)
 			return Event::Die;
 		}
 	}
+	//cheat key
+	if(GetAsyncKeyState('0')&0x8000)
+	{
+		for(auto& DieObj : wp_EventZoneMonsters)
+		{
+			auto sp_DieObj =DieObj.lock();
+			if (!sp_DieObj)continue;
+			sp_DieObj->bDie = true;
+		}
+	}
 
 	return _Event; 
 }

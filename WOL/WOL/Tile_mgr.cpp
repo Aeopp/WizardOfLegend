@@ -1,13 +1,11 @@
 #include "pch.h"
 #include "Tile_mgr.h"
 #include "game.h"
-#include "object_mgr.h"
 #include "helper.h"
 #include "math.h"
 #include <istream>
 #include <fstream>
 #include <ostream>
-#include "Font.h"
 
 
 Tile_mgr::~Tile_mgr() noexcept

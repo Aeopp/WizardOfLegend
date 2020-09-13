@@ -22,8 +22,7 @@ void BossBoomerang::initialize()
 
 	if (!sp_collision)return;
 
-
-	Duration = 2;
+	Duration = 3.5f;
 
 	ScaleX = 0.8f;
 	ScaleY = 0.8f;
@@ -62,15 +61,29 @@ void BossBoomerang::initialize()
 
 	HomingRotationCurrentSpeed = 0.5f;
 	HomingRotationacceleration = 0.1f;
-	_speed = 900.f;
+	_speed = 2500;
 }
 
 Event BossBoomerang::update(float dt)
 {
 	Event _event = object::update(dt);
-
+	ImgAngle += dt * RotationSpeed;
 	HitTileEffectRemainTime -= dt;
+	InitTime -= dt;
+	if (InitTime > 0)return Event::None;
 	
+	if(InitTime<0 && !bLaunch)
+	{
+		bLaunch = true;
+		auto sp_Target =wp_Target.lock();
+		if(sp_Target)
+		{
+			RAND_SOUNDPLAY("FIRE_DRAGON", { 1,3 }, 1.f, false);
+
+			_transform->_dir = (sp_Target->_transform->_location - _transform->_location).get_normalize();
+		}
+		
+	}
 	Duration -= dt;
 	if (Duration < 0)return Event::Die;
 
@@ -98,7 +111,7 @@ Event BossBoomerang::update(float dt)
 
 	_transform->_location += _transform->_dir * dt * _speed;
 
-	ImgAngle += dt * RotationSpeed;
+
 
 	return _event;
 }
@@ -161,13 +174,14 @@ void BossBoomerang::HitTile(RECT TileRt)
 }
 
 
-void BossBoomerang::SetUp(std::weak_ptr<class object> wp_AttackTarget,vec InitLocation, vec InitDir)
+void BossBoomerang::SetUp(std::weak_ptr<class object> wp_AttackTarget,vec InitLocation, vec InitDir,float InitTime)
 {
 	if (!_transform)return;
 	_transform->_location = std::move(InitLocation);
 	_transform->_dir = std::move(InitDir);
 	wp_Target = std::move( wp_AttackTarget);
 	CalcImgAngle(math::radian_to_degree(atan2f(InitDir.y, InitDir.x)));
+	this->InitTime = InitTime;
 }
 
 void BossBoomerang::CalcImgAngle(float RotationImgDegree)

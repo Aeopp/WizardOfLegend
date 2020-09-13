@@ -22,7 +22,7 @@ public:
 		static inline const vec PaintSize = { 70,70 };
 		vec particle_range = {  25,75};
 		// 파티클 개수
-		int32_t ParticleNum = 10;
+		int32_t ParticleNum = 5;
 		// 파티클 렌더링 사이즈 xy : Min  Max  
 		vec render_world_size_range= {  22 ,44 };
 		struct Particle_Info

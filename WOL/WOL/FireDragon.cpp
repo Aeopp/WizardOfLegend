@@ -25,7 +25,7 @@ void FireDragon::initialize()
 	sp_collision->bCollisionSlideAnObject = false;
 	ObjectTag = object::Tag::player_attack;
 	sp_collision->bCollisionTargetPushFromForce = true;
-	sp_collision->PushForce = 5.f;
+	sp_collision->PushForce = 3.f;
 	sp_collision->bCollision = true;
 	sp_collision->bHitEffect = true;
 	sp_collision->bTileHitEffect = true;
@@ -86,7 +86,11 @@ Event FireDragon::update(float dt)
 	}
 	if (Duration<0)
 	{
-		RAND_SOUNDPLAY("FIRE_DRAGON_DIE", { 0,3 }, 1.f, false);
+		if(!bDieSoundPlayed)
+		{
+			RAND_SOUNDPLAY("FIRE_DRAGON_DIE", { 0,3 }, 1.f, false);
+			bDieSoundPlayed = true;
+		}
 	}
 	if (ParticleLocationDQ.empty() && Duration<0)
 	{
@@ -164,19 +168,22 @@ void FireDragon::HitTile(RECT TileRt)
 {
 	object::HitTile(TileRt);
 
-	collision_mgr::instance().HitEffectPush(_transform->_location,
-		0.5f);
+	if(!bWallHited)
+	{
+		collision_mgr::instance().HitEffectPush(_transform->_location,
+			0.5f);
 
-	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+		RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
 
-	auto sp_collision = _collision_component.lock();
-	if (!sp_collision)return;
-	bAttacking = false;
-	sp_collision->bSlide = false;
-	sp_collision->bCollision = false;
+		auto sp_collision = _collision_component.lock();
+		if (!sp_collision)return;
+		bAttacking = false;
+		sp_collision->bSlide = false;
+		sp_collision->bCollision = false;
 
-	bWallHited = true;
-	Duration = ParticleLocationUpdateDelta* ParticleMaxNum + 0.05f;
+		bWallHited = true;
+		Duration = ParticleLocationUpdateDelta * ParticleMaxNum + 0.05f;
+	}
 }
 
 void FireDragon::Hit(std::weak_ptr<object> _target)

@@ -52,7 +52,7 @@ void WizardBall::initialize()
 	UniqueID = EObjUniqueID::EWizardBall;
 	ObjectTag = Tag::monster_attack;
 
-	HP = 10;
+	HP = 300;
 	
 }
 
@@ -111,9 +111,16 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 	if (!sp_Target)return;
 	float Atk = math::Rand<float>(sp_Target->Attack);
 
+	//if (sp_Target->ObjectTag == object::Tag::player && bAttacking)
+	//{
+	//	CurrentState = WizardBall::EState::AttackEnd;
+	//	StateDuration = 1.0;
+	//	AttackEnd();
+	//}
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
 		CurrentHitCoolTime = 0.10f;
+		StateDuration = 0.10f;
 		vec randvec = math::RandVec();
 		randvec.y = (abs(randvec.y));
 		vec v = _transform->_location;
@@ -128,7 +135,6 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
-		StateDuration = 0.10f;
 
 		HP -= Atk;
 

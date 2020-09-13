@@ -151,10 +151,12 @@ void Player::initialize()
 
 	ObjectTag = object::Tag::player;
 
-	CurrentInvincibletime = DefaultInvincibletime = 0.3f;
+	CurrentInvincibletime = DefaultInvincibletime = 0.5f;
 
 
 	wp_Inventory = object_mgr::instance().insert_object<UIInventory>();
+
+	
 };
 
 Event Player::update(float dt)
@@ -165,6 +167,7 @@ Event Player::update(float dt)
 	
 	if (!_player_info) return Event::Die;
 
+	_player_info->CurrentTeleportCoolTime -= dt;
 	_player_info->AddHp(_player_info->HpRegenerationAtSec * dt);
 	_player_info->AddMp(_player_info->MpRegenerationAtSec* dt);
 
@@ -183,7 +186,7 @@ Event Player::update(float dt)
 	_player_info->SkillCurrentBoomerangNum =
 		min(_player_info->SkillCurrentBoomerangNum + dt, _player_info->SkillBoomerangMaxNum);
 
-	if (_player_info->GetMP() >= _player_info->max_mp && !bUltiOn)
+	if (_player_info->GetMP() >= _player_info->max_mp*0.9&& !bUltiOn)
 	{
 		bUltiOn = true;
 		SOUNDPLAY("ULT_ON", 1.f, false);
@@ -203,17 +206,12 @@ void Player::Hit(std::weak_ptr<object> _target)
 {
 	auto sp_target = _target.lock();
 	if (!sp_target)return;
-	EnterBossStage(sp_target);
+	EnterDungeon(sp_target);
 
 	if (CurrentInvincibletime > 0)return;
 	if (!sp_target->bAttacking)return;
 	if (sp_target->ObjectTag == object::Tag::player_attack)return;
 
-
-	if (_player_info->bProtected == true){
-		sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
-		return;
-	}
 
 	sound_mgr::instance().Play("PLAYER_HITED_1", false, 1.f);
 	RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
@@ -257,7 +255,6 @@ void Player::Hit(std::weak_ptr<object> _target)
 		push_back({ v ,vec{0,1}*3,
 		1.f,int(Atk),std::move(Msg) });
 
-
 	if (_player_info->GetHP() > 0)
 	{
 		CurrentInvincibletime = DefaultInvincibletime;
@@ -265,9 +262,9 @@ void Player::Hit(std::weak_ptr<object> _target)
 		_Shadow.CurrentShadowState = EShadowState::NORMAL;
 		_player_info->bHit = true;
 		if (!_player_info->bDash)
-			_render_component->ChangeUnstoppableAnim(AnimTable::hit, 0.5f, AnimTable::idle);
-		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
-		_Timer.event_regist(time_event::EOnce, 0.5f,
+			_render_component->ChangeAnim(AnimTable::hit, DefaultInvincibletime, AnimTable::idle);
+		collision_mgr::instance().HitEffectPush(_transform->_location, DefaultInvincibletime);
+		_Timer.event_regist(time_event::EOnce, DefaultInvincibletime,
 			[&bHit = _player_info->bHit]()
 		{
 			bHit = false;
@@ -290,11 +287,11 @@ void Player::Hit(std::weak_ptr<object> _target)
 		//	_Timer.time_scale = 1.0f;*/
 		//	DeltaTime = 0.0f;
 
-		_player_info->SetHp(_player_info->max_hp);
-		_player_info->SetMp(_player_info->max_mp);
+		//_player_info->SetHp(_player_info->max_hp);
+		//_player_info->SetMp(_player_info->max_mp);
 	}
 	
-	Camera_Shake(Atk, 
+	Camera_Shake(Atk*0.3, 
 		(_transform->_location - sp_target->_transform->_location).get_normalize(),
 		Atk*0.01);
 };
@@ -360,10 +357,7 @@ void Player::MakeShield()
 		_shield->CalcIdx();
 	}
 	// 지속시간 종료시 쉴드 무적 해제
-	Timer::instance().event_regist(time_event::EOnce, _player_info->ShieldDuration, 
-	[&PInfo = _player_info]() {PInfo->bProtected = false; return true;  });
-
-	_player_info->bProtected = true;
+	
 
 	_player_info->bIdle = false;
 	_player_info->bAttack = true;
@@ -486,6 +480,7 @@ void Player::ICE_BLAST(int Num)
 	//_player_info->AddMp(-150);
 
 }
+
 void Player::Camera_Shake(float force,vec dir,float duration)
 {
 	auto Cam = _Camera.lock();
@@ -503,10 +498,18 @@ void Player::BindingSkillCheckCast(int SlotIdx)
 {
 	if (!game::SlotInfoMap[SlotIdx].bAcquire)return;
 	if (!_transform)return;
+	if (_player_info->bHit)return;
+	if (_player_info->bDash)return;
 	
 	ESkill _Skill = game::SlotInfoMap[SlotIdx]._Skill;
 
-	InputDirSpriteChange(_transform->_dir);
+	auto oMousePos = Input_mgr::instance().GetWorldMousePos();
+	
+	if (oMousePos)
+	{
+		_transform->_dir = (*oMousePos - _transform->_location).get_normalize();
+		InputDirSpriteChange(_transform->_dir);
+	}
 	
 	switch (_Skill)
 	{
@@ -556,18 +559,29 @@ void Player::player_check(float dt)
 				SOUNDPLAY("CLOSE_INVENTORY");
 		}
 	}
-
-	if (bInvenControl)return;
-
+	//if (_Input.Key_Down('9'))
+	//{
+	//	game::SlotInfoMap[2].bAcquire = true;
+	//	game::SlotInfoMap[3].bAcquire = true;
+	//	game::SlotInfoMap[4].bAcquire = true;
+	//	game::SlotInfoMap[5].bAcquire = true;
+	//	game::SlotInfoMap[6].bAcquire = true;
+	//}
 	
+	if (bInvenControl)return;
 
 	_player_info->bIdle = true;
 
 	if (!_player_info)return;
 
 	Player_Move(dt);
-
-
+	
+	if (_Input.Key_Down('9'))
+	{
+		auto sp_collision = _collision_component.lock();
+		if (!sp_collision)return;
+		sp_collision->bCollision = !sp_collision->bCollision;
+	}
 	if (_Input.Key_Down('Q'))
 	{
 		BindingSkillCheckCast(3);
@@ -602,10 +616,7 @@ void Player::player_check(float dt)
 	//	SkillRotBoomerang();
 	//}
 
-	if (_Input.Key_Down('0'))
-	{
-		Scene_mgr::instance().Scene_Change(ESceneID::EMIDDLE_BOSS);
-	}
+	
 	if (_Input.Key_Down(VK_SPACE))
 	{
 		Dash(_player_info->dash_speed);
@@ -743,7 +754,7 @@ void Player::SkillUlti()
 
 	SOUNDPLAY("ULT_USE", 1.f, false);
 	bUltiOn = false;
-	SkillInCastSlowTime(0.25f, 0.5f);
+//	SkillInCastSlowTime(0.25f, 0.5f);
 }
 
 void Player::SkillFireDragon()
@@ -1076,8 +1087,11 @@ void Player::GetSkill()
 	sound_mgr::instance().Play("GET_SKILL", false, 1.f);
 }
 
-void Player::EnterBossStage(std::shared_ptr<class object> IsPortal)
+void Player::EnterDungeon(std::shared_ptr<class object> IsPortal)
 {
+	if (!_player_info)return;
+	if (_player_info->CurrentTeleportCoolTime > 0)return;
+	
 	if (IsPortal->UniqueID == EObjUniqueID::Portal)
 	{
 		auto sp_Teleport = std::dynamic_pointer_cast<Teleport>(IsPortal);
@@ -1242,7 +1256,7 @@ void Player::Dash(float speed)
 {
 	if (!_player_info)return;
 	if (_player_info->bDash)return;
-	if (_player_info->bHit) return;
+	//if (_player_info->bHit) return;
 
 	_player_info->bDash = true;
 	CheckDirInput();
@@ -1261,8 +1275,7 @@ void Player::Dash(float speed)
 		Transform->_location += Transform->_dir *(speed*DeltaTime);
 		return true;
 	}));
-
-
+	
 	_render_component->ChangeUnstoppableAnim(AnimTable::dash,
 	_player_info->AnimDashDuration, AnimTable::idle);
 
@@ -1270,7 +1283,6 @@ void Player::Dash(float speed)
 	Camera_Shake(1, dir, 0.1f);
 	
 	sound_mgr::instance().RandSoundKeyPlay("DASH", { 1,4 },1.f);
-
 }
 
 void Player::Attack()

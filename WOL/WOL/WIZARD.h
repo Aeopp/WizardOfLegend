@@ -14,7 +14,7 @@ public:
 
     static inline float FireCoolTime = 0.5f;
     static inline float InitBallCoolTime = 1.f;
-    static inline float BallCoolTime = 17.f;
+    static inline float BallCoolTime = 25.f;
 
     float CurrentFireCoolTime = FireCoolTime; 
     float CurrentBallCoolTime = InitBallCoolTime;

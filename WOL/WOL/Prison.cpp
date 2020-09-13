@@ -113,3 +113,10 @@ std::pair<int,int> CollisionSize,vec Location )
 
 	SOUNDPLAY("PRISON_START", 1.f, false);
 }
+
+void Prison::SetCollisionCorrection(vec Correction)
+{
+	auto sp_collision = wp_collision.lock();
+	if (!sp_collision)return;
+	sp_collision->correction = Correction;
+}

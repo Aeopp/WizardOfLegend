@@ -19,7 +19,7 @@ void shield::DefenseMsg(vec loc)
 	//	v.x += math::Rand<int>({ -40,+40 });
 
 	object_mgr::instance().TextEffectMap[RGB(255, 248, 127)].
-		push_back({ v,vec{0,1}*3,2.f,17,L"Defense!" });
+		push_back({ v,vec{0,1}*3,1.2f,17,L"Defense!" });
 }
 
 void shield::initialize()
@@ -36,8 +36,8 @@ void shield::initialize()
 
 	ObjectTag = object::Tag::player_shield;
 
-	bAttacking = true;
-	Attack = { 0,10 };
+	bAttacking = false;
+	Attack = { 0,0 };
 
 	UniqueID = EObjUniqueID::GAIR_ARMOR;
 }

@@ -26,6 +26,7 @@ public :
     void SetUp(float ScaleX,float ScaleY,Prison::EType _Type,
         std::weak_ptr<class object> _owner, std::pair<int, int> CollisionSize
     ,vec Location);
+    void SetCollisionCorrection(vec Correction);
 private:
     std::shared_ptr<class Bmp> sp_Img;
     std::weak_ptr<class collision_component> wp_collision;

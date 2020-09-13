@@ -8,6 +8,7 @@
 #include "game.h"
 #include "Bmp.h"
 #include "Burning_Interface.h"
+#include "shield.h"
 
 void BossFireDragon::initialize()
 {
@@ -24,12 +25,11 @@ void BossFireDragon::initialize()
 	sp_collision->bCollisionSlideAnObject = false;
 	ObjectTag = object::Tag::monster_attack;
 	sp_collision->bCollisionTargetPushFromForce = true;
-	sp_collision->PushForce = 10.f;
+	sp_collision->PushForce = 1.f;
 	sp_collision->bCollision = true;
 	sp_collision->bHitEffect = true;
 	sp_collision->bTileHitEffect = false;
 	sp_collision->bCollision = true;
-
 
 	Duration = 1.f;
 
@@ -215,8 +215,8 @@ void BossFireDragon::SetUp(vec Location, vec Dir)
 	_transform->_location = Location;
 	_transform->_dir = Dir;
 	CurrentAngle = math::AngleFromVec(Dir);
-	AngleMin = CurrentAngle - 135;
-	AngleMax = CurrentAngle + 135;
+	AngleMin = CurrentAngle - 60;
+	AngleMax = CurrentAngle + 60;
 	
 	CalcSpriteFromAngle();
 }

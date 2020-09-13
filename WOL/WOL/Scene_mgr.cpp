@@ -13,7 +13,10 @@ void Scene_mgr::Scene_Change(ESceneID _ESceneID)
 	_CurScene = _ESceneID;
 	if (_PreScene != _CurScene)
 	{
-		if (sp_scene) sp_scene.reset();
+		if (sp_scene)
+		{
+			sp_scene.reset();
+		}
 
 		switch (_CurScene)
 		{

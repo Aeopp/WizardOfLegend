@@ -3,7 +3,7 @@
 #include "object_mgr.h"
 #include "collision_component.h"
 #include "Camera.h"
-
+#include "shield.h"
 #include "collision_mgr.h"
 #include "Bmp.h"
 #include "sound_mgr.h"
@@ -142,6 +142,13 @@ void WizardFire::Hit(std::weak_ptr<object> _target)
 	if (!sp_target)return;
 	if (!_transform)return;
 
+	if (sp_target->ObjectTag == object::Tag::player_shield)
+	{
+		bDie = true;
+		shield::DefenseMsg(_transform->_location);
+		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
+		return;
+	}
 
 	if (sp_target->ObjectTag == object::Tag::player_attack)
 	{

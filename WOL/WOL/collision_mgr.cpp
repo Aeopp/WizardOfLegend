@@ -280,7 +280,7 @@ void collision_mgr::update()
 
 	CollisionObjNum = 0;
 
-	collision(EMonster, EMonster);
+	//collision(EMonster, EMonster);
 	//collision(EMonster, EPlayer);
 	collision(EPlayerAttack, EMonster);
 	collision(EPlayerAttack, EMonsterAttack);

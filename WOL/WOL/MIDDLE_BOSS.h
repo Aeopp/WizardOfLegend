@@ -38,8 +38,6 @@ public:
     std::shared_ptr<class BossInfo> sp_MyInfo{};
     std::shared_ptr<class Bmp> FireImg{};
     std::weak_ptr<class UIBossName> wp_UIBossName{};
-
-
     std::weak_ptr<class UIBossHPBar> wp_UIBossHPBar{};
 
 
@@ -81,6 +79,7 @@ public:
     int PatternTableNum;
     int CurrentPatternIdx = 0;
 
+    bool bDieAction = true;
 
     void HitCalc(std::pair<int, int> AttackRange);
     void ReadyAction();
@@ -107,7 +106,7 @@ public:
     void BOSS_SKill_Boomerang(size_t NUM);
     void BOSS_SKill_Blast();
      // // //////////////////////////////////////
-    void BOSS_Blast_launch(size_t NUM, float launchAngle =0);
+    void BOSS_Blast_launch(size_t NUM, vec Dir);
     void FireSpawn();
     void BallSpawn(size_t NUM);
     void SummonMonster();

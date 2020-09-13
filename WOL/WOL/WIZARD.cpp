@@ -55,6 +55,9 @@ void WIZARD::initialize()
 	Monster::initialize();
 
 	_render_component->ChangeAnim(EAnimState::Idle, 1.0f, EAnimState::Idle);
+
+	_EnemyInfo.HP = 400;
+	
 }
 
 Event WIZARD::update(float dt)
@@ -116,7 +119,7 @@ Event WIZARD::update(float dt)
 			_EnemyInfo.bAttack = true;
 
 			Timer::instance().event_regist(time_event::EOnce, 2.3f,
-				[dir,this](){
+				[TargetLocation,this](){
 				if (_EnemyInfo.bHit)return true;
 				if (!_EnemyInfo.bAttack)return true;
 				if (!FireImg)return true;
@@ -124,7 +127,11 @@ Event WIZARD::update(float dt)
 				if (!NormalAttack)return true;
 				NormalAttack->_owner = _ptr;
 				NormalAttack->wp_Target = _AttackTarget;
-				NormalAttack->Cast(_transform->_location +  math::RandVec() * math::Rand<int>({ 20,200}), dir, 0, FireImg);
+				vec  InitLocation = _transform->_location + math::RandVec() * math::Rand<int>({ 20,200 });
+				vec FireDir = (TargetLocation - InitLocation).get_normalize();
+				NormalAttack->Cast(InitLocation, FireDir, 0, FireImg);
+				NormalAttack->speed = 400.f;
+					
 				_Shadow.CurrentShadowState = EShadowState::BIG;
 				_EnemyInfo.bAttack = false;
 

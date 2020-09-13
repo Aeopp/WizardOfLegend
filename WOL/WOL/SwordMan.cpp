@@ -65,7 +65,7 @@ void SwordMan::initialize()
 	sp_comp->fSlideFactor = 1.f;
 	_speed = 300.f;
 
-
+	_EnemyInfo.HP = 600;
 };
 
 Event SwordMan::update(float dt)

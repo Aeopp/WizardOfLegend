@@ -50,6 +50,8 @@ void ARCHER::initialize()
 	Monster::initialize();
 	
 	_render_component->ChangeAnim(EAnimState::Idle, 1.f, EAnimState::Idle);
+
+	_EnemyInfo.HP = 450;
 }
 
 Event ARCHER::update(float dt)

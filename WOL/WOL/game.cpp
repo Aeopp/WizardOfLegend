@@ -9,6 +9,8 @@
 #include "collision_mgr.h"
 #include "player_info.h"
 #include "Bmp.h"
+#include "player.h"
+
 
 void game::render()
 {
@@ -140,9 +142,15 @@ void game::SlotDataInit()
 	game::SlotInfoMap[0].bAcquire = true;
 	game::SlotInfoMap[1].bAcquire = true;
 
-	game::SlotInfoMap[2].bAcquire = true;
-	game::SlotInfoMap[3].bAcquire = true;
-	game::SlotInfoMap[4].bAcquire = true;
-	game::SlotInfoMap[5].bAcquire = true;
-	game::SlotInfoMap[6].bAcquire = true;
+	
+}
+
+void game::PlayerInit()
+{
+	if(!bPlayerInit)
+	{
+		auto _Player = object_mgr::instance().insert_object<Player>();
+		game::_Player = _Player;
+		bPlayerInit = true; 
+	}
 }

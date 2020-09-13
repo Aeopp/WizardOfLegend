@@ -69,7 +69,6 @@ void Scene_Start::initialize()
 
 void Scene_Start::release()
 {
-
 	Scene::release();
 }
 

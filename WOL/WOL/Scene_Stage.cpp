@@ -35,7 +35,6 @@
 void Scene_Stage::render(HDC hdc, std::pair<float, float> size_factor)
 {
 	Scene::render(hdc,size_factor);
-
 	{
 		auto FontOn = Font(hdc, L"", 20, RGB(255, 0, 0));
 
@@ -67,10 +66,6 @@ void Scene_Stage::update(float dt)
 
 	object_mgr::instance().update();
 
-	//if (_Input.Key_Down('0'))
-	//{
-	//	Scene_mgr::instance().Scene_Change(ESceneID::EBoss);
-	//}
 
 	_Input.update();
 
@@ -96,26 +91,26 @@ void Scene_Stage::initialize()
 	{
 			object_mgr& obj_mgr = object_mgr::instance();
 
-			auto _Player = obj_mgr.insert_object<Player>();
-			_Player->_transform->_location = PlayerSpawnLocation;
-
+			game::instance().PlayerInit();
+		
+			game::_Player->_transform->_location = PlayerLocation;
 			auto _camera = obj_mgr.insert_object<Camera>();
-			_camera->_owner = _Player;
+			_camera->_owner = game::_Player;
 			obj_mgr._Camera = _camera;
 
 			auto _Teleport = obj_mgr.insert_object<Teleport>();
-			_Teleport->SetUp(PlayerSpawnLocation);
+			_Teleport->SetUp(PlayerLocation);
 		
-		store_set_up(_Player);
-		TriggerSetUp(_Player);
+		store_set_up(game::_Player);
+		TriggerSetUp(game::_Player);
 		manage_objs.push_back(_Teleport);
-		manage_objs.push_back(_camera);
-		manage_objs.push_back(_Player);
 	}
 }
 
 void Scene_Stage::release()
 {
+
+	
 	Scene::release();
 
 	Tile_mgr::instance().release();
@@ -198,6 +193,8 @@ void Scene_Stage::store_set_up(std::weak_ptr<class Player> _Player)
 
 Scene_Stage::~Scene_Stage() noexcept
 {
+
+	
 	release();
 }
 
@@ -215,8 +212,9 @@ std::shared_ptr<class object> Scene_Stage::Stage_1(std::weak_ptr<class Player> _
 		vec PrisonLocation = vec{ 1660,2385 };
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 1.5, Prison::EType::Ver,
-			wp_Trigger, { 100,250 }, PrisonLocation);
-
+			wp_Trigger, { 200,250 }, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ 100,100});
+		
 		vec SwordManLocation = vec{ 600, 2440 };
 
 		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player,
@@ -263,7 +261,7 @@ std::shared_ptr<class object> Scene_Stage::Stage_1(std::weak_ptr<class Player> _
 		return ReturnObjects;
 	};
 	
-	auto EndEvent = [BlastCardLocation =this->PlayerSpawnLocation]()
+	auto EndEvent = [BlastCardLocation =this->PlayerLocation]()
 	{
 		auto blast_card = object_mgr::instance().
 		insert_object<ArcanaCard>(BlastCardLocation, ESkill::BLAST, L"ICE_BLAST_CARD");
@@ -297,22 +295,26 @@ std::shared_ptr<object> Scene_Stage::Stage_2(std::weak_ptr<Player> _Player)
 		vec PrisonLocation = vec{ 3779,2381};
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 0.8, Prison::EType::Ver,
-			wp_Trigger, { 60,150 }, PrisonLocation);
+			wp_Trigger, { 150,180 }, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ -120,0 });
 		
 		 PrisonLocation = vec{ 4750,2400};
 		 _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 0.8, Prison::EType::Ver,
-			wp_Trigger, { 60,150 }, PrisonLocation);
+			wp_Trigger, { 150,150 }, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ 120,0 });
 		
 		 PrisonLocation = vec{ 4030,2920};
 		 _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.1, 0.7, Prison::EType::Hor,
-			wp_Trigger, { 150,120 }, PrisonLocation);
+			wp_Trigger, { 170,200}, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ 0,+100 });
 		
 		 PrisonLocation = vec{ 4160,2040 };
 		 _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(0.9, 0.7, Prison::EType::Hor,
-			wp_Trigger, { 150,120 }, PrisonLocation);
+			wp_Trigger, { 170,200}, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ 0,-100 });
 
 		std::vector<vec> SwordManLocations = { { 3983, 2282 },{4514,2533} };
 		std::vector<vec> ArcherLocations = { { 4035, 2314},{4441,2502} };
@@ -368,13 +370,13 @@ std::shared_ptr<object> Scene_Stage::Stage_3(std::weak_ptr<Player> _Player)
 	// Start 
 	auto StartEvent = [wp_Trigger, _Player]() {
 
-		std::vector< std::weak_ptr<class object>> ReturnObjects;
+		std::vector<std::weak_ptr<class object>> ReturnObjects;
 
 		vec PrisonLocation = vec{ 4260,4232};
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 1, Prison::EType::Ver,
-			wp_Trigger, { 100,150 }, PrisonLocation);
-		
+			wp_Trigger, { 150,250}, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ -100,0 });
 
 		std::vector<vec> WizardBallLocations = 
 		{
@@ -417,7 +419,7 @@ std::shared_ptr<object> Scene_Stage::Stage_3(std::weak_ptr<Player> _Player)
 	EventQ.push(std::move(Event_1));
 	std::pair<int, int>  EventZoneSize = { 200,200 };
 	vec TriggerLocation = { 4861,4326 };
-	std::pair<vec, vec> CameraRange = { { 4600,4100} ,  { 5000,4500} };
+	std::pair<vec, vec> CameraRange = { { 4600,3900} ,  { 5000,4700} };
 	_Trigger->SetUp(EventZoneSize, TriggerLocation,
 		std::move(StartEvent),
 		[] {}, std::move(EventQ), true,
@@ -440,12 +442,14 @@ std::shared_ptr<object> Scene_Stage::Stage_4(std::weak_ptr<Player> _Player)
 		vec PrisonLocation = vec{ 2849,3852};
 		auto _Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(1.f, 1, Prison::EType::Ver,
-			wp_Trigger, { 100,220 }, PrisonLocation);
+			wp_Trigger, { 200,220 }, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ -100, 0 } );
 
 		PrisonLocation = vec{ 3340,4587};
 		_Prison = object_mgr::instance().insert_object<Prison>();
 		_Prison->SetUp(0.7, 1, Prison::EType::Hor,
-			wp_Trigger, { 120,150 }, PrisonLocation);
+			wp_Trigger, { 120,250 }, PrisonLocation);
+		_Prison->SetCollisionCorrection(vec{ 0, 70});
 		
 		vec SpawnInitCenter = vec{ 3346,3980 };
 		int32_t MonsterNum = 12;
@@ -534,18 +538,6 @@ std::shared_ptr<object> Scene_Stage::Stage_5(std::weak_ptr<Player> _Player)
 		return ReturnObjects;
 	};
 
-	auto Event_2 = [_Player]()
-	{
-		std::vector< std::weak_ptr<class object>> ReturnObjects;
-
-		auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
-		Midboss->SetUp(_Player, vec{ 856,4464 });
-		ReturnObjects.push_back(Midboss);
-		
-		return ReturnObjects;
-	};
-	
-	
 	auto EndEvent = []
 	{
 		vec TelePort_Location = { 856,4464 };
@@ -556,7 +548,6 @@ std::shared_ptr<object> Scene_Stage::Stage_5(std::weak_ptr<Player> _Player)
 
 	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
 	EventQ.push(std::move(Event_1));
-	EventQ.push(std::move(Event_2));
 	std::pair<int, int>  EventZoneSize = { 200,200 };
 	vec TriggerLocation = { 856,4464};
 	_Trigger->SetUp(EventZoneSize, TriggerLocation,
@@ -568,12 +559,209 @@ std::shared_ptr<object> Scene_Stage::Stage_5(std::weak_ptr<Player> _Player)
 
 std::shared_ptr<object> Scene_Stage::Stage_6(std::weak_ptr<Player> _Player)
 {
-	return {};
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	// Start 
+	auto StartEvent = [wp_Trigger, _Player]() {
+
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		vec PrisonLocation = vec{ 3745,955};
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 0.95, Prison::EType::Ver,
+			wp_Trigger, { 90,180 }, PrisonLocation);
+
+		std::vector<vec> Locations =
+		{
+			{4377,776},{4500,1050},{4175,1066},{4373,1334}
+		};
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, std::move(Locations));
+
+		Locations = { {4357,1189},{4362,998} };
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<ARCHER>(_Player, std::move(Locations));
+
+		return ReturnObjects;
+	};
+
+	auto Event_1 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+		
+		std::vector<vec> Locations
+		{
+			{3944,561} , {4500,505} 
+		};
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, std::move(Locations));
+		 Locations=
+		{
+			{4041,1046} , {4500,1056}
+		};
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<ARCHER>(_Player, std::move(Locations));
+		 Locations=
+		{
+			{3925,1484} , {4500,1519}
+		};
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<WIZARD>(_Player, std::move(Locations));
+
+		return ReturnObjects;
+	};
+
+	// 4351 1032
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	EventQ.push(std::move(Event_1));
+	std::pair<int, int>  EventZoneSize = { 200,200 };
+	vec TriggerLocation = { 4141,997};
+	std::pair<vec, vec> CameraRange = { { 4300,550} ,  { 4400,1300} };
+	_Trigger->SetUp(EventZoneSize, TriggerLocation,
+		std::move(StartEvent),
+		[]{}, std::move(EventQ),true,
+		std::move(CameraRange));
+
+	return _Trigger;
 }
 
 std::shared_ptr<object> Scene_Stage::Stage_7(std::weak_ptr<Player> _Player)
 {
-	return {}; 
+	auto _Trigger = object_mgr::instance().insert_object<Trigger>();
+
+	std::weak_ptr<class object> wp_Trigger = _Trigger;
+
+	// Start 
+	auto StartEvent = [wp_Trigger, _Player]() {
+
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		vec PrisonLocation = vec{ 446,450};
+		auto _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.5, 1, Prison::EType::Hor,
+			wp_Trigger, { 200,120 }, PrisonLocation);
+
+		 PrisonLocation = vec{ 446,950};
+		_Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.5, 1, Prison::EType::Hor,
+			wp_Trigger, { 200,120 }, PrisonLocation);
+
+		 PrisonLocation = vec{ 230,685};
+		 _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1.8, Prison::EType::Ver,
+			wp_Trigger, { 20,350 }, PrisonLocation);
+
+		 PrisonLocation = vec{ 670,685 };
+		 _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1.8, Prison::EType::Ver,
+			wp_Trigger, { 20,350 }, PrisonLocation);
+
+		 PrisonLocation = vec{ 1246,450 };
+		 _Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.5, 1, Prison::EType::Hor,
+			wp_Trigger, { 200,120 }, PrisonLocation);
+
+		PrisonLocation = vec{ 1246,950 };
+		_Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.5, 1, Prison::EType::Hor,
+			wp_Trigger, { 200,120 }, PrisonLocation);
+
+		PrisonLocation = vec{ 1030,685 };
+		_Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1.8, Prison::EType::Ver,
+			wp_Trigger, { 20,350 }, PrisonLocation);
+
+		PrisonLocation = vec{ 1470,685 };
+		_Prison = object_mgr::instance().insert_object<Prison>();
+		_Prison->SetUp(1.f, 1.8, Prison::EType::Ver,
+			wp_Trigger, { 20,350 }, PrisonLocation);
+
+		std::vector<vec> Locations =
+		{
+			{769,400},{869,400},
+			{769,500},{869,500},
+			{769,600},{869,600}
+		};
+
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>(_Player, std::move(Locations));
+		Locations = 
+		{
+			{300,630},{400,630},{500,630},
+			{1100,630},{1200,630},{1300,630}
+		};
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<ARCHER>(_Player, std::move(Locations));
+
+		return ReturnObjects;
+	};
+
+	auto Event_1 = [_Player]()
+	{
+		std::vector< std::weak_ptr<class object>> ReturnObjects;
+
+		std::vector<vec> Locations =
+		{
+			{769,400},{869,400},
+			{769,500},{869,500},
+			{769,600},{869,600}
+		};
+		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<SwordMan>
+		(_Player, std::move(Locations));
+
+		Locations =
+		{
+			{300,630},{400,630},
+			{1100,630},{1200,630}
+		};
+		
+		ReturnObjects += Monster::TypeMatchMonstersSpawn<WIZARD>(_Player, 
+			std::move(Locations));
+		
+		return ReturnObjects;
+	};
+
+	auto EndEvent = [_Player]
+	{
+		std::vector<vec> Locations =
+		{
+			{250,300},{400,300},
+			{550,300},{700,300}
+		};
+		
+		Monster::TypeMatchMonstersSpawn<ARCHER>(_Player,
+			std::move(Locations));
+		 Locations =
+		{
+			{325,600},{475,600},
+			{625,600},{775,600}
+		};
+		Monster::TypeMatchMonstersSpawn<SwordMan>(_Player,
+				std::move(Locations));
+			Locations =
+		{
+			{900,850},{1100,850},{1000,1000}
+		};
+		Monster::TypeMatchMonstersSpawn<WIZARD>(_Player,
+					std::move(Locations));
+		
+		vec TelePort_Location = { 813,673};
+
+		auto _Teleport = object_mgr::instance().insert_object<Teleport>();
+		_Teleport->SetUp(TelePort_Location, true, ESceneID::EBoss);
+	};
+	
+	std::queue<std::function<std::vector<std::weak_ptr<object>>()>> EventQ;
+	EventQ.push(std::move(Event_1));
+	std::pair<int, int>  EventZoneSize = { 200,200 };
+	vec TriggerLocation = { 1296,654};
+	
+	_Trigger->SetUp(EventZoneSize, TriggerLocation,
+		std::move(StartEvent),
+		std::move(EndEvent), std::move(EventQ));
+
+	return _Trigger;
 }
 
 

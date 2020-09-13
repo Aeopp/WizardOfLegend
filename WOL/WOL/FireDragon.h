@@ -14,6 +14,7 @@ public:
 	  void Hit(std::weak_ptr<object> _target) override;
 	  void SetUp(vec Location,vec Dir);
 public:
+	bool bDieSoundPlayed = false;
 	bool bWallHited = false;
 	std::shared_ptr<class Bmp> sp_DragonImg;
 	std::shared_ptr<class Bmp> sp_ParticleImg;

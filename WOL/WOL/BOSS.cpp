@@ -71,8 +71,8 @@ void BOSS::initialize()
 
 	PaintSizeX = 220;
 	PaintSizeY = 300;
-	ScaleX = 1.f;
-	ScaleY = 1.f;
+	ScaleX = 0.9;
+	ScaleY = 0.9;
 	Speed = 200.f;
 	Attack = { 90,100 };
 	AttackStartDistance = 750.f;
@@ -84,14 +84,10 @@ void BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 1800;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 4000;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
-
-
-
-
 
 	auto UI = object_mgr::instance().insert_object<UIBossName>(
 		L"BOSS_NAMEBAR.bmp", L"BOSS_NAMEBAR");

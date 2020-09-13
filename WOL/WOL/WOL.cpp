@@ -21,7 +21,7 @@ bool bDeltaTimeUnFixed{ false };
 bool bDebugTimeScale{ false };
 
 constexpr int ConstDelta = 1000 / 60;
-constexpr float FLOOR_FPS = 1.f / 50.f;
+constexpr float FLOOR_FPS = 1.f / 60.f;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -85,8 +85,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				{
 					_Timer.dt = GetTickCount() - _Timer.tick;
 				}
-				DeltaTime = min(_Timer.delta(), FLOOR_FPS);
-
+				//DeltaTime = min(_Timer.delta(), FLOOR_FPS);
+				DeltaTime = _Timer.delta();
+				
 				_Timer.tick = GetTickCount();
 
 				_game.update();
@@ -104,7 +105,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			{
 				_Timer.dt = GetTickCount() - _Timer.tick;
 			}
-			DeltaTime = min(_Timer.delta(), FLOOR_FPS);
+		//	DeltaTime = min(_Timer.delta(), FLOOR_FPS);
+			DeltaTime = _Timer.delta();
 
 
 				_Timer.tick = GetTickCount();

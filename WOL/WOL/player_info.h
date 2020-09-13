@@ -14,17 +14,16 @@ struct player_info
 	bool bDash{ false };
 	bool bMove{ false };
 	bool bHit{ false };
-	bool bProtected = false;
-	float DashDuration = 0.4;
-	float AnimDashDuration = 0.4;
-	float PlayerAttackMoveSpeed = 2333;
+	float DashDuration = 0.3;
+	float AnimDashDuration = 0.3;
+	float PlayerAttackMoveSpeed = 1500;
 	float AttackCollisionDuration = 0.1f;
 	float DefaultAttackDuration = 0.4;
 	float AttackAnimDuration = 0.4;
 	float CurrentAttackDuration = DefaultAttackDuration;
 
 	float  	SkillBoomerangMotionDuration = 0.35f;
-	float SkillFireDragonMotionDuration = 0.2f;
+	float SkillFireDragonMotionDuration = 0.3f;
 	float SkillICECrystalMotionDuration = 0.5f;
 	float SkillICEBlastMotionDuration = 0.5f;
 	float SkillShieldMotionDuration = 0.5f;
@@ -41,7 +40,7 @@ struct player_info
 	float SkillCurrentFireDragonNum = SkillFireDragonMaxNum;
 	float SkillCurrentBoomerangNum = SkillBoomerangMaxNum;
 
-	float MpRegenerationAtSec = -10.f;
+	float MpRegenerationAtSec = -50.f;
 	float HpRegenerationAtSec= 10.f;
 
 	float ShieldDuration = 20.f;
@@ -50,6 +49,8 @@ struct player_info
 	float NormalAttackPushForce{1.f};
 
 	std::pair<int, int> MissRange{0,8};
+	const float TeleportCoolTime = 5.f;
+	float CurrentTeleportCoolTime = TeleportCoolTime; 
 public : 
 	void AddGold(int Gold);
 	void AddHp(float HP); 

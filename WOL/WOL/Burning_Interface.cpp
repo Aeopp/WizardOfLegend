@@ -29,7 +29,7 @@ Burning_Interface::Burning::Particle_Info Burning_Interface::Burning::Particle_I
 	_Info.ColIdx = 0;
 	_Info.RowIdx = math::Rand<int>({0, 3});
 	_Info.render_location = vec::RandVecFromRange(particle_range);
-	_Info.render_dir = math::RandVec() * 5;
+	_Info.render_dir = math::RandVec() * 2;
 	int RandParticleSize = math::Rand<int>({ render_world_size_range . x , render_world_size_range . y });
 	
 	_Info.render_world_size = vec{ RandParticleSize  , RandParticleSize };
@@ -49,7 +49,7 @@ void Burning_Interface::Burning::burn(vec msgLocation)
 
 	object_mgr::instance().TextEffectMap[Burning_Interface::EffectColor].
 		push_back({ 
-	msgLocation,vec{0,1.f},2.5f,30,L"Burning!!" });
+	msgLocation,vec{0,1.f},2.0,30,L"불타오름!" });
 
 	RemainTime = Duration;
 	

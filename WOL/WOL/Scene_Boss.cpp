@@ -11,6 +11,7 @@
 #include "player.h"
 #include "Camera.h"
 #include "BOSS.h"
+#include "game.h"
 #include "Teleport.h"
 #include "Tile_mgr.h"
 
@@ -46,7 +47,7 @@ void Scene_Boss::update(float dt)
 
 	_Timer.update();
 
-	sound_mgr::instance().Frame(DeltaTime);
+	sound_mgr::instance().Frame(dt);
 
 	Tile_mgr::instance().update(dt);
 
@@ -71,27 +72,23 @@ void Scene_Boss::initialize()
 	{
 		object_mgr& obj_mgr = object_mgr::instance();
 
-		auto _Player = obj_mgr.insert_object<Player>();
-		auto _camera = obj_mgr.insert_object<Camera>();
-		auto _Teleport = obj_mgr.insert_object<Teleport>();
 
+		auto _Teleport = obj_mgr.insert_object<Teleport>();
 		
 		_Teleport->SetUp(PlayerSpawnLocation);
-		_camera->_owner = _Player;
-		obj_mgr._Camera = _camera;
-		_Player->_transform->_location = PlayerSpawnLocation;
+
+		game::_Player->_transform->_location = PlayerSpawnLocation;
 
 		sound_mgr::instance().Stop("DUNGEON_BGM");
 		SOUNDPLAY("BOSS_BGM", 1.f, true );
 
 		auto _Boss = object_mgr::instance().insert_object<BOSS>();
 
-		_Boss->SetUp(_Player, vec{ 2700,1400 });
+		_Boss->SetUp(game::_Player, vec{ 1856,1570});
 		
 		manage_objs.push_back(_Teleport);
 		manage_objs.push_back(_Boss);
-		manage_objs.push_back(_Player);
-		manage_objs.push_back(_camera);
+
 	};
 }
 

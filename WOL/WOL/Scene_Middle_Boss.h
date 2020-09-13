@@ -7,7 +7,7 @@ class Scene_Middle_Boss :
 public:
 	~Scene_Middle_Boss()noexcept override;
 
-	vec PlayerSpawnLocation = { 4781,1642 };
+	vec PlayerSpawnLocation = { 2400,4728};
 
 	void render(HDC hdc, std::pair<float, float> size_factor)override;
 	void update(float dt) override;

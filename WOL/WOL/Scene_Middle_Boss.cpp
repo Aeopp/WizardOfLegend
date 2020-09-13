@@ -14,6 +14,7 @@
 #include "Tile_mgr.h"
 #include "MIDDLE_BOSS.h"
 #include "Teleport.h"
+#include "game.h"
 
 Scene_Middle_Boss::~Scene_Middle_Boss() noexcept
 {
@@ -41,6 +42,8 @@ void Scene_Middle_Boss::render(HDC hdc, std::pair<float, float> size_factor)
 
 void Scene_Middle_Boss::update(float dt)
 {
+	Input_mgr& _Input = Input_mgr::instance();
+
 	Scene::update(dt);
 
 	Timer& _Timer = Timer::instance();
@@ -53,7 +56,7 @@ void Scene_Middle_Boss::update(float dt)
 
 	object_mgr::instance().update();
 
-	Input_mgr::instance().update();
+	_Input.update();
 
 	collision_mgr::instance().update();
 }
@@ -74,22 +77,16 @@ void Scene_Middle_Boss::initialize()
 		SOUNDPLAY("BOSS_BGM", 1.f, true);
 
 		object_mgr& obj_mgr = object_mgr::instance();
-
-		auto _Player = obj_mgr.insert_object<Player>();
-		auto _camera = obj_mgr.insert_object<Camera>();
+		
 		auto Midboss = object_mgr::instance().insert_object<MIDDLE_BOSS>();
 		auto _Teleport = obj_mgr.insert_object<Teleport>();
 	
 		_Teleport->SetUp(PlayerSpawnLocation,true , ESceneID::EStage);
-		Midboss->SetUp(_Player, vec{ 2700,1400 });
-		_camera->_owner = _Player;
-		obj_mgr._Camera = _camera;
-		_Player->_transform->_location = PlayerSpawnLocation;
+		Midboss->SetUp(game::_Player, vec{ 2700,1400 });
+		game::_Player->_transform->_location = PlayerSpawnLocation;
 		
 		manage_objs.push_back(_Teleport);
 		manage_objs.push_back(Midboss);
-		manage_objs.push_back(_Player);
-		manage_objs.push_back(_camera);
 	};
 }
 
