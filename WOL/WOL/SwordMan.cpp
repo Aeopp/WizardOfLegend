@@ -26,7 +26,6 @@ void SwordMan::initialize()
 	LeftAnimKey = L"SWORDMAN_LEFT";
 	RightAnimKey = L"SWORDMAN_RIGHT";
 
-	_EnemyInfo.HP = 350.f;
 	_EnemyInfo.DeadTimer = 1.5f;
 	_EnemyInfo.AttackRange = { 10,20 };
 	_EnemyInfo.AttackStartDistance = 150.f;

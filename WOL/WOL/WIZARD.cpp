@@ -24,7 +24,6 @@ void WIZARD::initialize()
 	LeftAnimKey = L"WIZARD_LEFT";
 	RightAnimKey = L"WIZARD_RIGHT";
 
-	_EnemyInfo.HP = 200.f;
 	_EnemyInfo.DeadTimer = 1.5f;
 	_EnemyInfo.AttackRange = { 20,30 };
 	_EnemyInfo.AttackStartDistance = 600.f;
@@ -45,14 +44,17 @@ void WIZARD::initialize()
 		int PaintSizeX, int PaintSizeY, float ScaleX, float ScaleY);*/
 
 
-	EscapeRamainTick = EscapeDuration = 1.3f;
+	EscapeRamainTick = 0;
+	 EscapeDuration = 1.3f;
 	_speed = 200.f;
 
 	FireImg = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_FIRE");
 	
-	
+
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
+
+	_render_component->ChangeAnim(EAnimState::Idle, 1.0f, EAnimState::Idle);
 }
 
 Event WIZARD::update(float dt)

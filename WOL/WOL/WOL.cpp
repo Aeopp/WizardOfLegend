@@ -21,7 +21,7 @@ bool bDeltaTimeUnFixed{ false };
 bool bDebugTimeScale{ false };
 
 constexpr int ConstDelta = 1000 / 60;
-constexpr float FLOOR_FPS = 1.f / 45.f;
+constexpr float FLOOR_FPS = 1.f / 50.f;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);

@@ -86,7 +86,7 @@ void MIDDLE_BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 2000;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 100;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;
@@ -296,10 +296,10 @@ void MIDDLE_BOSS::AttackStart()
 		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_Skill_ICECrystal, this, 3);
 		break;
 	case MIDDLE_BOSS::EPattern::BOOMERANG:
-		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_Boomerang, this,4);
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_Boomerang, this,3);
 		break;
 	case MIDDLE_BOSS::EPattern::FIRE_DRAGON:
-		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_FireDragon, this ,  8);
+		CurrentSKILL = std::bind(&MIDDLE_BOSS::BOSS_SKill_FireDragon, this ,  6);
 		break;
 	default:
 		break;
@@ -671,17 +671,17 @@ void MIDDLE_BOSS::BOSS_SKill_Boomerang(size_t NUM)
 void MIDDLE_BOSS::BOSS_SKill_Blast()
 {
 	std::shared_ptr<float> sp_Angle = std::make_shared<float> (0) ;
-	std::shared_ptr<int> sp_Num = std::make_shared<int>(4);
+	std::shared_ptr<int> sp_Num = std::make_shared<int>(3);
 
-	Timer::instance().event_regist_ReWhileDelta(3.1, 1, [=,this]() {
+	Timer::instance().event_regist_ReWhileDelta(2.1+0.1, 2.1/3, [=,this]() {
 		if (!sp_Angle)return;
 
-		for (int i = 0; i < 4; ++i)
+		for (int i = 0; i < 2; ++i)
 		{
 			BOSS_Blast_launch(*sp_Num, i * 90 + *sp_Angle);
 		}
 		*sp_Angle += 90.f /3.f ;
-		*sp_Num += 4;
+		*sp_Num += 3;
 	});
 }
 
@@ -771,17 +771,14 @@ void MIDDLE_BOSS::SummonMonster()
 	float SummonDistance = 150.f;
 	vec BossPos =_transform->_location;
 
-	vec ARHCER2Location = BossPos + vec{ 0,-1 }*SummonDistance;
 	vec ARHCERLocation = BossPos + vec{ -1,0 }*SummonDistance;
 	vec SwordManLocation = BossPos + vec{ 1,0 }*SummonDistance;
 		
-	Monster::CardEffect(ARHCER2Location,L"SUMMON_CARD_ARCHER");
 	Monster::CardEffect(SwordManLocation, L"SUMMON_CARD_SWORDMAN");
 	Monster::CardEffect(ARHCERLocation, L"SUMMON_CARD_ARCHER");
 
 	object_mgr::instance().insert_object<SwordMan>(wp_AttackTarget, SwordManLocation);
 	object_mgr::instance().insert_object<ARCHER>(wp_AttackTarget, ARHCERLocation);
-	object_mgr::instance().insert_object<ARCHER>(wp_AttackTarget, ARHCER2Location);
 
 	MonsterSpawnCurrentTick = MonsterSpawnCycle;
 }

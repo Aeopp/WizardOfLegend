@@ -4,6 +4,7 @@
 #include "ArcanaCard.h"
 #include "Bmp.h"
 #include "Bmp_mgr.h"
+#include "game.h"
 #include "sound_mgr.h"
 
 #include "UIInventory.h"
@@ -60,21 +61,15 @@ void ArcanaCard::Hit(std::weak_ptr<object> _target)
 
 	if (sp_Target->ObjectTag== object::Tag::player)
 	{
-		for (auto& [key, _SlotInfo] : UIInventory::SlotInfoMap)
+		for (auto& [key, _SlotInfo] : game::SlotInfoMap)
 		{
 			if (_SlotInfo._Skill == _Skill)
 			{
-
-
 				SOUNDPLAY("GET_SKILL", 1.f, false);
 				_SlotInfo.bAcquire = true;
-
-
 			}
-
 		}
 
 		bDie = true;
-		return;
 	}
 }

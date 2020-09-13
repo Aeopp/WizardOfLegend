@@ -46,7 +46,7 @@ void Scene_Boss::update(float dt)
 
 	_Timer.update();
 
-	sound_mgr::instance().Frame(_Timer.delta());
+	sound_mgr::instance().Frame(DeltaTime);
 
 	Tile_mgr::instance().update(dt);
 

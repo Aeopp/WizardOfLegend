@@ -11,7 +11,7 @@
 
 std::weak_ptr<class Bmp> UISkillIBarIcon::SkillBarBmpUpdate()
 {
-	switch (UIInventory::SlotInfoMap[CurrentSlotIdx]._Skill)
+	switch (game::SlotInfoMap[CurrentSlotIdx]._Skill)
 	{
 	case ESkill::Normal:
 		break;
@@ -55,7 +55,7 @@ void UISkillIBarIcon::late_initialize(vec pos,std::wstring FileName)
 
 void UISkillIBarIcon::render(HDC hdc, vec camera_pos, vec size_factor)
 {
-	if (!UIInventory::SlotInfoMap[CurrentSlotIdx].bAcquire)return;
+	if (!game::SlotInfoMap[CurrentSlotIdx].bAcquire)return;
 	auto& Render = _render_component;
 	Render->wp_Image = SkillBarBmpUpdate();
 	auto sp_Img = Render->wp_Image.lock();
@@ -94,7 +94,7 @@ void UISkillIBarIcon::CoolTimeRefUpdate()
 	auto sp_PlayerInfo = wp_PlayerInfo.lock();
 	if (!sp_PlayerInfo)return;
 
-	switch (UIInventory::SlotInfoMap[CurrentSlotIdx]._Skill)
+	switch (game::SlotInfoMap[CurrentSlotIdx]._Skill)
 	{
 	case ESkill::Normal:
 		break;

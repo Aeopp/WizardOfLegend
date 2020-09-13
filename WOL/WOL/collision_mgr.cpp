@@ -315,12 +315,6 @@ bool collision_mgr::IsObjectSlideMappingTag(collision_tag lhs, collision_tag rhs
 {
 	if (lhs == collision_tag::EMonster && rhs == collision_tag::EMonster)
 	{
-
-		int i = 0;
-
-
-
-
 		return true;
 	}
 
@@ -413,7 +407,10 @@ void collision_mgr::collision(collision_tag lhs, collision_tag rhs)
 				}
 				if (lhs_obj->bCollisionSlideAnObject || IsObjectSlideMappingTag(lhs_obj->_Tag, rhs_obj->_Tag))
 				{
-					_ptr->_transform->_location += (*bCollision * rhs_obj->fSlideFactor);
+					if(!rhs_obj->bSuperArmor)
+					{
+						_ptr->_transform->_location += (*bCollision * rhs_obj->fSlideFactor);
+					}
 				}
 				if (lhs_obj->bHitEffect)
 				{

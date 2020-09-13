@@ -34,7 +34,7 @@ void ScrewBoomerang::late_initialize(vec RotationInitCenter, vec RotationInitDir
 
 	RotationSpeed = 900.f;
 
-	Duration = 5.f;
+	Duration = 2.f;
 
 	ScaleX = 0.8f;
 	ScaleY = 0.8f;

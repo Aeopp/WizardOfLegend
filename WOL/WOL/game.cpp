@@ -52,7 +52,7 @@ void game::render()
 
 void game::update()
 {
-	Scene_mgr::instance().update(Timer::instance().delta());
+	Scene_mgr::instance().update(DeltaTime);
 }
 
 void game::initialize()
@@ -60,7 +60,8 @@ void game::initialize()
 	hDC = GetDC(hWnd);
 
 	_player_info = std::make_shared<player_info>();
-
+	SlotDataInit();
+	
 	Scene_mgr::instance().initialize();
 
 	Scene_mgr::instance().Scene_Change(ESceneID::EStart);
@@ -98,4 +99,50 @@ std::pair<float, float> game::size_factor()
 	return {
 		(float)(client_rect.right - client_rect.left) / width  ,
 		 (float)(client_rect.bottom - client_rect.top) / height };
+}
+
+void game::SlotDataInit()
+{
+	std::vector<std::tuple<std::wstring, std::wstring, ESkill>> IconKeyTable
+	{
+		{L"",L"NORMAL_ATTACK_EX",ESkill::Normal},
+		{L"",L"DASH_EX",ESkill::Dash},
+		{L"FIRE_DRAGON_ICON",L"FIRE_DRAGON_EX",ESkill::FIRE},
+		{L"ICE_BLAST_ICON",L"ICE_BLAST_EX",ESkill::BLAST},
+		{L"ICE_KRYSTAL_ICON",L"ICE_KRYSTAL_EX",ESkill::CRYSTAL},
+		{L"GAIA_ARMOR_ICON",L"GAIA_ARMOR_EX",ESkill::ARMOR},
+		{L"BOOMERANG_ICON",L"",ESkill::BOOMERANG}
+	};
+
+	for (int i = 0; i < IconKeyTable.size() - 1; ++i)
+	{
+		SlotInfo _SlotInfo;
+		_SlotInfo.Location = vec{ 270 + 66 * i,160 };
+		auto& [ImgKey, InfoKey, _ESkill] = IconKeyTable[i];
+
+		_SlotInfo.ImgKey = std::move(ImgKey);
+		_SlotInfo.InfoKey = std::move(InfoKey);
+		_SlotInfo._Skill = _ESkill;
+		game::SlotInfoMap[i] = std::move(_SlotInfo);
+	}
+
+	// 마지막 창작스킬 부메랑 슬롯
+	int IDX = IconKeyTable.size() - 1;
+	SlotInfo _SlotInfo;
+	_SlotInfo.Location = vec{ 270 + 66 * (IDX - 1) - 2,224 };
+	auto& [ImgKey, InfoKey, _ESkill] = IconKeyTable[IDX];
+
+	_SlotInfo.ImgKey = std::move(ImgKey);
+	_SlotInfo.InfoKey = std::move(InfoKey);
+	_SlotInfo._Skill = _ESkill;
+	game::SlotInfoMap[IDX] = std::move(_SlotInfo);
+
+	game::SlotInfoMap[0].bAcquire = true;
+	game::SlotInfoMap[1].bAcquire = true;
+
+	game::SlotInfoMap[2].bAcquire = true;
+	game::SlotInfoMap[3].bAcquire = true;
+	game::SlotInfoMap[4].bAcquire = true;
+	game::SlotInfoMap[5].bAcquire = true;
+	game::SlotInfoMap[6].bAcquire = true;
 }

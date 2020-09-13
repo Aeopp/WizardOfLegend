@@ -20,7 +20,7 @@ void WizardBall::initialize()
 	sp_Bmp = Bmp_mgr::instance().Find_Image_SP(L"WIZARD_BALL");
 
 	wp_collision =collision_mgr::instance().
-	insert(_ptr, collision_tag::EMonsterAttack,figure_type::ECircle);
+	insert(_ptr, collision_tag::EMonsterAttack,figure_type::ERect);
 
 	auto sp_collision = wp_collision.lock();
 
@@ -34,7 +34,7 @@ void WizardBall::initialize()
 	sp_collision->bRender = true;
 	sp_collision->bSlide= true;
 	sp_collision->PushForce = 1.f;
-	sp_collision->_size = {30.f,30.f};
+	sp_collision->_size = {30,30.f};
 
 	_Shadow.initialize();
 	_Shadow._owner = (_ptr);
@@ -46,13 +46,14 @@ void WizardBall::initialize()
 	ScaleX = 0.75f;
 	ScaleY = 0.75f;
 	Speed = 150.f;
-	AttackSpeed = 1500.f;
+	AttackSpeed = 1200.f;
 	Attack = { 40,50 };
 	AttackStartDistance = 750.f;
 	UniqueID = EObjUniqueID::EWizardBall;
-	ObjectTag = Tag::monster_attack; 
+	ObjectTag = Tag::monster_attack;
 
-
+	HP = 10;
+	
 }
 
 void WizardBall::late_initialize(std::weak_ptr<class object> wp_AttackTarget, vec location)
@@ -112,7 +113,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 
 	if (sp_Target->ObjectTag == object::Tag::player_attack && CurrentHitCoolTime<0)
 	{
-		CurrentHitCoolTime = 0.20f;
+		CurrentHitCoolTime = 0.10f;
 		vec randvec = math::RandVec();
 		randvec.y = (abs(randvec.y));
 		vec v = _transform->_location;
@@ -127,7 +128,7 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
-		StateDuration = 0.2f;
+		StateDuration = 0.10f;
 
 		HP -= Atk;
 
@@ -138,8 +139,8 @@ void WizardBall::Hit(std::weak_ptr<object> _target)
 	{
 		collision_mgr::instance().HitEffectPush(_transform->_location, 0.5f);
 		CurrentState = WizardBall::EState::HIT;
-		StateDuration = 0.2f;
-		CurrentHitCoolTime = 0.25f;
+		StateDuration = 0.10f;
+		CurrentHitCoolTime = 0.10f;
 		RAND_SOUNDPLAY("HIT_SOUND_NORMAL", { 1,2 }, 1.f, false);
 		if (bAttacking && !bDef)
 		{

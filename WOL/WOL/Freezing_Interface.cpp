@@ -50,7 +50,7 @@ void Freezing_Interface::Freezing::Freez(vec msgLocation)
 	if (RemainTime > 0)return;
 
 	object_mgr::instance().TextEffectMap[Freezing_Interface::EffectColor].
-		push_back({ msgLocation,vec{0,1.f},3.5f,30,L"Freezing!!" });
+		push_back({ msgLocation,vec{0,1.f},3.0f,30,L"Freezing!!" });
 
 	RemainTime = Duration;
 	ColIdx = 0;

@@ -76,7 +76,7 @@ void Boss_Blast::initialize()
 	ObjectTag = object::Tag::monster_attack;
 	bAttacking = true;
 
-	Duration = 0.8f;
+	Duration = 0.4f;
 
 	bAttacking = true;
 
@@ -115,15 +115,15 @@ Event Boss_Blast::update(float dt)
 		_Event = Event::Die;
 	}
 
-
+	
 	return _Event;
 };
 
 void Boss_Blast::HitTile(RECT _rt)
 {
 	actor::HitTile(_rt);
-	IceEffectPlay();
-	bDie = true;
+	/*IceEffectPlay();
+	bDie = true;*/
 }
 
 void Boss_Blast::render(HDC hdc, vec camera_pos, vec size_factor)

@@ -97,7 +97,7 @@ void object_mgr::update()
 {
 	using namespace std;
 
-	float dt = Timer::instance().delta();
+	float dt = DeltaTime;
 
 	for (auto& [f, obj_list] : object_map)
 	{

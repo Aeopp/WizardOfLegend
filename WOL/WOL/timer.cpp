@@ -19,7 +19,7 @@ void Timer::update()
 	{
 		auto& [remain_time, function] = *event_iter;
 
-		remain_time -= delta();
+		remain_time -= DeltaTime;
 
 		if (remain_time < 0)
 		{
@@ -36,7 +36,7 @@ void Timer::update()
 	{
 		auto& [remain_time,default_time, function] = *event_iter;
 
-		remain_time -= delta();
+		remain_time -= DeltaTime;
 
 		if (remain_time < 0)
 		{
@@ -61,7 +61,7 @@ void Timer::update()
 	{
 		auto& [remain_time, function] = *event_iter;
 
-		remain_time -= delta();
+		remain_time -= DeltaTime;
 
 		if (remain_time < 0)
 		{
@@ -78,8 +78,8 @@ void Timer::update()
 	{
 		auto& [remain_time,TargetDT,CurrentDT, function] = *event_iter;
 
-		remain_time -= delta();
-		CurrentDT -= delta();
+		remain_time -= DeltaTime; 
+		CurrentDT -= DeltaTime;
 		if (remain_time < 0)
 		{
 			event_iter = rewhileDT_events.erase(event_iter);

@@ -30,7 +30,7 @@ void Scene_Start::update(float dt)
 
 	_Timer.update();
 
-	sound_mgr::instance().Frame(_Timer.delta());
+	sound_mgr::instance().Frame(DeltaTime);
 
 	object_mgr::instance().update();
 

@@ -4,7 +4,6 @@
 #include "game.h"
 #include "Color.h"
 #include "UISlot.h"
-#include "object_mgr.h"
 #include "Bmp_mgr.h"
 #include "Bmp.h"
 #include "Input_mgr.h"
@@ -27,43 +26,12 @@ void UIInventory::initialize()
 	_transform->_location = vec{ 400,380};
 	Scale = 0.85;
 
-	std::vector<std::tuple<std::wstring,std::wstring,ESkill>> IconKeyTable
-	{
-		{L"",L"NORMAL_ATTACK_EX",ESkill::Normal},
-		{L"",L"DASH_EX",ESkill::Dash},
-		{L"FIRE_DRAGON_ICON",L"FIRE_DRAGON_EX",ESkill::FIRE},
-		{L"ICE_BLAST_ICON",L"ICE_BLAST_EX",ESkill::BLAST},
-		{L"ICE_KRYSTAL_ICON",L"ICE_KRYSTAL_EX",ESkill::CRYSTAL},
-		{L"GAIA_ARMOR_ICON",L"GAIA_ARMOR_EX",ESkill::ARMOR},
-		{L"BOOMERANG_ICON",L"",ESkill::BOOMERANG}
-	};
-
-	for (int i = 0; i < IconKeyTable.size()-1; ++i)
-	{
-		SlotInfo _SlotInfo;
-		_SlotInfo.Location = vec{ 270 + 66* i,160 };
-		auto& [ImgKey, InfoKey, _ESkill] = IconKeyTable[i];
-
-		_SlotInfo.ImgKey = std::move(ImgKey);
-		_SlotInfo.InfoKey = std::move(InfoKey);
-		_SlotInfo._Skill = _ESkill;
-		SlotInfoMap[i] = std::move(_SlotInfo);
-	}
-	
-	// 마지막 창작스킬 부메랑 슬롯
-	int IDX = IconKeyTable.size() - 1;
-	SlotInfo _SlotInfo;
-	_SlotInfo.Location = vec{ 270 + 66 * (IDX-1)-2,224 };
-	auto& [ImgKey, InfoKey, _ESkill] = IconKeyTable[IDX];
-
-	_SlotInfo.ImgKey = std::move(ImgKey);
-	_SlotInfo.InfoKey = std::move(InfoKey);
-	_SlotInfo._Skill = _ESkill;
-	SlotInfoMap[IDX] = std::move(_SlotInfo);
-
-
-	SlotInfoMap[0].bAcquire = true;
-	SlotInfoMap[1].bAcquire = true;
+	////TODO DEBUG CODE Remove Plz
+	//SlotInfoMap[2].bAcquire = true;
+	//SlotInfoMap[3].bAcquire = true;
+	//SlotInfoMap[4].bAcquire = true;
+	//SlotInfoMap[5].bAcquire = true;
+	//SlotInfoMap[6].bAcquire = true;
 }
 
 void UIInventory::render(HDC hdc, vec camera_pos, vec size_factor)
@@ -72,7 +40,7 @@ void UIInventory::render(HDC hdc, vec camera_pos, vec size_factor)
 
 	UI::render(hdc, camera_pos, size_factor);
 
-	for (auto& [slotIdx,_SlotInfo]: SlotInfoMap)
+	for (auto& [slotIdx,_SlotInfo]: game::SlotInfoMap)
 	{
 		if (!_SlotInfo.bAcquire)continue;
 		vec DestLoc = _SlotInfo.Location;
@@ -88,8 +56,8 @@ void UIInventory::render(HDC hdc, vec camera_pos, vec size_factor)
 			0, 0, 52, 52, COLOR::MRGENTA());
 	}
 
-	if (!SlotInfoMap[CurrentInfoIdx].bAcquire)return;
-	vec DestLoc = SlotInfoMap[CurrentInfoIdx].Location;
+	if (!game::SlotInfoMap[CurrentInfoIdx].bAcquire)return;
+	vec DestLoc = game::SlotInfoMap[CurrentInfoIdx].Location;
 
 	DestLoc -= SlotInfo::SelectSize * 0.5;
 
@@ -100,11 +68,11 @@ void UIInventory::render(HDC hdc, vec camera_pos, vec size_factor)
 		SlotInfo::SelectSize.x, SlotInfo::SelectSize.y, CurrentSelectDC,
 		0, 0, 61, 61, COLOR::MRGENTA());
 
-	if (!SlotInfoMap[CurrentInfoIdx].bAcquire)return ;
+	if (!game::SlotInfoMap[CurrentInfoIdx].bAcquire)return ;
 
 	vec InfoDescLoc = vec{ 235,514 };
 	auto sp_CurrentInfoBmp = Bmp_mgr::instance().Find_Image_SP(
-		SlotInfoMap[CurrentInfoIdx].InfoKey);
+		game::SlotInfoMap[CurrentInfoIdx].InfoKey);
 
 	if (!sp_CurrentInfoBmp)return;
 	GdiTransparentBlt(hdc,InfoDescLoc.x,InfoDescLoc.y,
@@ -130,9 +98,9 @@ Event UIInventory::update(float dt)
 
 	vec MousePos = *oPos;
 
-	for (auto& [SlotIdx, _SlotInfo]  :SlotInfoMap)
+	for (auto& [SlotIdx, _SlotInfo]  : game::SlotInfoMap)
 	{
-		//if (!SlotInfoMap[SlotIdx].bAcquire)return Event::None;
+	
 		if (!_SlotInfo.bAcquire)return Event::None;
 
 		RECT _SlotRect = { _SlotInfo.Location.x - 24 ,
@@ -150,9 +118,9 @@ Event UIInventory::update(float dt)
 			{
 				if (ChangeCoolTime<0 && bSelect)
 				{
-					std::swap(SlotInfoMap[SlotIdx].ImgKey, SlotInfoMap[CurrentSelectIdx].ImgKey);
-					std::swap(SlotInfoMap[SlotIdx].InfoKey, SlotInfoMap[CurrentSelectIdx].InfoKey);
-					std::swap(SlotInfoMap[SlotIdx]._Skill, SlotInfoMap[CurrentSelectIdx]._Skill);
+					std::swap(game::SlotInfoMap[SlotIdx].ImgKey, game::SlotInfoMap[CurrentSelectIdx].ImgKey);
+					std::swap(game::SlotInfoMap[SlotIdx].InfoKey, game::SlotInfoMap[CurrentSelectIdx].InfoKey);
+					std::swap(game::SlotInfoMap[SlotIdx]._Skill, game::SlotInfoMap[CurrentSelectIdx]._Skill);
 					SOUNDPLAY("CHANGE_SKILL", 1.f, false);
 
 					ChangeCoolTime = 0.1f;

@@ -501,10 +501,10 @@ void Player::Camera_Shake(float force,vec dir,float duration)
 
 void Player::BindingSkillCheckCast(int SlotIdx)
 {
-	if (!UIInventory::SlotInfoMap[SlotIdx].bAcquire)return;
+	if (!game::SlotInfoMap[SlotIdx].bAcquire)return;
 	if (!_transform)return;
 	
-	ESkill _Skill = UIInventory::SlotInfoMap[SlotIdx]._Skill;
+	ESkill _Skill = game::SlotInfoMap[SlotIdx]._Skill;
 
 	InputDirSpriteChange(_transform->_dir);
 	
@@ -595,16 +595,17 @@ void Player::player_check(float dt)
 	}
 	if (_Input.Key_Down('T'))
 	{
-
-
 		BindingSkillCheckCast(6);
 	}
-	if (_Input.Key_Down('Z'))
+	//if (_Input.Key_Down('Z'))
+	//{
+	//	SkillRotBoomerang();
+	//}
+
+	if (_Input.Key_Down('0'))
 	{
-		SkillRotBoomerang();
+		Scene_mgr::instance().Scene_Change(ESceneID::EMIDDLE_BOSS);
 	}
-
-
 	if (_Input.Key_Down(VK_SPACE))
 	{
 		Dash(_player_info->dash_speed);

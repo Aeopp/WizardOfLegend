@@ -27,11 +27,11 @@ void BossFireDragon::initialize()
 	sp_collision->PushForce = 10.f;
 	sp_collision->bCollision = true;
 	sp_collision->bHitEffect = true;
-	sp_collision->bTileHitEffect = true;
+	sp_collision->bTileHitEffect = false;
 	sp_collision->bCollision = true;
 
 
-	Duration = 3.f;
+	Duration = 1.f;
 
 	PaintSizeX = 180;
 	PaintSizeY = 180;
@@ -193,19 +193,19 @@ void BossFireDragon::HitTile(RECT TileRt)
 {
 	object::HitTile(TileRt);
 
-	collision_mgr::instance().HitEffectPush(_transform->_location,
-		0.5f);
+	//collision_mgr::instance().HitEffectPush(_transform->_location,
+	//	0.5f);
 
-	RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
+	//RAND_SOUNDPLAY("WALL_HITTED_FIREDRAGON", { 0,2 }, 1.f, false);
 
-	auto sp_collision = _collision_component.lock();
-	if (!sp_collision)return;
-	bAttacking = false;
-	sp_collision->bSlide = false;
-	sp_collision->bCollision = false;
+	//auto sp_collision = _collision_component.lock();
+	//if (!sp_collision)return;
+	//bAttacking = false;
+	//sp_collision->bSlide = false;
+	//sp_collision->bCollision = false;
 
-	bWallHited = true;
-	Duration = ParticleLocationUpdateDelta* ParticleMaxNum + 0.05f;
+	//bWallHited = true;
+	//Duration = ParticleLocationUpdateDelta* ParticleMaxNum + 0.05f;
 }
 
 void BossFireDragon::SetUp(vec Location, vec Dir)

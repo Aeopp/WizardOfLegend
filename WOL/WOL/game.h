@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "singleton_interface.h"
+#include "UIInventory.h"
 
 class game : public singleton_interface<game>
 {
@@ -17,7 +18,8 @@ public:
 
 	int	print_cul_obj{};
 	int print_render_obj{};
-
+	
+	static inline std::unordered_map<uint8_t, SlotInfo> SlotInfoMap{};
 	std::shared_ptr<class player_info> _player_info{};
 
 	static inline RECT client_rect{};
@@ -40,6 +42,8 @@ public:
 	static inline HDC hDC;
 	static inline HWND hWnd{};
 	static inline  HDC CurrentHdc{};
+private:
+	void SlotDataInit();
 };
 
 

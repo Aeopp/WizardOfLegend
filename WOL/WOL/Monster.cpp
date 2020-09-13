@@ -81,6 +81,9 @@ void Monster::initialize()
 	ObjectTag = object::Tag::monster;
 
 	InitTime = 3.0f;
+
+	_EnemyInfo.HP = 10;
+	
 };
 
 Event Monster::update(float dt)

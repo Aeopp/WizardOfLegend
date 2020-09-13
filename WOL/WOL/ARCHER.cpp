@@ -22,7 +22,7 @@ void ARCHER::initialize()
 	LeftAnimKey = L"ARCHER_LEFT";
 	RightAnimKey = L"ARCHER_RIGHT";
 
-	_EnemyInfo.HP = 200.f;
+	
 	_EnemyInfo.DeadTimer = 1.5f;
 	_EnemyInfo.AttackRange = { 20,30 };
 	_EnemyInfo.AttackStartDistance = 600.f;
@@ -42,12 +42,14 @@ void ARCHER::initialize()
 	NormalAttack->_owner = _ptr;
 	NormalAttack->wp_Target = _AttackTarget;
 
-	EscapeRamainTick = EscapeDuration = 1.3f;
+	EscapeRamainTick = 0;
+	  EscapeDuration = 1.3f;
 	_speed = 400.f;
 
 	// 필요한 정보들 미리 세팅 끝마치고호출 하기 바람
 	Monster::initialize();
-
+	
+	_render_component->ChangeAnim(EAnimState::Idle, 1.f, EAnimState::Idle);
 }
 
 Event ARCHER::update(float dt)
@@ -144,7 +146,7 @@ Event ARCHER::update(float dt)
 		}
 		else if (CurrentFireCoolTime > 0)
 		{
-			_render_component->ChangeAnim(EAnimState::Attack, 0.3f);
+			_render_component->ChangeAnim(EAnimState::Idle, 0.3f);
 			_Shadow.CurrentShadowState = EShadowState::NORMAL; 		
 			SetArrowLineRender(false);
 			 

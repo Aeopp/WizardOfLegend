@@ -58,7 +58,7 @@ public:
     void AttackReady();
     void IdleAction();
     bool bAttackEnd = false;
-    int HP = 200;
+    int HP;
 
 };
 
