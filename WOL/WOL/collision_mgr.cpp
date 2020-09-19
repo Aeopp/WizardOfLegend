@@ -146,10 +146,14 @@ void collision_mgr::load_collision(std::wstring filename= StageFileName)
 
 		_Tile_Collision_List.emplace_back(x,y);
 	}
-
-	std::wstringstream wss;
-	wss << L"맵 충돌 데이터를 로딩했습니다. \n " << DefaultMapCollisionPath << filename;
-	MessageBox(game::hWnd, wss.str().c_str(), L"Collision Data Load", MB_OK);
+	
+#ifdef _DEBUG
+	{
+		std::wstringstream wss;
+		wss << L"맵 충돌 데이터를 로딩했습니다. \n " << DefaultMapCollisionPath << filename;
+		MessageBox(game::hWnd, wss.str().c_str(), L"Collision Data Load", MB_OK);
+	}
+#endif
 };
 
 std::weak_ptr< collision_component>

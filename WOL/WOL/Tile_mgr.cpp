@@ -151,10 +151,16 @@ void Tile_mgr::Load_Tile(std::wstring filename)
 		_Tile_list.push_back(std::move(_Temp));
 	}
 
-	std::wstringstream
-		wss;
-	wss <<  L"타일 데이터를 로딩했습니다. \n " << DefaultTilePath << filename;
-	MessageBox(game::hWnd, wss.str().c_str(), L"Tile Data Load",  MB_OK);
+#ifdef _DEBUG
+	{
+		std::wstringstream
+			wss;
+		wss << L"타일 데이터를 로딩했습니다. \n " << DefaultTilePath << filename;
+		MessageBox(game::hWnd, wss.str().c_str(), L"Tile Data Load", MB_OK);
+	}
+#endif // __DEBUG
+
+	
 }
 void Tile_mgr::Erase_Tile(std::pair<int, int> WorldIndex)
 {

@@ -88,7 +88,7 @@ void MIDDLE_BOSS::initialize()
 	auto HPBar = object_mgr::instance().insert_object<UIBossHPBar>();
 	wp_UIBossHPBar = HPBar;
 	sp_MyInfo = std::make_shared<BossInfo>();
-	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 2000;
+	sp_MyInfo->CurrentHP = sp_MyInfo->MAXHP = 3000;
 	HPBar->current = sp_MyInfo->CurrentHP;
 	HPBar->goal_time = 1.f;
 	HPBar->target = HPBar->max = sp_MyInfo->MAXHP;

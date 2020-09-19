@@ -54,7 +54,7 @@ void Scene_Start::initialize()
 	object_mgr::instance().initialize();
 
 	// TOOD :: Scene Dependent Init 
-	{
+	{	sound_mgr::instance().Stop("MAIN_MENU_BGM");
 		sound_mgr::instance().Play("MAIN_MENU_BGM", true, 1.f);
 		
 

@@ -1373,7 +1373,6 @@ void Player::Player_Move(float dt)
 {
 	if (!_player_info)return;
 	if (_player_info->bAttack)return;
-	if (_player_info->bHit)return;
 	
 	_player_info->bMove = false;
 	if (!_player_info->bDash)

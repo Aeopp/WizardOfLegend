@@ -27,7 +27,7 @@ public:
     std::list <std::tuple<float, float, std::function<bool()>>> loop_events;
     //          전체 수행시간 , 각 수행당 시간 격차 , 함수
     std::list <std::tuple<float, float, float,std::function<void()>>> rewhileDT_events;
-
+    
     int max_fps{1000};
     int fps{ 65 };
 

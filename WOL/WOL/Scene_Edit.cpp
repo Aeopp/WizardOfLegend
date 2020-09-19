@@ -134,7 +134,7 @@ void Scene_Edit::initialize()
 
 	Tile_mgr::instance().initialize();
 
-
+	sound_mgr::instance().Stop("MAIN_MENU_BGM");
 	// 이미지들 대신 이니셜라이즈
 	
 }
