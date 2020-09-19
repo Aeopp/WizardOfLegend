@@ -3,7 +3,6 @@
 # WizardOfLegend
 * What is this project ? 
 	* 프로젝트 이름은 WizardOfLegend 이며 스팀플랫폼으로 출시한 인디게임을 모작했습니다.
-	* 제작기간은 2020.8.31 ~ 2020.9.7 까지 입니다.
 	* 모작한 게임에 대한 정보는 [여기](https://store.steampowered.com/app/445980/Wizard_of_Legend/) 에서 참고하실 수 있습니다.
 	* visual studio 2019 , window api , git , paint.net  
 	
