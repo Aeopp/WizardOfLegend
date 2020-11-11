@@ -12,6 +12,7 @@ public:
 	void update(float dt);
 	void initialize() ;
 	void release() ;
+	
 private:
 	std::shared_ptr<class Scene> sp_scene{};
 	ESceneID _PreScene{ ESceneID::ENone };

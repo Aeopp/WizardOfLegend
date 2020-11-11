@@ -5,7 +5,6 @@
 #include "event.h"
 #include "objectUniqueID.h"
 
-
 class  object abstract 
 {
 public:

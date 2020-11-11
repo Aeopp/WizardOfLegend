@@ -89,8 +89,6 @@ void object_mgr::render(HDC hdc,std::pair<float,float> size_factor)
 			}
 		}
 	}
-
-
 };
 
 void object_mgr::update()

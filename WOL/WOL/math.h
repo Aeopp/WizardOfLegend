@@ -193,8 +193,6 @@ Ty math::Rand_Normal(std::pair<Ty, Ty> range)
 		std::uniform_int_distribution<Ty> dis(range.first, range.second);
 		return dis(gen);
 	}
-
-	
 }
 
 template<typename Ty>

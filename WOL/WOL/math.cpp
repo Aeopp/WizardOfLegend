@@ -190,7 +190,8 @@ vec::vec(float _x, float _y) : x{ _x }, y{ _y }
 
 vec vec::make_vec_from_dir(const float degree)
 {
-	return vec(std::cosf(math::degree_to_radian(degree)), std::sinf(math::degree_to_radian(degree)));
+	return vec(std::cosf(math::degree_to_radian(degree)), 
+		std::sinf(math::degree_to_radian(degree)));
 }
 
 vec& vec::operator-=(const vec& _rhs)
